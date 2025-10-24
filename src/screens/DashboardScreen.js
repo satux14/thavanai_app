@@ -9,8 +9,9 @@ import {
   Alert,
   Platform,
   ImageBackground,
+  Modal,
 } from 'react-native';
-import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries } from '../utils/storage';
+import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook } from '../utils/storage';
 import { getCurrentUser, logoutUser } from '../utils/auth';
 import jsPDF from 'jspdf';
 import LanguageToggle from '../components/LanguageToggle';
@@ -28,6 +29,9 @@ export default function DashboardScreen({ navigation }) {
   const [sortBy, setSortBy] = useState('updated'); // 'updated', 'name', 'amount', 'date'
   const [showFilters, setShowFilters] = useState(false);
   const [bookStatusFilter, setBookStatusFilter] = useState('active'); // 'active', 'closed', 'all'
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [bookToShare, setBookToShare] = useState(null);
+  const [shareUsername, setShareUsername] = useState('');
 
   useEffect(() => {
     loadBooks();
@@ -291,6 +295,51 @@ export default function DashboardScreen({ navigation }) {
         ]
       );
     }
+  };
+
+  const handleShareBook = (book) => {
+    setBookToShare(book);
+    setShareUsername('');
+    setShowShareModal(true);
+  };
+
+  const handleShareConfirm = async () => {
+    if (!shareUsername.trim()) {
+      if (Platform.OS === 'web') {
+        alert(t('enterUsername'));
+      } else {
+        Alert.alert(t('error'), t('enterUsername'));
+      }
+      return;
+    }
+
+    try {
+      await shareBook(bookToShare.id, shareUsername.trim());
+      setShowShareModal(false);
+      setShareUsername('');
+      setBookToShare(null);
+      
+      if (Platform.OS === 'web') {
+        alert(t('bookShared'));
+      } else {
+        Alert.alert(t('success'), t('bookShared'));
+      }
+      
+      loadBooks();
+    } catch (error) {
+      console.error('Error sharing book:', error);
+      if (Platform.OS === 'web') {
+        alert(t('shareFailed') + ': ' + error.message);
+      } else {
+        Alert.alert(t('error'), t('shareFailed') + ': ' + error.message);
+      }
+    }
+  };
+
+  const handleShareCancel = () => {
+    setShowShareModal(false);
+    setShareUsername('');
+    setBookToShare(null);
   };
 
   const handleExportBook = async (book) => {
@@ -750,6 +799,16 @@ export default function DashboardScreen({ navigation }) {
                   <Text style={styles.actionButtonText}>✏️ {t('edit')}</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.shareButton]}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleShareBook(book);
+                  }}
+                >
+                  <Text style={styles.actionButtonText}>🤝 {t('share')}</Text>
+                </TouchableOpacity>
+
                 {book.status === 'closed' ? (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.reopenButton]}
@@ -923,6 +982,54 @@ export default function DashboardScreen({ navigation }) {
           <Text style={styles.createButtonText}>{t('createNewBook')}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Share Book Modal */}
+      <Modal
+        visible={showShareModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleShareCancel}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{t('shareBook')}</Text>
+            <Text style={styles.modalSubtitle}>
+              {t('shareBookDesc', { bookName: bookToShare?.name || '' })}
+            </Text>
+            
+            <View style={styles.modalInputContainer}>
+              <Text style={styles.modalLabel}>{t('borrowerUsername')}</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={shareUsername}
+                onChangeText={setShareUsername}
+                placeholder={t('enterUsername')}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoFocus={true}
+              />
+              <Text style={styles.modalHint}>
+                {t('shareBookHint')}
+              </Text>
+            </View>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={handleShareCancel}
+              >
+                <Text style={styles.modalCancelButtonText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalConfirmButton]}
+                onPress={handleShareConfirm}
+              >
+                <Text style={styles.modalConfirmButtonText}>{t('shareNow')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1401,6 +1508,9 @@ const styles = StyleSheet.create({
   editButton: {
     backgroundColor: '#2196F3',
   },
+  shareButton: {
+    backgroundColor: '#FF9800',
+  },
   closeButton: {
     backgroundColor: '#607D8B',
   },
@@ -1421,6 +1531,86 @@ const styles = StyleSheet.create({
     color: '#f44336',
     fontWeight: 'bold',
     fontSize: 12,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+  },
+  modalInputContainer: {
+    marginBottom: 24,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
+  },
+  modalHint: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: '#f5f5f5',
+  },
+  modalCancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalConfirmButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalConfirmButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   createButtonContainer: {
     backgroundColor: '#fff',

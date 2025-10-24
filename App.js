@@ -1,9 +1,4 @@
-// Polyfills must be imported first
-import 'react-native-get-random-values';
-import 'react-native-url-polyfill/auto';
-import { Buffer } from 'buffer';
-global.Buffer = Buffer;
-
+// Polyfills are loaded in index.js before this file is imported
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';

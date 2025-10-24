@@ -1,11 +1,16 @@
 import { getDatabase, getAllUsers, saveAllUsers, getNextUserId } from './database';
-import CryptoJS from 'crypto-js';
+import * as Crypto from 'expo-crypto';
 
 /**
  * Hash a password using SHA-256
+ * Using expo-crypto which is React Native native (no encoding issues)
  */
-export const hashPassword = (password) => {
-  return CryptoJS.SHA256(password).toString();
+export const hashPassword = async (password) => {
+  const hash = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    password
+  );
+  return hash;
 };
 
 /**
@@ -17,7 +22,7 @@ export const registerUser = async (username, password, fullName, preferredLangua
     getDatabase(); // Check if initialized
     
     const users = await getAllUsers();
-    const hashedPassword = hashPassword(password);
+    const hashedPassword = await hashPassword(password);
     const createdAt = new Date().toISOString();
 
     // Check if username already exists
@@ -72,7 +77,7 @@ export const loginUser = async (username, password) => {
     const users = await getAllUsers();
     console.log('Total users in database:', users.length);
     
-    const hashedPassword = hashPassword(password);
+    const hashedPassword = await hashPassword(password);
 
     const user = users.find(u => u.username === username && u.password === hashedPassword);
 
@@ -126,8 +131,9 @@ export const getCurrentUser = async () => {
 /**
  * Verify a password against a hash
  */
-export const verifyPassword = (password, hashedPassword) => {
-  return hashPassword(password) === hashedPassword;
+export const verifyPassword = async (password, hashedPassword) => {
+  const hash = await hashPassword(password);
+  return hash === hashedPassword;
 };
 
 /**

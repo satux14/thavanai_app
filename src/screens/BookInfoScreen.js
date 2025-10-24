@@ -8,10 +8,13 @@ import {
   ScrollView,
   Alert,
   Platform,
+  Image,
+  Modal,
 } from 'react-native';
 import { saveBook, getBook, updateBook } from '../utils/storage';
 import DatePicker from '../components/DatePicker';
 import { useLanguage } from '../utils/i18n';
+import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
 
 export default function BookInfoScreen({ navigation, route }) {
   const { t } = useLanguage();
@@ -28,13 +31,12 @@ export default function BookInfoScreen({ navigation, route }) {
     backgroundImage: null,
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [showImageGallery, setShowImageGallery] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('nature');
 
   // Auto-calculate end date when start date changes
   const handleStartDateChange = (date) => {
-    setBookInfo({ ...bookInfo, startDate: date });
-    
-    // Auto-fill end date (100 days from start date)
-    if (date && !isEditing) {
+    if (date) {
       const startDate = new Date(date);
       const endDate = new Date(startDate);
       endDate.setDate(startDate.getDate() + 100);
@@ -42,12 +44,18 @@ export default function BookInfoScreen({ navigation, route }) {
       // Format as YYYY-MM-DD
       const formattedEndDate = endDate.toISOString().split('T')[0];
       setBookInfo(prev => ({ ...prev, startDate: date, endDate: formattedEndDate }));
+    } else {
+      setBookInfo({ ...bookInfo, startDate: date });
     }
   };
 
   useEffect(() => {
     if (bookId) {
       loadBookInfo();
+    } else {
+      // Set default background image for new books
+      const defaultImage = getDefaultBackgroundImage();
+      setBookInfo(prev => ({ ...prev, backgroundImage: defaultImage.uri }));
     }
   }, [bookId]);
 
@@ -80,7 +88,15 @@ export default function BookInfoScreen({ navigation, route }) {
     if (isEditing && bookId) {
       // Update existing book
       try {
+        console.log('Updating book with data:', {
+          bookId,
+          name: bookInfo.name,
+          startDate: bookInfo.startDate,
+          endDate: bookInfo.endDate,
+          loanAmount: bookInfo.loanAmount
+        });
         await updateBook(bookId, bookInfo);
+        console.log('Book updated successfully');
         if (Platform.OS === 'web') {
           alert('Book information updated successfully');
           navigation.goBack();
@@ -93,6 +109,7 @@ export default function BookInfoScreen({ navigation, route }) {
           ]);
         }
       } catch (error) {
+        console.error('Error updating book:', error);
         if (Platform.OS === 'web') {
           alert('Failed to update book information: ' + error.message);
         } else {
@@ -114,6 +131,17 @@ export default function BookInfoScreen({ navigation, route }) {
 
   const handleCancel = () => {
     navigation.goBack();
+  };
+
+  const handleSelectImage = (image) => {
+    if (image.uri) {
+      // Nature or pets image
+      setBookInfo({ ...bookInfo, backgroundImage: image.uri });
+    } else if (image.color) {
+      // Pattern (just a color)
+      setBookInfo({ ...bookInfo, backgroundColor: image.color, backgroundImage: null });
+    }
+    setShowImageGallery(false);
   };
 
   return (
@@ -230,15 +258,28 @@ export default function BookInfoScreen({ navigation, route }) {
 
           {/* Background Image */}
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>பின்னணி படம் (Background Image)</Text>
+            <Text style={styles.label}>{t('backgroundImage')}</Text>
+            
+            {/* Gallery Button */}
+            <TouchableOpacity
+              style={styles.galleryButton}
+              onPress={() => setShowImageGallery(true)}
+            >
+              <Text style={styles.galleryButtonText}>🖼️ {t('selectFromGallery')}</Text>
+            </TouchableOpacity>
+
             {bookInfo.backgroundImage ? (
               <View style={styles.imagePreviewContainer}>
-                <Text style={styles.imagePreviewText}>✓ Image Selected</Text>
+                <Image 
+                  source={{ uri: bookInfo.backgroundImage }}
+                  style={styles.imagePreview}
+                  resizeMode="cover"
+                />
                 <TouchableOpacity
                   style={styles.clearImageButton}
                   onPress={() => setBookInfo({ ...bookInfo, backgroundImage: null })}
                 >
-                  <Text style={styles.clearImageText}>Clear</Text>
+                  <Text style={styles.clearImageText}>{t('clear')}</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -286,6 +327,83 @@ export default function BookInfoScreen({ navigation, route }) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Background Image Gallery Modal */}
+      <Modal
+        visible={showImageGallery}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowImageGallery(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('selectBackground')}</Text>
+              <TouchableOpacity onPress={() => setShowImageGallery(false)}>
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Category Tabs */}
+            <View style={styles.categoryTabs}>
+              {['nature', 'pets', 'gods', 'patterns'].map((category) => (
+                <TouchableOpacity
+                  key={category}
+                  style={[
+                    styles.categoryTab,
+                    selectedCategory === category && styles.categoryTabActive,
+                  ]}
+                  onPress={() => setSelectedCategory(category)}
+                >
+                  <Text
+                    style={[
+                      styles.categoryTabText,
+                      selectedCategory === category && styles.categoryTabTextActive,
+                    ]}
+                  >
+                    {category === 'nature' 
+                      ? '🌿 Nature' 
+                      : category === 'pets' 
+                      ? '🐾 Pets' 
+                      : category === 'gods'
+                      ? '🙏 Gods'
+                      : '🎨 Colors'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Image Grid */}
+            <ScrollView style={styles.imageGrid}>
+              <View style={styles.imageGridContent}>
+                {BACKGROUND_IMAGES[selectedCategory]?.map((image) => (
+                  <TouchableOpacity
+                    key={image.id}
+                    style={styles.imageOption}
+                    onPress={() => handleSelectImage(image)}
+                  >
+                    {image.uri ? (
+                      <Image
+                        source={{ uri: image.thumbnail || image.uri }}
+                        style={styles.imageOptionPreview}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles.imageOptionPreview,
+                          { backgroundColor: image.color },
+                        ]}
+                      />
+                    )}
+                    <Text style={styles.imageOptionName}>{image.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -471,5 +589,120 @@ const styles = StyleSheet.create({
     color: '#999',
     fontSize: 14,
     fontStyle: 'italic',
+  },
+  galleryButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  galleryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    width: '100%',
+    maxWidth: 600,
+    maxHeight: '90%',
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    backgroundColor: '#f5f5f5',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  modalCloseButton: {
+    fontSize: 28,
+    color: '#666',
+    fontWeight: 'bold',
+  },
+  categoryTabs: {
+    flexDirection: 'row',
+    padding: 8,
+    backgroundColor: '#f9f9f9',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  categoryTab: {
+    flex: 1,
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 3,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  categoryTabActive: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
+  },
+  categoryTabText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666',
+  },
+  categoryTabTextActive: {
+    color: '#fff',
+  },
+  imageGrid: {
+    flex: 1,
+  },
+  imageGridContent: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 15,
+    gap: 15,
+  },
+  imageOption: {
+    width: '30%',
+    minWidth: 120,
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  imageOptionPreview: {
+    width: '100%',
+    height: 120,
+    borderRadius: 10,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+  },
+  imageOptionName: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
   },
 });

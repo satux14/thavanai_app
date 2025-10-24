@@ -61,6 +61,12 @@ const translations = {
     sharedWithMe: 'Shared with Me',
     shared: 'Shared',
     share: 'Share',
+    asOwner: 'Owner',
+    asBorrower: 'Borrower',
+    noOwnedBooks: 'No Books as Owner',
+    noOwnedBooksDesc: 'Create your first book to lend money',
+    noSharedBooks: 'No Shared Books',
+    noSharedBooksDesc: 'No books have been shared with you yet',
     shareBook: 'Share Book',
     shareBookDesc: 'Share "{bookName}" with a borrower',
     borrowerUsername: 'Borrower Username',
@@ -69,6 +75,16 @@ const translations = {
     shareNow: 'Share Now',
     bookShared: 'Book shared successfully!',
     shareFailed: 'Failed to share book',
+    viewShared: 'View Shared',
+    sharedWith: 'Shared With',
+    sharedWithDesc: 'Users who have access to "{bookName}"',
+    noSharedUsers: 'This book is not shared with anyone yet',
+    sharedOn: 'Shared on',
+    unshare: 'Unshare',
+    confirmUnshare: 'Remove access for {username}?',
+    bookUnshared: 'Book access removed successfully!',
+    unshareFailed: 'Failed to remove access',
+    failedToLoadSharedUsers: 'Failed to load shared users',
     searchPlaceholder: 'Search by name, D.L.No, father name...',
     sortBy: 'Sort by:',
     latest: 'Latest',
@@ -103,8 +119,10 @@ const translations = {
     fatherName: "Father Name",
     address: 'Address',
     loanAmountRs: 'Loan Amount Rs.',
-    backgroundColor: 'Background Color',
     backgroundImage: 'Background Image',
+    selectFromGallery: 'Select from Gallery',
+    selectBackground: 'Select Background',
+    backgroundColor: 'Background Color',
     imageSelected: 'Image Selected',
     clearImage: 'Clear',
     imageUploadWebOnly: 'Image upload (web only for now)',
@@ -214,6 +232,12 @@ const translations = {
     sharedWithMe: 'என்னுடன் பகிரப்பட்டவை',
     shared: 'பகிரப்பட்டது',
     share: 'பகிர்',
+    asOwner: 'உரிமையாளர்',
+    asBorrower: 'கடன் வாங்குபவர்',
+    noOwnedBooks: 'உரிமையாளராக புத்தகங்கள் இல்லை',
+    noOwnedBooksDesc: 'பணத்தை கடனாக கொடுக்க உங்கள் முதல் புத்தகத்தை உருவாக்கவும்',
+    noSharedBooks: 'பகிரப்பட்ட புத்தகங்கள் இல்லை',
+    noSharedBooksDesc: 'உங்களுடன் இதுவரை எந்த புத்தகங்களும் பகிரப்படவில்லை',
     shareBook: 'புத்தகத்தை பகிர்',
     shareBookDesc: '"{bookName}" ஐ கடன் வாங்குபவருடன் பகிர்',
     borrowerUsername: 'கடன் வாங்குபவர் பயனர்பெயர்',
@@ -222,6 +246,16 @@ const translations = {
     shareNow: 'இப்போது பகிர்',
     bookShared: 'புத்தகம் வெற்றிகரமாக பகிரப்பட்டது!',
     shareFailed: 'புத்தகத்தை பகிர தவறிவிட்டது',
+    viewShared: 'பகிரப்பட்டவர்களைக் காண்க',
+    sharedWith: 'பகிரப்பட்டவர்கள்',
+    sharedWithDesc: '"{bookName}" புத்தகத்திற்கான அணுகல் உள்ள பயனர்கள்',
+    noSharedUsers: 'இந்த புத்தகம் இதுவரை யாருடனும் பகிரப்படவில்லை',
+    sharedOn: 'பகிரப்பட்ட தேதி',
+    unshare: 'பகிர்வை நீக்கு',
+    confirmUnshare: '{username} இன் அணுகலை நீக்கவா?',
+    bookUnshared: 'புத்தக அணுகல் வெற்றிகரமாக நீக்கப்பட்டது!',
+    unshareFailed: 'அணுகலை நீக்க முடியவில்லை',
+    failedToLoadSharedUsers: 'பகிரப்பட்ட பயனர்களை ஏற்ற முடியவில்லை',
     searchPlaceholder: 'பெயர், D.L.எண், தந்தை பெயர் மூலம் தேடு...',
     sortBy: 'வரிசைப்படுத்து:',
     latest: 'சமீபத்திய',
@@ -256,8 +290,10 @@ const translations = {
     fatherName: 'தந்தை பெயர்',
     address: 'முகவரி',
     loanAmountRs: 'கடன் தொகை ரூ.',
-    backgroundColor: 'பின்னணி நிறம்',
     backgroundImage: 'பின்னணி படம்',
+    selectFromGallery: 'கேலரியிலிருந்து தேர்ந்தெடு',
+    selectBackground: 'பின்னணியைத் தேர்ந்தெடு',
+    backgroundColor: 'பின்னணி நிறம்',
     imageSelected: '✓ படம் தேர்ந்தெடுக்கப்பட்டது',
     clearImage: 'அழி',
     imageUploadWebOnly: 'படப் பதிவேற்றம் (இப்போது வெப் மட்டும்)',
@@ -378,17 +414,23 @@ export const useLanguage = () => {
 
 // Helper function to format date as dd-mm-yyyy
 export const formatDate = (dateString) => {
-  if (!dateString) return '';
+  if (!dateString) return 'N/A';
   
   try {
     const date = new Date(dateString);
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'N/A';
+    }
+    
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     
     return `${day}-${month}-${year}`;
   } catch (error) {
-    return dateString;
+    return 'N/A';
   }
 };
 

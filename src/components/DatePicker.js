@@ -11,13 +11,15 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function DatePicker({ label, value, onChange }) {
   const [show, setShow] = useState(false);
-  const [date, setDate] = useState(value ? new Date(value.split('/').reverse().join('-')) : new Date());
+  // Value is now in yyyy-mm-dd format, can be parsed directly
+  const [date, setDate] = useState(value ? new Date(value) : new Date());
 
   const formatDate = (dateObj) => {
     const day = String(dateObj.getDate()).padStart(2, '0');
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
     const year = dateObj.getFullYear();
-    return `${day}/${month}/${year}`;
+    // Return in yyyy-mm-dd format for proper storage and parsing
+    return `${year}-${month}-${day}`;
   };
 
   const handleDateChange = (event, selectedDate) => {
@@ -46,11 +48,11 @@ export default function DatePicker({ label, value, onChange }) {
         <Text style={styles.label}>{label}</Text>
         <input
           type="date"
-          value={value ? value.split('/').reverse().join('-') : ''}
+          value={value || ''}
           onChange={(e) => {
             if (e.target.value) {
-              const selectedDate = new Date(e.target.value);
-              onChange(formatDate(selectedDate));
+              // e.target.value is already in yyyy-mm-dd format
+              onChange(e.target.value);
             }
           }}
           style={{
@@ -67,13 +69,27 @@ export default function DatePicker({ label, value, onChange }) {
     );
   }
 
+  // Helper to display date in dd-mm-yyyy format
+  const displayDate = (dateStr) => {
+    if (!dateStr) return 'Select Date';
+    try {
+      const d = new Date(dateStr);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}-${month}-${year}`;
+    } catch {
+      return dateStr;
+    }
+  };
+
   // For iOS and Android
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TouchableOpacity style={styles.dateButton} onPress={() => setShow(true)}>
         <Text style={styles.dateText}>
-          {value || 'Select Date'}
+          {displayDate(value)}
         </Text>
         <Text style={styles.calendarIcon}>📅</Text>
       </TouchableOpacity>

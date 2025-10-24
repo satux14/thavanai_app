@@ -81,9 +81,7 @@ function AppNavigator() {
           name="Dashboard"
           component={DashboardScreen}
           options={{
-            title: t('appNameTamil'),
-            headerTitleAlign: 'center',
-            headerLeft: () => null, // Remove back button on dashboard
+            headerShown: false, // Hide header to save space - Dashboard has its own custom header
           }}
         />
         <Stack.Screen

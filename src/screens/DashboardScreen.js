@@ -11,14 +11,14 @@ import {
   ImageBackground,
   Modal,
 } from 'react-native';
-import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook } from '../utils/storage';
+import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook, getBookShares, unshareBook } from '../utils/storage';
 import { getCurrentUser, logoutUser } from '../utils/auth';
 import jsPDF from 'jspdf';
 import LanguageToggle from '../components/LanguageToggle';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 export default function DashboardScreen({ navigation }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [books, setBooks] = useState([]);
   const [ownedBooks, setOwnedBooks] = useState([]);
   const [sharedBooks, setSharedBooks] = useState([]);
@@ -29,9 +29,13 @@ export default function DashboardScreen({ navigation }) {
   const [sortBy, setSortBy] = useState('updated'); // 'updated', 'name', 'amount', 'date'
   const [showFilters, setShowFilters] = useState(false);
   const [bookStatusFilter, setBookStatusFilter] = useState('active'); // 'active', 'closed', 'all'
+  const [viewMode, setViewMode] = useState('owner'); // 'owner' or 'borrower'
   const [showShareModal, setShowShareModal] = useState(false);
   const [bookToShare, setBookToShare] = useState(null);
   const [shareUsername, setShareUsername] = useState('');
+  const [showSharedUsersModal, setShowSharedUsersModal] = useState(false);
+  const [sharedUsers, setSharedUsers] = useState([]);
+  const [bookToViewShares, setBookToViewShares] = useState(null);
 
   useEffect(() => {
     loadBooks();
@@ -40,7 +44,9 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      console.log('Dashboard focused - reloading books...');
       loadBooks();
+      loadCurrentUser();
     });
     return unsubscribe;
   }, [navigation]);
@@ -79,14 +85,33 @@ export default function DashboardScreen({ navigation }) {
     );
     
     // Separate owned and shared books
-    const owned = booksWithBalance.filter(book => book.ownerId === user.id);
-    const shared = booksWithBalance.filter(book => book.isShared && book.ownerId !== user.id);
+    const owned = booksWithBalance.filter(book => book.isOwned === true);
+    const shared = booksWithBalance.filter(book => book.isShared === true);
     
     setBooks(booksWithBalance);
     setOwnedBooks(owned);
     setSharedBooks(shared);
     
-    console.log('Owned books:', owned.length, 'Shared books:', shared.length);
+    // Auto-switch to borrower view if no owner books but has shared books
+    if (owned.length === 0 && shared.length > 0) {
+      setViewMode('borrower');
+    } else {
+      // Default to owner view
+      setViewMode('owner');
+    }
+    
+    console.log('Total books:', booksWithBalance.length);
+    console.log('Owned books:', owned.length);
+    console.log('Shared books:', shared.length);
+    
+    // Debug: Log book dates
+    if (booksWithBalance.length > 0) {
+      console.log('First book dates:', {
+        name: booksWithBalance[0].name,
+        startDate: booksWithBalance[0].startDate,
+        endDate: booksWithBalance[0].endDate
+      });
+    }
   };
 
   const filterAndSortBooks = () => {
@@ -342,6 +367,65 @@ export default function DashboardScreen({ navigation }) {
     setBookToShare(null);
   };
 
+  const handleViewSharedUsers = async (book) => {
+    setBookToViewShares(book);
+    try {
+      const shares = await getBookShares(book.id);
+      setSharedUsers(shares);
+      setShowSharedUsersModal(true);
+    } catch (error) {
+      console.error('Error loading shared users:', error);
+      if (Platform.OS === 'web') {
+        alert(t('failedToLoadSharedUsers'));
+      } else {
+        Alert.alert(t('error'), t('failedToLoadSharedUsers'));
+      }
+    }
+  };
+
+  const handleUnshareBook = async (username) => {
+    const confirmMsg = t('confirmUnshare', { username });
+    
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm(confirmMsg)
+      : await new Promise((resolve) => {
+          Alert.alert(
+            t('confirm'),
+            confirmMsg,
+            [
+              { text: t('cancel'), onPress: () => resolve(false), style: 'cancel' },
+              { text: t('unshare'), onPress: () => resolve(true), style: 'destructive' },
+            ]
+          );
+        });
+
+    if (!confirmed) return;
+
+    try {
+      await unshareBook(bookToViewShares.id, username);
+      
+      if (Platform.OS === 'web') {
+        alert(t('bookUnshared'));
+      } else {
+        Alert.alert(t('success'), t('bookUnshared'));
+      }
+      
+      // Refresh shared users list
+      const shares = await getBookShares(bookToViewShares.id);
+      setSharedUsers(shares);
+      
+      // Reload books to update the dashboard
+      loadBooks();
+    } catch (error) {
+      console.error('Error unsharing book:', error);
+      if (Platform.OS === 'web') {
+        alert(t('unshareFailed'));
+      } else {
+        Alert.alert(t('error'), t('unshareFailed'));
+      }
+    }
+  };
+
   const handleExportBook = async (book) => {
     try {
       // Fetch entries for the book
@@ -530,10 +614,10 @@ export default function DashboardScreen({ navigation }) {
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.headerCount}>
-            {t('booksCount', { 
-              filtered: filteredOwnedBooks.length + filteredSharedBooks.length, 
-              total: books.length 
-            })}
+            {viewMode === 'owner' 
+              ? t('booksCount', { filtered: filteredOwnedBooks.length, total: ownedBooks.length })
+              : t('booksCount', { filtered: filteredSharedBooks.length, total: sharedBooks.length })
+            }
           </Text>
           <View style={styles.headerButtons}>
             <LanguageToggle />
@@ -542,6 +626,36 @@ export default function DashboardScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
+      </View>
+
+      {/* App Title */}
+      <View style={styles.appTitleContainer}>
+        <Text style={styles.appTitle}>
+          {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
+        </Text>
+        {language === 'ta' && (
+          <Text style={styles.appTitleEnglish}>Daily Installment Book</Text>
+        )}
+      </View>
+
+      {/* View Mode Toggle */}
+      <View style={styles.viewModeContainer}>
+        <TouchableOpacity
+          style={[styles.viewModeTab, viewMode === 'owner' && styles.viewModeTabActive]}
+          onPress={() => setViewMode('owner')}
+        >
+          <Text style={[styles.viewModeTabText, viewMode === 'owner' && styles.viewModeTabTextActive]}>
+            📖 {t('asOwner')} ({ownedBooks.length})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.viewModeTab, viewMode === 'borrower' && styles.viewModeTabActive]}
+          onPress={() => setViewMode('borrower')}
+        >
+          <Text style={[styles.viewModeTabText, viewMode === 'borrower' && styles.viewModeTabTextActive]}>
+            🤝 {t('asBorrower')} ({sharedBooks.length})
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Search and Filter Bar */}
@@ -654,36 +768,33 @@ export default function DashboardScreen({ navigation }) {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         >
-        {/* No books at all */}
-        {books.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>📚</Text>
-            <Text style={styles.emptyTitle}>{t('noBooksYet')}</Text>
-            <Text style={styles.emptyText}>
-              {t('noBooksYetDesc')}
-            </Text>
-          </View>
-        ) : (filteredOwnedBooks.length === 0 && filteredSharedBooks.length === 0 && searchQuery) ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>🔍</Text>
-            <Text style={styles.emptyTitle}>{t('noBooksFound')}</Text>
-            <Text style={styles.emptyText}>
-              {t('noBooksFoundDesc', { query: searchQuery })}
-            </Text>
-            <TouchableOpacity
-              style={styles.clearSearchButton}
-              onPress={() => setSearchQuery('')}
-            >
-              <Text style={styles.clearSearchButtonText}>{t('clearSearch')}</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <>
-          {/* My Books Section */}
-          {filteredOwnedBooks.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>📖 {t('myBooks')} ({filteredOwnedBooks.length})</Text>
-              {filteredOwnedBooks.map((book, index) => {
+        {/* Show books based on view mode */}
+        {viewMode === 'owner' ? (
+          // Owner View
+          ownedBooks.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>📖</Text>
+              <Text style={styles.emptyTitle}>{t('noOwnedBooks')}</Text>
+              <Text style={styles.emptyText}>
+                {t('noOwnedBooksDesc')}
+              </Text>
+            </View>
+          ) : filteredOwnedBooks.length === 0 && searchQuery ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🔍</Text>
+              <Text style={styles.emptyTitle}>{t('noBooksFound')}</Text>
+              <Text style={styles.emptyText}>
+                {t('noBooksFoundDesc', { query: searchQuery })}
+              </Text>
+              <TouchableOpacity
+                style={styles.clearSearchButton}
+                onPress={() => setSearchQuery('')}
+              >
+                <Text style={styles.clearSearchButtonText}>{t('clearSearch')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            filteredOwnedBooks.map((book, index) => {
             const CardWrapper = book.backgroundImage ? ImageBackground : View;
             const cardWrapperProps = book.backgroundImage
               ? {
@@ -728,7 +839,7 @@ export default function DashboardScreen({ navigation }) {
                       <Text style={styles.bookName}>
                         {book.name}
                         {book.fatherName && (
-                          <Text style={styles.fatherNameInline}> s/o {book.fatherName}</Text>
+                          <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
                         )}
                       </Text>
                     </View>
@@ -809,6 +920,16 @@ export default function DashboardScreen({ navigation }) {
                   <Text style={styles.actionButtonText}>🤝 {t('share')}</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.viewSharesButton]}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleViewSharedUsers(book);
+                  }}
+                >
+                  <Text style={styles.actionButtonText}>👥 {t('viewShared')}</Text>
+                </TouchableOpacity>
+
                 {book.status === 'closed' ? (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.reopenButton]}
@@ -844,15 +965,34 @@ export default function DashboardScreen({ navigation }) {
             </CardWrapper>
           </TouchableOpacity>
             );
-          })}
+          })
+          )
+        ) : (
+          // Borrower View
+          sharedBooks.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🤝</Text>
+              <Text style={styles.emptyTitle}>{t('noSharedBooks')}</Text>
+              <Text style={styles.emptyText}>
+                {t('noSharedBooksDesc')}
+              </Text>
             </View>
-          )}
-
-          {/* Shared with Me Section */}
-          {filteredSharedBooks.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>🤝 {t('sharedWithMe')} ({filteredSharedBooks.length})</Text>
-              {filteredSharedBooks.map((book, index) => {
+          ) : filteredSharedBooks.length === 0 && searchQuery ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🔍</Text>
+              <Text style={styles.emptyTitle}>{t('noBooksFound')}</Text>
+              <Text style={styles.emptyText}>
+                {t('noBooksFoundDesc', { query: searchQuery })}
+              </Text>
+              <TouchableOpacity
+                style={styles.clearSearchButton}
+                onPress={() => setSearchQuery('')}
+              >
+                <Text style={styles.clearSearchButtonText}>{t('clearSearch')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            filteredSharedBooks.map((book, index) => {
             const CardWrapper = book.backgroundImage ? ImageBackground : View;
             const cardWrapperProps = book.backgroundImage
               ? {
@@ -896,7 +1036,7 @@ export default function DashboardScreen({ navigation }) {
                       <Text style={styles.bookName}>
                         {book.name}
                         {book.fatherName && (
-                          <Text style={styles.fatherNameInline}> s/o {book.fatherName}</Text>
+                          <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
                         )}
                       </Text>
                     </View>
@@ -965,10 +1105,8 @@ export default function DashboardScreen({ navigation }) {
             </CardWrapper>
           </TouchableOpacity>
             );
-          })}
-            </View>
-          )}
-          </>
+          })
+          )
         )}
         
         {/* Add some bottom padding in scroll content */}
@@ -1030,6 +1168,62 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* Shared Users Modal */}
+      <Modal
+        visible={showSharedUsersModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowSharedUsersModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{t('sharedWith')}</Text>
+              <TouchableOpacity onPress={() => setShowSharedUsersModal(false)}>
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <Text style={styles.modalSubtitle}>
+              {t('sharedWithDesc', { bookName: bookToViewShares?.name || '' })}
+            </Text>
+
+            <ScrollView style={styles.sharedUsersList}>
+              {sharedUsers.length === 0 ? (
+                <View style={styles.emptySharedUsers}>
+                  <Text style={styles.emptySharedUsersText}>{t('noSharedUsers')}</Text>
+                </View>
+              ) : (
+                sharedUsers.map((user) => (
+                  <View key={user.userId} style={styles.sharedUserItem}>
+                    <View style={styles.sharedUserInfo}>
+                      <Text style={styles.sharedUserName}>{user.fullName}</Text>
+                      <Text style={styles.sharedUserUsername}>@{user.username}</Text>
+                      <Text style={styles.sharedUserDate}>
+                        {t('sharedOn')}: {formatDateDDMMYYYY(user.sharedAt)}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.unshareButton}
+                      onPress={() => handleUnshareBook(user.username)}
+                    >
+                      <Text style={styles.unshareButtonText}>🚫 {t('unshare')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[styles.modalButton, styles.modalConfirmButton]}
+              onPress={() => setShowSharedUsersModal(false)}
+            >
+              <Text style={styles.modalConfirmButtonText}>{t('close')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1051,6 +1245,64 @@ const styles = StyleSheet.create({
   },
   headerRight: {
     alignItems: 'flex-end',
+  },
+  // App Title Styles
+  appTitleContainer: {
+    backgroundColor: '#fff',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: '#2196F3',
+  },
+  appTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#2196F3',
+    textAlign: 'center',
+  },
+  appTitleEnglish: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  // View Mode Toggle Styles
+  viewModeContainer: {
+    backgroundColor: '#f5f5f5',
+    flexDirection: 'row',
+    padding: 8,
+    gap: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  viewModeTab: {
+    flex: 1,
+    padding: 14,
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  viewModeTabActive: {
+    backgroundColor: '#4CAF50',
+    borderColor: '#4CAF50',
+    elevation: 3,
+    shadowOpacity: 0.2,
+  },
+  viewModeTabText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#666',
+  },
+  viewModeTabTextActive: {
+    color: '#fff',
   },
   headerButtons: {
     flexDirection: 'row',
@@ -1304,7 +1556,7 @@ const styles = StyleSheet.create({
   },
   bookDlNo: {
     fontSize: 13,
-    color: '#666',
+    color: '#000',
     fontWeight: '600',
   },
   lastUpdatedCompact: {
@@ -1320,12 +1572,12 @@ const styles = StyleSheet.create({
   bookName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000',
   },
   fatherNameInline: {
     fontSize: 16,
     fontWeight: 'normal',
-    color: '#666',
+    color: '#000',
     fontStyle: 'italic',
   },
   loanSection: {
@@ -1611,6 +1863,75 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalCloseButton: {
+    fontSize: 24,
+    color: '#666',
+    fontWeight: 'bold',
+    padding: 4,
+  },
+  sharedUsersList: {
+    maxHeight: 400,
+    marginBottom: 16,
+  },
+  emptySharedUsers: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptySharedUsersText: {
+    fontSize: 16,
+    color: '#999',
+    textAlign: 'center',
+  },
+  sharedUserItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  sharedUserInfo: {
+    flex: 1,
+  },
+  sharedUserName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  sharedUserUsername: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  sharedUserDate: {
+    fontSize: 12,
+    color: '#999',
+  },
+  unshareButton: {
+    backgroundColor: '#ff5252',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginLeft: 12,
+  },
+  unshareButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  viewSharesButton: {
+    backgroundColor: '#9C27B0',
   },
   createButtonContainer: {
     backgroundColor: '#fff',

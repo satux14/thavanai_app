@@ -107,6 +107,7 @@ export const getAllBooks = async () => {
           ownerName: owner?.fullName || 'Unknown',
           sharedAt: share?.sharedAt,
           isOwned: false,
+          isShared: true,
         };
       });
 
@@ -163,6 +164,16 @@ export const updateBook = async (bookId, bookData) => {
       throw new Error('Book not found');
     }
 
+    console.log('Before update - book dates:', {
+      startDate: books[bookIndex].startDate,
+      endDate: books[bookIndex].endDate
+    });
+    
+    console.log('Update data - dates:', {
+      startDate: bookData.startDate,
+      endDate: bookData.endDate
+    });
+
     books[bookIndex] = {
       ...books[bookIndex],
       dlNo: bookData.dlNo,
@@ -177,9 +188,14 @@ export const updateBook = async (bookId, bookData) => {
       updatedAt: now,
     };
 
+    console.log('After update - book dates:', {
+      startDate: books[bookIndex].startDate,
+      endDate: books[bookIndex].endDate
+    });
+
     await saveAllBooksData(books);
 
-    console.log('Book updated:', bookId);
+    console.log('Book updated and saved:', bookId);
     return await getBook(bookId);
   } catch (error) {
     console.error('Error updating book:', error);

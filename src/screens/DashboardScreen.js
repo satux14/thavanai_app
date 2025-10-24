@@ -19,7 +19,10 @@ import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 export default function DashboardScreen({ navigation }) {
   const { t } = useLanguage();
   const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
+  const [ownedBooks, setOwnedBooks] = useState([]);
+  const [sharedBooks, setSharedBooks] = useState([]);
+  const [filteredOwnedBooks, setFilteredOwnedBooks] = useState([]);
+  const [filteredSharedBooks, setFilteredSharedBooks] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('updated'); // 'updated', 'name', 'amount', 'date'
@@ -47,7 +50,7 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     filterAndSortBooks();
-  }, [books, searchQuery, sortBy, bookStatusFilter]);
+  }, [ownedBooks, sharedBooks, searchQuery, sortBy, bookStatusFilter]);
 
   const calculateBalance = (loanAmount, entries) => {
     const loan = parseFloat(loanAmount) || 0;
@@ -57,6 +60,9 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const loadBooks = async () => {
+    const user = await getCurrentUser();
+    if (!user) return;
+
     const allBooks = await getAllBooks();
     
     // Load entries for each book to calculate balance
@@ -68,47 +74,61 @@ export default function DashboardScreen({ navigation }) {
       })
     );
     
+    // Separate owned and shared books
+    const owned = booksWithBalance.filter(book => book.ownerId === user.id);
+    const shared = booksWithBalance.filter(book => book.isShared && book.ownerId !== user.id);
+    
     setBooks(booksWithBalance);
+    setOwnedBooks(owned);
+    setSharedBooks(shared);
+    
+    console.log('Owned books:', owned.length, 'Shared books:', shared.length);
   };
 
   const filterAndSortBooks = () => {
-    let filtered = [...books];
+    // Helper function to apply filters
+    const applyFilters = (booksList) => {
+      let filtered = [...booksList];
 
-    // Filter by status (active/closed/all)
-    if (bookStatusFilter === 'active') {
-      filtered = filtered.filter(book => book.status !== 'closed');
-    } else if (bookStatusFilter === 'closed') {
-      filtered = filtered.filter(book => book.status === 'closed');
-    }
-    // If 'all', don't filter by status
-
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(book => 
-        (book.name && book.name.toLowerCase().includes(query)) ||
-        (book.dlNo && book.dlNo.toLowerCase().includes(query)) ||
-        (book.fatherName && book.fatherName.toLowerCase().includes(query)) ||
-        (book.address && book.address.toLowerCase().includes(query))
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '');
-        case 'amount':
-          return (b.loanAmount || 0) - (a.loanAmount || 0);
-        case 'date':
-          return new Date(b.startDate) - new Date(a.startDate);
-        case 'updated':
-        default:
-          return new Date(b.updatedAt) - new Date(a.updatedAt);
+      // Filter by status (active/closed/all)
+      if (bookStatusFilter === 'active') {
+        filtered = filtered.filter(book => book.status !== 'closed');
+      } else if (bookStatusFilter === 'closed') {
+        filtered = filtered.filter(book => book.status === 'closed');
       }
-    });
+      // If 'all', don't filter by status
 
-    setFilteredBooks(filtered);
+      // Apply search filter
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(book => 
+          (book.name && book.name.toLowerCase().includes(query)) ||
+          (book.dlNo && book.dlNo.toLowerCase().includes(query)) ||
+          (book.fatherName && book.fatherName.toLowerCase().includes(query)) ||
+          (book.address && book.address.toLowerCase().includes(query))
+        );
+      }
+
+      // Apply sorting
+      filtered.sort((a, b) => {
+        switch (sortBy) {
+          case 'name':
+            return (a.name || '').localeCompare(b.name || '');
+          case 'amount':
+            return (b.loanAmount || 0) - (a.loanAmount || 0);
+          case 'date':
+            return new Date(b.startDate) - new Date(a.startDate);
+          case 'updated':
+          default:
+            return new Date(b.updatedAt) - new Date(a.updatedAt);
+        }
+      });
+
+      return filtered;
+    };
+
+    setFilteredOwnedBooks(applyFilters(ownedBooks));
+    setFilteredSharedBooks(applyFilters(sharedBooks));
   };
 
   const loadCurrentUser = async () => {

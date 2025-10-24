@@ -35,6 +35,7 @@ export const saveBook = async (bookData) => {
     const newBook = {
       id: bookId,
       ownerId: currentUser.id,
+      borrowerId: bookData.borrowerId || null, // The user who borrowed the money
       dlNo: bookData.dlNo,
       name: bookData.name,
       fatherName: bookData.fatherName,
@@ -317,6 +318,11 @@ export const saveEntry = async (bookId, entryData) => {
       amount: entryData.amount,
       remaining: entryData.remaining,
       signature: entryData.signature || null,
+      // Signature system fields
+      signatureStatus: entryData.signatureStatus || 'none', // 'none', 'signed_by_owner', 'signature_requested', 'signed_by_request', 'request_rejected'
+      signatureRequestedBy: entryData.signatureRequestedBy || null, // userId who requested
+      signedBy: entryData.signedBy || null, // userId who signed
+      signedAt: entryData.signedAt || null, // timestamp when signed
       pageNumber: entryData.pageNumber,
       serialNumber: entryData.serialNumber,
       createdAt: now,
@@ -524,6 +530,254 @@ export const getBookShares = async (bookId) => {
     return bookShares;
   } catch (error) {
     console.error('Error getting book shares:', error);
+    throw error;
+  }
+};
+
+/**
+ * Owner signs an entry
+ */
+export const signEntry = async (entryId) => {
+  try {
+    getDatabase();
+    const currentUser = await getCurrentUser();
+    
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+
+    const entries = await getAllEntriesData();
+    const entryIndex = entries.findIndex(e => e.id === entryId);
+    
+    if (entryIndex === -1) {
+      throw new Error('Entry not found');
+    }
+
+    const entry = entries[entryIndex];
+    const books = await getAllBooksData();
+    const book = books.find(b => b.id === entry.bookId);
+
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    // Only owner can sign
+    if (book.ownerId !== currentUser.id) {
+      throw new Error('Only the book owner can sign entries');
+    }
+
+    const now = new Date().toISOString();
+    
+    entries[entryIndex] = {
+      ...entry,
+      signatureStatus: 'signed_by_owner',
+      signedBy: currentUser.id,
+      signedAt: now,
+      signatureRequestedBy: null, // Clear any pending request
+    };
+
+    await saveAllEntriesData(entries);
+    
+    // Update book's updated_at
+    const bookIndex = books.findIndex(b => b.id === entry.bookId);
+    if (bookIndex !== -1) {
+      books[bookIndex].updatedAt = now;
+      await saveAllBooksData(books);
+    }
+
+    console.log('Entry signed by owner:', entryId);
+    return entries[entryIndex];
+  } catch (error) {
+    console.error('Error signing entry:', error);
+    throw error;
+  }
+};
+
+/**
+ * Borrower requests signature for an entry
+ */
+export const requestSignature = async (entryId) => {
+  try {
+    getDatabase();
+    const currentUser = await getCurrentUser();
+    
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+
+    const entries = await getAllEntriesData();
+    const entryIndex = entries.findIndex(e => e.id === entryId);
+    
+    if (entryIndex === -1) {
+      throw new Error('Entry not found');
+    }
+
+    const entry = entries[entryIndex];
+    const books = await getAllBooksData();
+    const book = books.find(b => b.id === entry.bookId);
+
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    // Check if user has access to this book (shared with them)
+    const shares = await getAllBookSharesData();
+    const hasAccess = shares.some(
+      s => s.bookId === book.id && s.sharedWithUserId === currentUser.id
+    );
+
+    if (!hasAccess && book.ownerId !== currentUser.id) {
+      throw new Error('You do not have access to this book');
+    }
+
+    if (book.ownerId === currentUser.id) {
+      throw new Error('Owner should sign directly, not request signature');
+    }
+
+    const now = new Date().toISOString();
+    
+    entries[entryIndex] = {
+      ...entry,
+      signatureStatus: 'signature_requested',
+      signatureRequestedBy: currentUser.id,
+    };
+
+    await saveAllEntriesData(entries);
+    
+    // Update book's updated_at
+    const bookIndex = books.findIndex(b => b.id === entry.bookId);
+    if (bookIndex !== -1) {
+      books[bookIndex].updatedAt = now;
+      await saveAllBooksData(books);
+    }
+
+    console.log('Signature requested for entry:', entryId);
+    return entries[entryIndex];
+  } catch (error) {
+    console.error('Error requesting signature:', error);
+    throw error;
+  }
+};
+
+/**
+ * Owner approves a signature request
+ */
+export const approveSignatureRequest = async (entryId) => {
+  try {
+    getDatabase();
+    const currentUser = await getCurrentUser();
+    
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+
+    const entries = await getAllEntriesData();
+    const entryIndex = entries.findIndex(e => e.id === entryId);
+    
+    if (entryIndex === -1) {
+      throw new Error('Entry not found');
+    }
+
+    const entry = entries[entryIndex];
+    const books = await getAllBooksData();
+    const book = books.find(b => b.id === entry.bookId);
+
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    // Only owner can approve
+    if (book.ownerId !== currentUser.id) {
+      throw new Error('Only the book owner can approve signature requests');
+    }
+
+    if (entry.signatureStatus !== 'signature_requested') {
+      throw new Error('No pending signature request for this entry');
+    }
+
+    const now = new Date().toISOString();
+    
+    entries[entryIndex] = {
+      ...entry,
+      signatureStatus: 'signed_by_request',
+      signedBy: currentUser.id,
+      signedAt: now,
+    };
+
+    await saveAllEntriesData(entries);
+    
+    // Update book's updated_at
+    const bookIndex = books.findIndex(b => b.id === entry.bookId);
+    if (bookIndex !== -1) {
+      books[bookIndex].updatedAt = now;
+      await saveAllBooksData(books);
+    }
+
+    console.log('Signature request approved for entry:', entryId);
+    return entries[entryIndex];
+  } catch (error) {
+    console.error('Error approving signature request:', error);
+    throw error;
+  }
+};
+
+/**
+ * Owner rejects a signature request
+ */
+export const rejectSignatureRequest = async (entryId) => {
+  try {
+    getDatabase();
+    const currentUser = await getCurrentUser();
+    
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+
+    const entries = await getAllEntriesData();
+    const entryIndex = entries.findIndex(e => e.id === entryId);
+    
+    if (entryIndex === -1) {
+      throw new Error('Entry not found');
+    }
+
+    const entry = entries[entryIndex];
+    const books = await getAllBooksData();
+    const book = books.find(b => b.id === entry.bookId);
+
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    // Only owner can reject
+    if (book.ownerId !== currentUser.id) {
+      throw new Error('Only the book owner can reject signature requests');
+    }
+
+    if (entry.signatureStatus !== 'signature_requested') {
+      throw new Error('No pending signature request for this entry');
+    }
+
+    const now = new Date().toISOString();
+    
+    entries[entryIndex] = {
+      ...entry,
+      signatureStatus: 'request_rejected',
+      signatureRequestedBy: null,
+    };
+
+    await saveAllEntriesData(entries);
+    
+    // Update book's updated_at
+    const bookIndex = books.findIndex(b => b.id === entry.bookId);
+    if (bookIndex !== -1) {
+      books[bookIndex].updatedAt = now;
+      await saveAllBooksData(books);
+    }
+
+    console.log('Signature request rejected for entry:', entryId);
+    return entries[entryIndex];
+  } catch (error) {
+    console.error('Error rejecting signature request:', error);
     throw error;
   }
 };

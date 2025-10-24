@@ -323,6 +323,39 @@ export default function EntriesScreen({ navigation, route }) {
         entryData.signedAt = null;
       }
 
+      // STEP 1: Auto-fill ONLY previous empty entries with 0
+      const currentSerialNumber = selectedEntry.serialNumber;
+      const allEntries = await getEntries(bookId);
+      
+      // Find all entries BEFORE current that have dates but no amount filled
+      const previousEmptyEntries = allEntries.filter(
+        e => e.serialNumber < currentSerialNumber && 
+             e.date && 
+             (e.amount === null || e.amount === undefined || e.amount === '')
+      );
+      
+      console.log(`Filling ${previousEmptyEntries.length} previous empty entries with 0`);
+      
+      // Fill ONLY previous empty entries with 0 amount
+      for (const emptyEntry of previousEmptyEntries) {
+        if (emptyEntry.id) {
+          // Calculate balance for this entry
+          const entriesBeforeThis = allEntries.filter(
+            e => e.serialNumber < emptyEntry.serialNumber && 
+                 e.amount !== null && e.amount !== undefined && e.amount !== ''
+          );
+          const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+          const balance = (book.loanAmount || 0) - totalPaidBefore;
+          
+          await updateEntryStorage(emptyEntry.id, {
+            ...emptyEntry,
+            amount: 0,
+            remaining: balance,
+          });
+        }
+      }
+
+      // STEP 2: Save the current entry being edited
       if (selectedEntry.id) {
         // Update existing entry
         await updateEntryStorage(selectedEntry.id, entryData);
@@ -338,6 +371,36 @@ export default function EntriesScreen({ navigation, route }) {
       } else {
         // Create new entry
         await saveEntry(bookId, entryData);
+      }
+
+      // STEP 3: Recalculate balances ONLY for future entries that ALREADY have amounts
+      // DO NOT fill future empty entries - leave them empty
+      const updatedEntries = await getEntries(bookId);
+      const entriesAfterCurrent = updatedEntries.filter(
+        e => e.serialNumber > currentSerialNumber && 
+             e.amount !== null && 
+             e.amount !== undefined && 
+             e.amount !== ''  // Only entries that have been filled
+      );
+      
+      console.log(`Recalculating ${entriesAfterCurrent.length} future entries (not filling empty ones)`);
+      
+      for (const entry of entriesAfterCurrent) {
+        const entriesBeforeThis = updatedEntries.filter(
+          e => e.serialNumber < entry.serialNumber && 
+               e.amount !== null && 
+               e.amount !== undefined && 
+               e.amount !== ''
+        );
+        const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+        const balance = (book.loanAmount || 0) - totalPaidBefore - (parseFloat(entry.amount) || 0);
+        
+        if (entry.id) {
+          await updateEntryStorage(entry.id, {
+            ...entry,
+            remaining: balance,
+          });
+        }
       }
 
       // Reload data
@@ -513,6 +576,15 @@ export default function EntriesScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      {/* User Info - Top Left */}
+      {currentUser && (
+        <View style={styles.userInfoHeader}>
+          <Text style={styles.userInfoText}>
+            👤 {currentUser.fullName} (@{currentUser.username})
+          </Text>
+        </View>
+      )}
+
       {/* Book Info Header */}
       <View style={styles.bookHeader}>
         <Text style={styles.bookHeaderText}>
@@ -592,10 +664,14 @@ export default function EntriesScreen({ navigation, route }) {
                     <Text style={styles.cellText}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={styles.cellText}>{entry.amount || ''}</Text>
+                    <Text style={styles.cellText}>
+                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? entry.amount : ''}
+                    </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={styles.cellText}>{entry.remaining || ''}</Text>
+                    <Text style={styles.cellText}>
+                      {entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '' ? entry.remaining : ''}
+                    </Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>
                     {(() => {
@@ -847,6 +923,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  userInfoHeader: {
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    paddingLeft: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  userInfoText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '600',
   },
   bookHeader: {
     backgroundColor: '#2196F3',

@@ -641,7 +641,7 @@ export const requestSignature = async (entryId) => {
       throw new Error('Book not found');
     }
 
-    // Check if user has access to this book (shared with them)
+    // Check if user has access to this book (owner or shared with them)
     const shares = await getAllBookSharesData();
     const hasAccess = shares.some(
       s => s.bookId === book.id && s.sharedWithUserId === currentUser.id
@@ -651,10 +651,7 @@ export const requestSignature = async (entryId) => {
       throw new Error('You do not have access to this book');
     }
 
-    if (book.ownerId === currentUser.id) {
-      throw new Error('Owner should sign directly, not request signature');
-    }
-
+    // In the new system, anyone (owner or borrower) can request signature from the other party
     const now = new Date().toISOString();
     
     entries[entryIndex] = {
@@ -707,13 +704,23 @@ export const approveSignatureRequest = async (entryId) => {
       throw new Error('Book not found');
     }
 
-    // Only owner can approve
-    if (book.ownerId !== currentUser.id) {
-      throw new Error('Only the book owner can approve signature requests');
-    }
-
     if (entry.signatureStatus !== 'signature_requested') {
       throw new Error('No pending signature request for this entry');
+    }
+
+    // Check if user has access to this book
+    const shares = await getAllBookSharesData();
+    const hasAccess = shares.some(
+      s => s.bookId === book.id && s.sharedWithUserId === currentUser.id
+    );
+
+    if (!hasAccess && book.ownerId !== currentUser.id) {
+      throw new Error('You do not have access to this book');
+    }
+
+    // User cannot approve their own request
+    if (entry.signatureRequestedBy === currentUser.id) {
+      throw new Error('You cannot approve your own signature request');
     }
 
     const now = new Date().toISOString();
@@ -769,13 +776,23 @@ export const rejectSignatureRequest = async (entryId) => {
       throw new Error('Book not found');
     }
 
-    // Only owner can reject
-    if (book.ownerId !== currentUser.id) {
-      throw new Error('Only the book owner can reject signature requests');
-    }
-
     if (entry.signatureStatus !== 'signature_requested') {
       throw new Error('No pending signature request for this entry');
+    }
+
+    // Check if user has access to this book
+    const shares = await getAllBookSharesData();
+    const hasAccess = shares.some(
+      s => s.bookId === book.id && s.sharedWithUserId === currentUser.id
+    );
+
+    if (!hasAccess && book.ownerId !== currentUser.id) {
+      throw new Error('You do not have access to this book');
+    }
+
+    // User cannot reject their own request
+    if (entry.signatureRequestedBy === currentUser.id) {
+      throw new Error('You cannot reject your own signature request');
     }
 
     const now = new Date().toISOString();

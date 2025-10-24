@@ -255,37 +255,16 @@ export default function EntriesScreen({ navigation, route }) {
 
   const handleEditEntry = (entry) => {
     const status = entry.signatureStatus || 'none';
-    const isSigned = status === 'signed_by_owner' || status === 'signed_by_request';
+    const isSigned = status === 'signed_by_request';
     
-    // Owner cannot edit signed entries
-    if (isOwner && isSigned) {
+    // No one can edit approved/signed entries - it requires both parties' agreement
+    if (isSigned) {
       if (Platform.OS === 'web') {
-        alert(t('ownerCannotEditSigned'));
+        alert(t('cannotEditApprovedEntry'));
       } else {
-        Alert.alert(t('error'), t('ownerCannotEditSigned'));
+        Alert.alert(t('error'), t('cannotEditApprovedEntry'));
       }
       return;
-    }
-    
-    // Borrower can edit signed entries, but warn them signature will be cleared
-    if (!isOwner && isSigned) {
-      const confirmed = Platform.OS === 'web'
-        ? window.confirm(t('editSignedWarning'))
-        : false; // We'll handle this below
-      
-      if (Platform.OS !== 'web') {
-        Alert.alert(
-          t('warning'),
-          t('editSignedWarning'),
-          [
-            { text: t('cancel'), style: 'cancel', onPress: () => {} },
-            { text: t('continueEdit'), onPress: () => proceedToEdit(entry) },
-          ]
-        );
-        return;
-      }
-      
-      if (!confirmed) return;
     }
 
     proceedToEdit(entry);
@@ -323,10 +302,9 @@ export default function EntriesScreen({ navigation, route }) {
     }
 
     try {
-      // Check if borrower is editing a signed entry - clear signature status
-      const wasSigned = selectedEntry.signatureStatus === 'signed_by_owner' || 
-                        selectedEntry.signatureStatus === 'signed_by_request';
-      const shouldClearSignature = !isOwner && wasSigned;
+      // Check if anyone is editing a signed entry - clear signature status
+      const wasSigned = selectedEntry.signatureStatus === 'signed_by_request';
+      const shouldClearSignature = wasSigned;
       
       const entryData = {
         date: editFormData.date,
@@ -386,35 +364,6 @@ export default function EntriesScreen({ navigation, route }) {
   };
 
   // Signature action handlers
-  const handleSignByOwner = async () => {
-    if (!selectedEntry || !selectedEntry.id) {
-      if (Platform.OS === 'web') {
-        alert(t('pleaseSaveEntryFirst'));
-      } else {
-        Alert.alert(t('error'), t('pleaseSaveEntryFirst'));
-      }
-      return;
-    }
-
-    try {
-      await signEntry(selectedEntry.id, currentUser.id, false);
-      if (Platform.OS === 'web') {
-        alert(t('entrySigned'));
-      } else {
-        Alert.alert(t('success'), t('entrySigned'));
-      }
-      await loadData();
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Error signing entry:', error);
-      if (Platform.OS === 'web') {
-        alert(t('signFailed'));
-      } else {
-        Alert.alert(t('error'), t('signFailed'));
-      }
-    }
-  };
-
   const handleRequestSignature = async () => {
     if (!selectedEntry || !selectedEntry.id) {
       if (Platform.OS === 'web') {
@@ -519,34 +468,35 @@ export default function EntriesScreen({ navigation, route }) {
     if (!selectedEntry || !currentUser) return null;
 
     const status = selectedEntry.signatureStatus || 'none';
+    const requesterId = selectedEntry.signatureRequestedBy;
+    
+    // Check if current user is the one who requested signature
+    const isRequester = requesterId === currentUser.id;
+    // Check if current user is the one being asked to sign
+    const isRecipient = !isRequester && status === 'signature_requested';
 
-    if (isOwner) {
-      // Owner view
-      switch (status) {
-        case 'signed_by_owner':
-          return { text: t('signedByOwner'), action: null, disabled: true, color: '#4CAF50' };
-        case 'signature_requested':
-          return { text: t('signRequestedSign'), action: 'approve_reject', color: '#FF9800' };
-        case 'signed_by_request':
-          return { text: t('signedByRequest'), action: null, disabled: true, color: '#4CAF50' };
-        case 'request_rejected':
-        case 'none':
-        default:
-          return { text: t('signHereByOwner'), action: 'sign', color: '#2196F3' };
-      }
-    } else {
-      // Borrower view
-      switch (status) {
-        case 'signed_by_owner':
-        case 'signed_by_request':
-          return { text: t('signed'), action: null, disabled: true, color: '#4CAF50' };
-        case 'signature_requested':
-          return { text: t('signatureRequestPending'), action: null, disabled: true, color: '#FF9800' };
-        case 'request_rejected':
-        case 'none':
-        default:
-          return { text: t('requestSignature'), action: 'request', color: '#2196F3' };
-      }
+    switch (status) {
+      case 'signed_by_request':
+        // Entry has been signed
+        return { text: t('approved'), action: null, disabled: true, color: '#4CAF50' };
+      
+      case 'signature_requested':
+        if (isRecipient) {
+          // Current user needs to approve/reject
+          return { text: t('signatureRequestReceived'), action: 'approve_reject', color: '#FF9800' };
+        } else {
+          // Current user is waiting for other party to respond
+          return { text: t('waitingForSignature'), action: null, disabled: true, color: '#FF9800' };
+        }
+      
+      case 'request_rejected':
+        // Signature was rejected, can request again
+        return { text: t('requestSignatureAgain'), action: 'request', color: '#2196F3' };
+      
+      case 'none':
+      default:
+        // No signature yet - anyone can request from the other party
+        return { text: t('requestSignature'), action: 'request', color: '#2196F3' };
     }
   };
 
@@ -660,12 +610,6 @@ export default function EntriesScreen({ navigation, route }) {
                       const signerName = signer?.username || 'Unknown';
                       
                       switch (status) {
-                        case 'signed_by_owner':
-                          return (
-                            <View style={styles.signatureStatusContainer}>
-                              <Text style={styles.signatureStatusText}>✓ {t('signedByOwner')}</Text>
-                            </View>
-                          );
                         case 'signature_requested':
                           return (
                             <View style={styles.signatureStatusContainer}>
@@ -801,7 +745,7 @@ export default function EntriesScreen({ navigation, route }) {
                       {buttonConfig.action === 'approve_reject' ? (
                         // Show approve/reject buttons for owner when signature is requested
                         <View style={styles.approveRejectContainer}>
-                          <Text style={styles.requestWarning}>⚠️ {t('signatureRequestedByBorrower')}</Text>
+                          <Text style={styles.requestWarning}>⚠️ {t('signatureRequestedByOtherParty')}</Text>
                           <View style={styles.approveRejectButtons}>
                             <TouchableOpacity
                               style={[styles.approveButton, styles.signatureActionButton]}
@@ -826,9 +770,7 @@ export default function EntriesScreen({ navigation, route }) {
                             buttonConfig.disabled && styles.signatureButtonDisabled
                           ]}
                           onPress={() => {
-                            if (buttonConfig.action === 'sign') {
-                              handleSignByOwner();
-                            } else if (buttonConfig.action === 'request') {
+                            if (buttonConfig.action === 'request') {
                               handleRequestSignature();
                             }
                           }}

@@ -11,7 +11,8 @@ import {
   Platform,
 } from 'react-native';
 import SignatureScreen from 'react-native-signature-canvas';
-import { getBook, getEntries, saveEntry, updateEntry as updateEntryStorage } from '../utils/storage';
+import { getBook, getEntries, saveEntry, updateEntry as updateEntryStorage, signEntry, requestSignature, approveSignatureRequest, rejectSignatureRequest } from '../utils/storage';
+import { getCurrentUser, getAllUsersForDisplay } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
@@ -19,7 +20,7 @@ const ENTRIES_PER_PAGE = 10;
 
 export default function EntriesScreen({ navigation, route }) {
   const { bookId } = route.params;
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [book, setBook] = useState(null);
   const [entries, setEntries] = useState([]);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
@@ -29,6 +30,9 @@ export default function EntriesScreen({ navigation, route }) {
   const [showSignature, setShowSignature] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isOwner, setIsOwner] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -54,8 +58,19 @@ export default function EntriesScreen({ navigation, route }) {
       const loadedBook = await getBook(bookId);
       let loadedEntries = await getEntries(bookId);
       
+      // Load current user and check if they are the owner
+      const user = await getCurrentUser();
+      setCurrentUser(user);
+      setIsOwner(user && loadedBook && user.id === loadedBook.ownerId);
+      
+      // Load all users for signature display
+      const users = await getAllUsersForDisplay();
+      setAllUsers(users);
+      
       console.log('Book loaded:', loadedBook);
       console.log('Entries loaded:', loadedEntries.length);
+      console.log('Users loaded:', users.length);
+      console.log('Current user:', user?.username, 'Is owner:', user?.id === loadedBook?.ownerId);
       
       // Auto-fill 100 days of entries if this is a new book with start date
       if (loadedEntries.length === 0 && loadedBook.startDate) {
@@ -239,6 +254,44 @@ export default function EntriesScreen({ navigation, route }) {
   };
 
   const handleEditEntry = (entry) => {
+    const status = entry.signatureStatus || 'none';
+    const isSigned = status === 'signed_by_owner' || status === 'signed_by_request';
+    
+    // Owner cannot edit signed entries
+    if (isOwner && isSigned) {
+      if (Platform.OS === 'web') {
+        alert(t('ownerCannotEditSigned'));
+      } else {
+        Alert.alert(t('error'), t('ownerCannotEditSigned'));
+      }
+      return;
+    }
+    
+    // Borrower can edit signed entries, but warn them signature will be cleared
+    if (!isOwner && isSigned) {
+      const confirmed = Platform.OS === 'web'
+        ? window.confirm(t('editSignedWarning'))
+        : false; // We'll handle this below
+      
+      if (Platform.OS !== 'web') {
+        Alert.alert(
+          t('warning'),
+          t('editSignedWarning'),
+          [
+            { text: t('cancel'), style: 'cancel', onPress: () => {} },
+            { text: t('continueEdit'), onPress: () => proceedToEdit(entry) },
+          ]
+        );
+        return;
+      }
+      
+      if (!confirmed) return;
+    }
+
+    proceedToEdit(entry);
+  };
+
+  const proceedToEdit = (entry) => {
     setSelectedEntry(entry);
     
     // Auto-fill date to today if empty
@@ -270,6 +323,11 @@ export default function EntriesScreen({ navigation, route }) {
     }
 
     try {
+      // Check if borrower is editing a signed entry - clear signature status
+      const wasSigned = selectedEntry.signatureStatus === 'signed_by_owner' || 
+                        selectedEntry.signatureStatus === 'signed_by_request';
+      const shouldClearSignature = !isOwner && wasSigned;
+      
       const entryData = {
         date: editFormData.date,
         amount: parseFloat(editFormData.amount) || 0,
@@ -279,9 +337,26 @@ export default function EntriesScreen({ navigation, route }) {
         serialNumber: selectedEntry.serialNumber,
       };
 
+      // Clear signature status if borrower edited a signed entry
+      if (shouldClearSignature) {
+        entryData.signatureStatus = 'none';
+        entryData.signatureRequestedBy = null;
+        entryData.signedBy = null;
+        entryData.signedAt = null;
+      }
+
       if (selectedEntry.id) {
         // Update existing entry
         await updateEntryStorage(selectedEntry.id, entryData);
+        
+        // Show message to borrower that they need to request signature again
+        if (shouldClearSignature) {
+          if (Platform.OS === 'web') {
+            alert(t('signatureClearedRequestAgain'));
+          } else {
+            Alert.alert(t('success'), t('signatureClearedRequestAgain'));
+          }
+        }
       } else {
         // Create new entry
         await saveEntry(bookId, entryData);
@@ -308,6 +383,171 @@ export default function EntriesScreen({ navigation, route }) {
 
   const handleClearSignature = () => {
     setEditFormData({ ...editFormData, signature: '' });
+  };
+
+  // Signature action handlers
+  const handleSignByOwner = async () => {
+    if (!selectedEntry || !selectedEntry.id) {
+      if (Platform.OS === 'web') {
+        alert(t('pleaseSaveEntryFirst'));
+      } else {
+        Alert.alert(t('error'), t('pleaseSaveEntryFirst'));
+      }
+      return;
+    }
+
+    try {
+      await signEntry(selectedEntry.id, currentUser.id, false);
+      if (Platform.OS === 'web') {
+        alert(t('entrySigned'));
+      } else {
+        Alert.alert(t('success'), t('entrySigned'));
+      }
+      await loadData();
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error signing entry:', error);
+      if (Platform.OS === 'web') {
+        alert(t('signFailed'));
+      } else {
+        Alert.alert(t('error'), t('signFailed'));
+      }
+    }
+  };
+
+  const handleRequestSignature = async () => {
+    if (!selectedEntry || !selectedEntry.id) {
+      if (Platform.OS === 'web') {
+        alert(t('pleaseSaveEntryFirst'));
+      } else {
+        Alert.alert(t('error'), t('pleaseSaveEntryFirst'));
+      }
+      return;
+    }
+
+    try {
+      await requestSignature(selectedEntry.id, currentUser.id);
+      if (Platform.OS === 'web') {
+        alert(t('signatureRequested'));
+      } else {
+        Alert.alert(t('success'), t('signatureRequested'));
+      }
+      await loadData();
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error requesting signature:', error);
+      if (Platform.OS === 'web') {
+        alert(t('requestFailed'));
+      } else {
+        Alert.alert(t('error'), t('requestFailed'));
+      }
+    }
+  };
+
+  const handleApproveRequest = async () => {
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm(t('confirmApproveSignature'))
+      : await new Promise((resolve) => {
+          Alert.alert(
+            t('confirm'),
+            t('confirmApproveSignature'),
+            [
+              { text: t('cancel'), onPress: () => resolve(false), style: 'cancel' },
+              { text: t('approve'), onPress: () => resolve(true) },
+            ]
+          );
+        });
+
+    if (!confirmed) return;
+
+    try {
+      await approveSignatureRequest(selectedEntry.id, currentUser.id);
+      if (Platform.OS === 'web') {
+        alert(t('signatureApproved'));
+      } else {
+        Alert.alert(t('success'), t('signatureApproved'));
+      }
+      await loadData();
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error approving signature:', error);
+      if (Platform.OS === 'web') {
+        alert(t('approveFailed'));
+      } else {
+        Alert.alert(t('error'), t('approveFailed'));
+      }
+    }
+  };
+
+  const handleRejectRequest = async () => {
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm(t('confirmRejectSignature'))
+      : await new Promise((resolve) => {
+          Alert.alert(
+            t('confirm'),
+            t('confirmRejectSignature'),
+            [
+              { text: t('cancel'), onPress: () => resolve(false), style: 'cancel' },
+              { text: t('reject'), onPress: () => resolve(true), style: 'destructive' },
+            ]
+          );
+        });
+
+    if (!confirmed) return;
+
+    try {
+      await rejectSignatureRequest(selectedEntry.id);
+      if (Platform.OS === 'web') {
+        alert(t('signatureRejected'));
+      } else {
+        Alert.alert(t('success'), t('signatureRejected'));
+      }
+      await loadData();
+      setShowEditModal(false);
+    } catch (error) {
+      console.error('Error rejecting signature:', error);
+      if (Platform.OS === 'web') {
+        alert(t('rejectFailed'));
+      } else {
+        Alert.alert(t('error'), t('rejectFailed'));
+      }
+    }
+  };
+
+  // Get signature button text and action based on user role and entry status
+  const getSignatureButtonConfig = () => {
+    if (!selectedEntry || !currentUser) return null;
+
+    const status = selectedEntry.signatureStatus || 'none';
+
+    if (isOwner) {
+      // Owner view
+      switch (status) {
+        case 'signed_by_owner':
+          return { text: t('signedByOwner'), action: null, disabled: true, color: '#4CAF50' };
+        case 'signature_requested':
+          return { text: t('signRequestedSign'), action: 'approve_reject', color: '#FF9800' };
+        case 'signed_by_request':
+          return { text: t('signedByRequest'), action: null, disabled: true, color: '#4CAF50' };
+        case 'request_rejected':
+        case 'none':
+        default:
+          return { text: t('signHereByOwner'), action: 'sign', color: '#2196F3' };
+      }
+    } else {
+      // Borrower view
+      switch (status) {
+        case 'signed_by_owner':
+        case 'signed_by_request':
+          return { text: t('signed'), action: null, disabled: true, color: '#4CAF50' };
+        case 'signature_requested':
+          return { text: t('signatureRequestPending'), action: null, disabled: true, color: '#FF9800' };
+        case 'request_rejected':
+        case 'none':
+        default:
+          return { text: t('requestSignature'), action: 'request', color: '#2196F3' };
+      }
+    }
   };
 
   if (loading || !book) {
@@ -408,11 +648,55 @@ export default function EntriesScreen({ navigation, route }) {
                     <Text style={styles.cellText}>{entry.remaining || ''}</Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>
-                    {entry.signature ? (
-                      <Text style={styles.signatureIndicator}>✓</Text>
-                    ) : (
-                      <Text style={styles.cellText}></Text>
-                    )}
+                    {(() => {
+                      const status = entry.signatureStatus || 'none';
+                      const requesterId = entry.signatureRequestedBy;
+                      const signedById = entry.signedBy;
+                      
+                      // Find usernames
+                      const requester = allUsers.find(u => u.id === requesterId);
+                      const signer = allUsers.find(u => u.id === signedById);
+                      const requesterName = requester?.username || 'Unknown';
+                      const signerName = signer?.username || 'Unknown';
+                      
+                      switch (status) {
+                        case 'signed_by_owner':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              <Text style={styles.signatureStatusText}>✓ {t('signedByOwner')}</Text>
+                            </View>
+                          );
+                        case 'signature_requested':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              <Text style={styles.signatureRequestedText}>⏳ {t('pending')}</Text>
+                              <Text style={styles.signatureDetailText}>
+                                {t('reqBy')} {requesterName}
+                              </Text>
+                            </View>
+                          );
+                        case 'signed_by_request':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              <Text style={styles.signatureStatusText}>✓ {t('approved')}</Text>
+                              <Text style={styles.signatureDetailText}>
+                                {t('reqBy')} {requesterName}
+                              </Text>
+                            </View>
+                          );
+                        case 'request_rejected':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              <Text style={styles.signatureRejectedText}>✗ {t('rejected')}</Text>
+                              <Text style={styles.signatureDetailText}>
+                                {t('reqBy')} {requesterName}
+                              </Text>
+                            </View>
+                          );
+                        default:
+                          return <Text style={styles.cellText}></Text>;
+                      }
+                    })()}
                   </View>
                 </TouchableOpacity>
               ))}
@@ -505,27 +789,59 @@ export default function EntriesScreen({ navigation, route }) {
                 />
               </View>
 
-              {/* Signature */}
+              {/* Digital Signature System */}
               <View style={styles.fieldContainer}>
-                <Text style={styles.label}>{t('signature')}</Text>
-                {editFormData.signature ? (
-                  <View style={styles.signaturePreview}>
-                    <Text style={styles.signatureText}>✓ {t('signed')}</Text>
-                    <TouchableOpacity
-                      style={styles.clearButton}
-                      onPress={handleClearSignature}
-                    >
-                      <Text style={styles.clearButtonText}>{t('clearSignature')}</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.signatureButton}
-                    onPress={() => setShowSignature(true)}
-                  >
-                    <Text style={styles.signatureButtonText}>✍️ {t('addSignature')}</Text>
-                  </TouchableOpacity>
-                )}
+                <Text style={styles.label}>{t('digitalSignature')}</Text>
+                {(() => {
+                  const buttonConfig = getSignatureButtonConfig();
+                  if (!buttonConfig) return null;
+
+                  return (
+                    <View>
+                      {buttonConfig.action === 'approve_reject' ? (
+                        // Show approve/reject buttons for owner when signature is requested
+                        <View style={styles.approveRejectContainer}>
+                          <Text style={styles.requestWarning}>⚠️ {t('signatureRequestedByBorrower')}</Text>
+                          <View style={styles.approveRejectButtons}>
+                            <TouchableOpacity
+                              style={[styles.approveButton, styles.signatureActionButton]}
+                              onPress={handleApproveRequest}
+                            >
+                              <Text style={styles.approveButtonText}>✓ {t('approve')}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={[styles.rejectButton, styles.signatureActionButton]}
+                              onPress={handleRejectRequest}
+                            >
+                              <Text style={styles.rejectButtonText}>✗ {t('reject')}</Text>
+                            </TouchableOpacity>
+                          </View>
+                        </View>
+                      ) : (
+                        // Show single button for other states
+                        <TouchableOpacity
+                          style={[
+                            styles.signatureStatusButton,
+                            { backgroundColor: buttonConfig.color },
+                            buttonConfig.disabled && styles.signatureButtonDisabled
+                          ]}
+                          onPress={() => {
+                            if (buttonConfig.action === 'sign') {
+                              handleSignByOwner();
+                            } else if (buttonConfig.action === 'request') {
+                              handleRequestSignature();
+                            }
+                          }}
+                          disabled={buttonConfig.disabled}
+                        >
+                          <Text style={styles.signatureStatusButtonText}>
+                            {buttonConfig.text}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  );
+                })()}
               </View>
 
               {/* Save/Cancel Buttons */}
@@ -710,6 +1026,35 @@ const styles = StyleSheet.create({
     color: '#4CAF50',
     fontWeight: 'bold',
   },
+  signatureStatusContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  signatureStatusText: {
+    fontSize: 11,
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  signatureRequestedText: {
+    fontSize: 11,
+    color: '#FF9800',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  signatureRejectedText: {
+    fontSize: 11,
+    color: '#f44336',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  signatureDetailText: {
+    fontSize: 9,
+    color: '#666',
+    marginTop: 2,
+    textAlign: 'center',
+  },
   bottomActions: {
     padding: 15,
     backgroundColor: '#fff',
@@ -836,6 +1181,57 @@ const styles = StyleSheet.create({
   },
   clearButtonText: {
     color: '#fff',
+    fontWeight: 'bold',
+  },
+  // New signature system styles
+  signatureStatusButton: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  signatureStatusButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  signatureButtonDisabled: {
+    opacity: 0.7,
+  },
+  approveRejectContainer: {
+    marginTop: 8,
+  },
+  requestWarning: {
+    fontSize: 14,
+    color: '#FF9800',
+    fontWeight: '600',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  approveRejectButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  signatureActionButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  approveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  approveButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+  rejectButton: {
+    backgroundColor: '#f44336',
+  },
+  rejectButtonText: {
+    color: '#fff',
+    fontSize: 15,
     fontWeight: 'bold',
   },
   modalButtonContainer: {

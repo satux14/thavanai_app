@@ -386,6 +386,11 @@ export const updateEntry = async (entryId, entryData) => {
       amount: entryData.amount,
       remaining: entryData.remaining,
       signature: entryData.signature || null,
+      // Update signature status fields if provided
+      ...(entryData.signatureStatus !== undefined && { signatureStatus: entryData.signatureStatus }),
+      ...(entryData.signatureRequestedBy !== undefined && { signatureRequestedBy: entryData.signatureRequestedBy }),
+      ...(entryData.signedBy !== undefined && { signedBy: entryData.signedBy }),
+      ...(entryData.signedAt !== undefined && { signedAt: entryData.signedAt }),
     };
 
     await saveAllEntriesData(entries);

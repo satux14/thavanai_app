@@ -1029,9 +1029,14 @@ export default function DashboardScreen({ navigation }) {
                     <View style={styles.bookTitleSection}>
                       <View style={styles.headerTopRow}>
                         <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
-                        <Text style={styles.lastUpdatedCompact}>
-                          {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
-                        </Text>
+                        <View style={styles.lastUpdatedContainer}>
+                          <Text style={styles.lastUpdatedCompact}>
+                            {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
+                          </Text>
+                          <Text style={styles.ownerInfo}>
+                            {t('asOwner')}: {book.ownerName} (@{book.ownerUsername})
+                          </Text>
+                        </View>
                       </View>
                       <Text style={styles.bookName}>
                         {book.name}
@@ -1559,6 +1564,10 @@ const styles = StyleSheet.create({
     color: '#000',
     fontWeight: '600',
   },
+  lastUpdatedContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+  },
   lastUpdatedCompact: {
     fontSize: 10,
     color: '#000',
@@ -1568,6 +1577,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
+  },
+  ownerInfo: {
+    fontSize: 9,
+    color: '#666',
+    fontStyle: 'italic',
+    marginTop: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.90)',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 3,
   },
   bookName: {
     fontSize: 20,

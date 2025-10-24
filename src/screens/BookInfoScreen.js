@@ -17,7 +17,7 @@ import { useLanguage } from '../utils/i18n';
 import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
 
 export default function BookInfoScreen({ navigation, route }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { bookId } = route.params || {};
   const [bookInfo, setBookInfo] = useState({
     dlNo: '',
@@ -150,7 +150,9 @@ export default function BookInfoScreen({ navigation, route }) {
         {/* Title at Top */}
         <View style={styles.titleContainer}>
           <Text style={styles.titleTamil}>தினத்தவணைப் புத்தகம்</Text>
-          <Text style={styles.titleEnglish}>Daily Installment Book</Text>
+          {language === 'en' && (
+            <Text style={styles.titleEnglish}>Daily Installment Book</Text>
+          )}
         </View>
 
         {/* D.L.No. below title */}

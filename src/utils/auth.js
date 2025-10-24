@@ -177,3 +177,21 @@ export const findUserById = async (userId) => {
     throw error;
   }
 };
+
+/**
+ * Get all users (for signature display)
+ */
+export const getAllUsersForDisplay = async () => {
+  try {
+    getDatabase(); // Check if initialized
+    const users = await getAllUsers();
+    return users.map(u => ({
+      id: u.id,
+      username: u.username,
+      fullName: u.fullName,
+    }));
+  } catch (error) {
+    console.error('Error getting all users:', error);
+    return [];
+  }
+};

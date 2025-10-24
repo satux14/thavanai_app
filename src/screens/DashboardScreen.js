@@ -481,7 +481,10 @@ export default function DashboardScreen({ navigation }) {
         </View>
         <View style={styles.headerRight}>
           <Text style={styles.headerCount}>
-            {t('booksCount', { filtered: filteredBooks.length, total: books.length })}
+            {t('booksCount', { 
+              filtered: filteredOwnedBooks.length + filteredSharedBooks.length, 
+              total: books.length 
+            })}
           </Text>
           <View style={styles.headerButtons}>
             <LanguageToggle />
@@ -602,7 +605,16 @@ export default function DashboardScreen({ navigation }) {
           scrollEnabled={true}
           nestedScrollEnabled={true}
         >
-        {filteredBooks.length === 0 && searchQuery ? (
+        {/* No books at all */}
+        {books.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>📚</Text>
+            <Text style={styles.emptyTitle}>{t('noBooksYet')}</Text>
+            <Text style={styles.emptyText}>
+              {t('noBooksYetDesc')}
+            </Text>
+          </View>
+        ) : (filteredOwnedBooks.length === 0 && filteredSharedBooks.length === 0 && searchQuery) ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>🔍</Text>
             <Text style={styles.emptyTitle}>{t('noBooksFound')}</Text>
@@ -616,16 +628,13 @@ export default function DashboardScreen({ navigation }) {
               <Text style={styles.clearSearchButtonText}>{t('clearSearch')}</Text>
             </TouchableOpacity>
           </View>
-        ) : books.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>📚</Text>
-            <Text style={styles.emptyTitle}>{t('noBooksYet')}</Text>
-            <Text style={styles.emptyText}>
-              {t('noBooksYetDesc')}
-            </Text>
-          </View>
         ) : (
-          filteredBooks.map((book, index) => {
+          <>
+          {/* My Books Section */}
+          {filteredOwnedBooks.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>📖 {t('myBooks')} ({filteredOwnedBooks.length})</Text>
+              {filteredOwnedBooks.map((book, index) => {
             const CardWrapper = book.backgroundImage ? ImageBackground : View;
             const cardWrapperProps = book.backgroundImage
               ? {
@@ -776,7 +785,131 @@ export default function DashboardScreen({ navigation }) {
             </CardWrapper>
           </TouchableOpacity>
             );
-          })
+          })}
+            </View>
+          )}
+
+          {/* Shared with Me Section */}
+          {filteredSharedBooks.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>🤝 {t('sharedWithMe')} ({filteredSharedBooks.length})</Text>
+              {filteredSharedBooks.map((book, index) => {
+            const CardWrapper = book.backgroundImage ? ImageBackground : View;
+            const cardWrapperProps = book.backgroundImage
+              ? {
+                  source: { uri: book.backgroundImage },
+                  style: [
+                    styles.bookCard,
+                    { backgroundColor: book.backgroundColor || '#fff' },
+                  ],
+                }
+              : {
+                  style: [
+                    styles.bookCard,
+                    { backgroundColor: book.backgroundColor || '#fff' },
+                  ],
+                };
+
+            return (
+              <TouchableOpacity
+                key={book.id}
+                onPress={() => handleOpenBook(book)}
+                activeOpacity={0.8}
+              >
+                <CardWrapper {...cardWrapperProps}>
+                  {/* Semi-transparent overlay if image is set */}
+                  {book.backgroundImage && (
+                    <View style={styles.imageOverlay} />
+                  )}
+                  
+                  {/* Card Header */}
+                  <View style={[styles.bookHeader, book.backgroundImage && { zIndex: 1 }]}>
+                    <View style={styles.bookNumber}>
+                      <Text style={styles.bookNumberText}>{index + 1}</Text>
+                    </View>
+                    <View style={styles.bookTitleSection}>
+                      <View style={styles.headerTopRow}>
+                        <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
+                        <Text style={styles.lastUpdatedCompact}>
+                          {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
+                        </Text>
+                      </View>
+                      <Text style={styles.bookName}>
+                        {book.name}
+                        {book.fatherName && (
+                          <Text style={styles.fatherNameInline}> s/o {book.fatherName}</Text>
+                        )}
+                      </Text>
+                    </View>
+                  </View>
+
+              {/* Loan Amount & Balance - Prominent */}
+              <View style={[styles.loanSection, book.backgroundImage && { zIndex: 1 }]}>
+                <View style={styles.amountRow}>
+                  <View style={styles.amountItem}>
+                    <Text style={styles.loanLabel}>{t('loanAmount')}</Text>
+                    <Text style={styles.loanAmount}>₹{book.loanAmount || 'N/A'}</Text>
+                  </View>
+                  <View style={styles.balanceDivider} />
+                  <View style={styles.amountItem}>
+                    <Text style={styles.balanceLabel}>{t('balance')}</Text>
+                    <Text style={[
+                      styles.balanceAmount,
+                      book.balance === 0 && styles.balanceZero,
+                      book.balance < 0 && styles.balanceNegative
+                    ]}>
+                      ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(2) : '0.00'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Date Information */}
+              <View style={[styles.dateSection, book.backgroundImage && { zIndex: 1 }]}>
+                <View style={styles.dateRow}>
+                  <View style={styles.dateItem}>
+                    <Text style={styles.dateLabel}>{t('startDate')}</Text>
+                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.startDate)}</Text>
+                  </View>
+                  <View style={styles.dateDivider} />
+                  <View style={styles.dateItem}>
+                    <Text style={styles.dateLabel}>{t('endDate')}</Text>
+                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.endDate)}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Status Badge */}
+              {book.status === 'closed' && (
+                <View style={[styles.statusBadge, book.backgroundImage && { zIndex: 1 }]}>
+                  <Text style={styles.statusBadgeText}>🔒 {t('closed')}</Text>
+                </View>
+              )}
+
+              {/* Shared Badge */}
+              <View style={[styles.sharedBadge, book.backgroundImage && { zIndex: 1 }]}>
+                <Text style={styles.sharedBadgeText}>🤝 {t('shared')}</Text>
+              </View>
+
+              {/* Action Buttons - Borrower has limited actions */}
+              <View style={[styles.bookActions, book.backgroundImage && { zIndex: 1 }]}>
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.exportButton]}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    handleExportBook(book);
+                  }}
+                >
+                  <Text style={styles.actionButtonText}>📄 {t('exportPdf')}</Text>
+                </TouchableOpacity>
+              </View>
+            </CardWrapper>
+          </TouchableOpacity>
+            );
+          })}
+            </View>
+          )}
+          </>
         )}
         
         {/* Add some bottom padding in scroll content */}
@@ -1217,6 +1350,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
+  },
+  sharedBadge: {
+    backgroundColor: '#4CAF50',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  sharedBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+    paddingHorizontal: 5,
   },
   bookActions: {
     flexDirection: 'row',

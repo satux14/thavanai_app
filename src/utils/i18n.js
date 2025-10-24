@@ -105,6 +105,8 @@ const translations = {
     signatureRejected: 'Signature request rejected',
     rejectFailed: 'Failed to reject signature',
     reqBy: 'Req. by',
+    approvedBy: 'Approved by',
+    pendingApproval: 'pending approval',
     cannotEditApprovedEntry: 'Cannot edit approved entries. Both parties have agreed to this transaction.',
     
     searchPlaceholder: 'Search by name, D.L.No, father name...',
@@ -115,6 +117,7 @@ const translations = {
     startDate: 'Start Date',
     showBooksFilter: 'Show:',
     activeBooks: 'Active Books',
+    pendingBooks: 'Pending',
     closedBooks: 'Closed Books',
     allBooks: 'All Books',
     noBooksYet: 'No Books Yet',
@@ -307,6 +310,8 @@ const translations = {
     signatureRejected: 'கையொப்பம் கோரிக்கை நிராகரிக்கப்பட்டது',
     rejectFailed: 'கையொப்பத்தை நிராகரிக்க முடியவில்லை',
     reqBy: 'கோரியவர்',
+    approvedBy: 'ஒப்புதல் அளித்தவர்',
+    pendingApproval: 'ஒப்புதல் நிலுவையில்',
     cannotEditApprovedEntry: 'ஒப்புதல் பெற்ற பதிவுகளை திருத்த முடியாது. இரு தரப்பினரும் இந்த பரிவர்த்தனையை ஒப்புக்கொண்டனர்.',
     
     searchPlaceholder: 'பெயர், D.L.எண், தந்தை பெயர் மூலம் தேடு...',
@@ -317,6 +322,7 @@ const translations = {
     startDate: 'தொடக்க தேதி',
     showBooksFilter: 'காட்டு:',
     activeBooks: 'செயலில் உள்ள புத்தகங்கள்',
+    pendingBooks: 'நிலுவையில்',
     closedBooks: 'மூடிய புத்தகங்கள்',
     allBooks: 'அனைத்து புத்தகங்கள்',
     noBooksYet: 'இன்னும் புத்தகங்கள் இல்லை',

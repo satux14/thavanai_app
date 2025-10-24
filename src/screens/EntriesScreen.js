@@ -702,6 +702,9 @@ export default function EntriesScreen({ navigation, route }) {
                               <Text style={styles.signatureDetailText}>
                                 {t('reqBy')} {requesterName}
                               </Text>
+                              <Text style={styles.signatureDetailText}>
+                                {t('approvedBy')} {signerName}
+                              </Text>
                             </View>
                           );
                         case 'request_rejected':

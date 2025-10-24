@@ -75,12 +75,20 @@ export default function DashboardScreen({ navigation }) {
 
     const allBooks = await getAllBooks();
     
-    // Load entries for each book to calculate balance
+    // Load entries for each book to calculate balance and pending signatures
     const booksWithBalance = await Promise.all(
       allBooks.map(async (book) => {
         const entries = await getEntries(book.id);
         const balance = calculateBalance(book.loanAmount, entries);
-        return { ...book, balance, entryCount: entries.length };
+        
+        // Count pending signature requests that need THIS user's action
+        // (where they are NOT the requester)
+        const pendingSignatures = entries.filter(
+          e => e.signatureStatus === 'signature_requested' && 
+               e.signatureRequestedBy !== user.id
+        ).length;
+        
+        return { ...book, balance, entryCount: entries.length, pendingSignatures };
       })
     );
     
@@ -119,11 +127,13 @@ export default function DashboardScreen({ navigation }) {
     const applyFilters = (booksList) => {
       let filtered = [...booksList];
 
-      // Filter by status (active/closed/all)
+      // Filter by status (active/closed/all/pending)
       if (bookStatusFilter === 'active') {
         filtered = filtered.filter(book => book.status !== 'closed');
       } else if (bookStatusFilter === 'closed') {
         filtered = filtered.filter(book => book.status === 'closed');
+      } else if (bookStatusFilter === 'pending') {
+        filtered = filtered.filter(book => book.pendingSignatures > 0);
       }
       // If 'all', don't filter by status
 
@@ -608,7 +618,9 @@ export default function DashboardScreen({ navigation }) {
           {currentUser && (
             <View>
               <Text style={styles.welcomeText}>{t('welcome')},</Text>
-              <Text style={styles.userName}>{currentUser.fullName}</Text>
+              <Text style={styles.userName}>
+                {currentUser.fullName} (@{currentUser.username})
+              </Text>
             </View>
           )}
         </View>
@@ -738,6 +750,14 @@ export default function DashboardScreen({ navigation }) {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                style={[styles.sortButton, bookStatusFilter === 'pending' && styles.sortButtonActive]}
+                onPress={() => setBookStatusFilter('pending')}
+              >
+                <Text style={[styles.sortButtonText, bookStatusFilter === 'pending' && styles.sortButtonTextActive]}>
+                  ⚠️ {t('pendingBooks')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
                 style={[styles.sortButton, bookStatusFilter === 'closed' && styles.sortButtonActive]}
                 onPress={() => setBookStatusFilter('closed')}
               >
@@ -836,12 +856,21 @@ export default function DashboardScreen({ navigation }) {
                           {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
                         </Text>
                       </View>
-                      <Text style={styles.bookName}>
-                        {book.name}
-                        {book.fatherName && (
-                          <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
+                      <View style={styles.nameRow}>
+                        <Text style={styles.bookName}>
+                          {book.name}
+                          {book.fatherName && (
+                            <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
+                          )}
+                        </Text>
+                        {book.pendingSignatures > 0 && (
+                          <View style={styles.pendingBadgeInline}>
+                            <Text style={styles.pendingBadgeInlineText}>
+                              ⚠️ {book.pendingSignatures}
+                            </Text>
+                          </View>
                         )}
-                      </Text>
+                      </View>
                     </View>
                   </View>
 
@@ -1038,12 +1067,21 @@ export default function DashboardScreen({ navigation }) {
                           </Text>
                         </View>
                       </View>
-                      <Text style={styles.bookName}>
-                        {book.name}
-                        {book.fatherName && (
-                          <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
+                      <View style={styles.nameRow}>
+                        <Text style={styles.bookName}>
+                          {book.name}
+                          {book.fatherName && (
+                            <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
+                          )}
+                        </Text>
+                        {book.pendingSignatures > 0 && (
+                          <View style={styles.pendingBadgeInline}>
+                            <Text style={styles.pendingBadgeInlineText}>
+                              ⚠️ {book.pendingSignatures}
+                            </Text>
+                          </View>
                         )}
-                      </Text>
+                      </View>
                     </View>
                   </View>
 
@@ -1727,6 +1765,25 @@ const styles = StyleSheet.create({
   statusBadgeText: {
     color: '#fff',
     fontSize: 12,
+    fontWeight: 'bold',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  pendingBadgeInline: {
+    backgroundColor: '#FF9800',
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  pendingBadgeInlineText: {
+    color: '#fff',
+    fontSize: 11,
     fontWeight: 'bold',
   },
   sharedBadge: {

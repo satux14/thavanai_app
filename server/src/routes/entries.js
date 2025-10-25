@@ -54,18 +54,22 @@ router.post('/', (req, res) => {
     id,
     bookId,
     serialNumber,
-    pageNumber,
-    date,
-    amount,
-    remaining,
-    signatureStatus,
-    signatureRequestedBy,
-    signedBy,
-    signedAt
+    pageNumber = 1,
+    date = null,
+    amount = null,
+    remaining = null,
+    signatureStatus = 'none',
+    signatureRequestedBy = null,
+    signedBy = null,
+    signedAt = null
   } = req.body;
 
-  if (!id || !bookId || serialNumber === undefined) {
-    return res.status(400).json({ error: 'ID, bookId, and serialNumber are required' });
+  if (!id || !bookId || serialNumber === undefined || serialNumber === null) {
+    console.error('Missing required fields:', { id, bookId, serialNumber });
+    return res.status(400).json({ 
+      error: 'ID, bookId, and serialNumber are required',
+      received: { id, bookId, serialNumber }
+    });
   }
 
   // Verify access to book
@@ -97,13 +101,28 @@ router.post('/', (req, res) => {
         updated_at = CURRENT_TIMESTAMP
     `;
 
+    const params = [
+      id, 
+      bookId, 
+      serialNumber, 
+      pageNumber || 1, 
+      date || null, 
+      amount || null, 
+      remaining || null, 
+      signatureStatus || 'none', 
+      signatureRequestedBy || null, 
+      signedBy || null, 
+      signedAt || null
+    ];
+
     db.run(
       query,
-      [id, bookId, serialNumber, pageNumber, date, amount, remaining, signatureStatus, signatureRequestedBy, signedBy, signedAt],
+      params,
       function(err) {
         if (err) {
           console.error('Save entry error:', err);
-          return res.status(500).json({ error: 'Failed to save entry' });
+          console.error('Failed params:', params);
+          return res.status(500).json({ error: 'Failed to save entry', details: err.message });
         }
 
         // Update book's updated_at

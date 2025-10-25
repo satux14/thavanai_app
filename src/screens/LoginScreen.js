@@ -52,11 +52,21 @@ export default function LoginScreen({ navigation }) {
       navigation.replace('Dashboard');
     } else {
       console.log('Login failed:', result.error);
+      
+      // Better error message for network issues
+      let errorMessage = result.error || 'Invalid username or password';
+      if (result.error && result.error.toLowerCase().includes('network')) {
+        errorMessage = 'Cannot connect to server.\n\n' +
+          '📱 Make sure your phone is on WiFi (same network as server)\n' +
+          '🌐 Server should be at: 192.168.1.17:3000\n' +
+          '❌ Mobile data will not work';
+      }
+      
       // Show error message (web-compatible)
       if (Platform.OS === 'web') {
-        alert('Login Failed: ' + (result.error || 'Invalid username or password'));
+        alert('Login Failed: ' + errorMessage);
       } else {
-        Alert.alert('Login Failed', result.error || 'Invalid username or password');
+        Alert.alert('Login Failed', errorMessage);
       }
     }
   };

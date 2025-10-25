@@ -16,9 +16,21 @@ export const registerUser = async (username, password, fullName, preferredLangua
     };
   } catch (error) {
     console.error('Error in registerUser:', error);
+    
+    // Detect network errors
+    let errorMessage = error.message || 'Failed to register user';
+    if (error.message && (
+      error.message.includes('Network request failed') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('fetch failed') ||
+      error.message.toLowerCase().includes('network')
+    )) {
+      errorMessage = 'Network request failed - Cannot connect to server';
+    }
+    
     return {
       success: false,
-      error: error.message || 'Failed to register user',
+      error: errorMessage,
     };
   }
 };
@@ -40,9 +52,21 @@ export const loginUser = async (username, password) => {
     };
   } catch (error) {
     console.error('Error logging in:', error);
+    
+    // Detect network errors
+    let errorMessage = error.message || 'Login failed';
+    if (error.message && (
+      error.message.includes('Network request failed') ||
+      error.message.includes('Failed to fetch') ||
+      error.message.includes('fetch failed') ||
+      error.message.toLowerCase().includes('network')
+    )) {
+      errorMessage = 'Network request failed - Cannot connect to server';
+    }
+    
     return {
       success: false,
-      error: error.message || 'Login failed',
+      error: errorMessage,
     };
   }
 };

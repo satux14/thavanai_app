@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const booksRoutes = require('./routes/books');
 const entriesRoutes = require('./routes/entries');
 const sharingRoutes = require('./routes/sharing');
+const adminRoutes = require('./routes/admin');
+const authMiddleware = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/books', booksRoutes);
 app.use('/api/entries', entriesRoutes);
 app.use('/api/sharing', sharingRoutes);
+app.use('/api/admin', authMiddleware, adminRoutes); // Admin routes (protected)
 
 // OpenAPI/Swagger Documentation
 try {
@@ -43,6 +46,12 @@ try {
 } catch (error) {
   console.warn('⚠ OpenAPI spec not found, skipping documentation');
 }
+
+// Serve Admin UI (static files)
+app.use('/admin', express.static(path.join(__dirname, '../admin-ui')));
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, '../admin-ui/index.html'));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -61,13 +70,14 @@ app.use((req, res) => {
 // Start server
 app.listen(PORT, () => {
   console.log(`
-╔══════════════════════════════════════════════════════════╗
-║  Thavanai Server - Daily Installment Book API          ║
-╠══════════════════════════════════════════════════════════╣
-║  Server running on: http://localhost:${PORT}              ║
-║  API Documentation: http://localhost:${PORT}/api-docs     ║
-║  Health Check:      http://localhost:${PORT}/health       ║
-╚══════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════╗
+║  Thavanai Server - Daily Installment Book API           ║
+╠═══════════════════════════════════════════════════════════╣
+║  Server running on: http://localhost:${PORT}               ║
+║  API Documentation: http://localhost:${PORT}/api-docs      ║
+║  Admin Panel:       http://localhost:${PORT}/admin         ║
+║  Health Check:      http://localhost:${PORT}/health        ║
+╚═══════════════════════════════════════════════════════════╝
   `);
 });
 

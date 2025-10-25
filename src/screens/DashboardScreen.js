@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook, getBookShares, unshareBook } from '../utils/storage';
 import { getCurrentUser, logoutUser } from '../utils/auth';
-import jsPDF from 'jspdf';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import LanguageToggle from '../components/LanguageToggle';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 

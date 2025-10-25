@@ -716,12 +716,12 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {(entry.amount !== null && entry.amount !== undefined && entry.amount !== '') || entry.amount === 0 ? entry.amount : ''}
+                      {entry.amount !== null && entry.amount !== undefined && String(entry.amount).trim() !== '' ? entry.amount : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {(entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '') || entry.remaining === 0 ? entry.remaining : ''}
+                      {entry.remaining !== null && entry.remaining !== undefined && String(entry.remaining).trim() !== '' ? entry.remaining : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>

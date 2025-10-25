@@ -142,7 +142,8 @@ export default function EntriesScreen({ navigation, route }) {
         const formattedDate = entryDate.toISOString().split('T')[0]; // YYYY-MM-DD
         
         // Create entry with date pre-filled
-        await saveEntry(book.id, {
+        await saveEntry({
+          bookId: book.id,
           serialNumber,
           pageNumber,
           date: formattedDate,
@@ -312,6 +313,7 @@ export default function EntriesScreen({ navigation, route }) {
       const shouldClearSignature = wasSigned;
       
       const entryData = {
+        bookId: bookId,
         date: editFormData.date,
         amount: parseFloat(editFormData.amount) || 0,
         remaining: parseFloat(editFormData.remaining) || 0,
@@ -375,7 +377,7 @@ export default function EntriesScreen({ navigation, route }) {
         }
       } else {
         // Create new entry
-        await saveEntry(bookId, entryData);
+        await saveEntry(entryData);
       }
 
       // STEP 3: Recalculate balances ONLY for future entries that ALREADY have amounts

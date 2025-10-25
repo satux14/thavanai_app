@@ -1,5 +1,8 @@
 import { getDatabase, getAllUsers, saveAllUsers, getNextUserId } from './database';
 import * as Crypto from 'expo-crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const CURRENT_USER_KEY = '@current_user';
 
 /**
  * Hash a password using SHA-256
@@ -91,18 +94,20 @@ export const loginUser = async (username, password) => {
 
     console.log('User logged in successfully:', user);
     
-    // Store current user in memory
-    global.currentUser = {
+    // Store current user in AsyncStorage
+    const currentUser = {
       id: user.id,
       username: user.username,
       fullName: user.fullName,
       preferredLanguage: user.preferredLanguage || 'en',
       createdAt: user.createdAt,
     };
+    
+    await AsyncStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
 
     return {
       success: true,
-      user: global.currentUser,
+      user: currentUser,
     };
   } catch (error) {
     console.error('Error logging in:', error);
@@ -118,14 +123,20 @@ export const loginUser = async (username, password) => {
  */
 export const logoutUser = async () => {
   console.log('Logging out user');
-  global.currentUser = null;
+  await AsyncStorage.removeItem(CURRENT_USER_KEY);
 };
 
 /**
  * Get the current logged-in user
  */
 export const getCurrentUser = async () => {
-  return global.currentUser || null;
+  try {
+    const userJson = await AsyncStorage.getItem(CURRENT_USER_KEY);
+    return userJson ? JSON.parse(userJson) : null;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
+  }
 };
 
 /**

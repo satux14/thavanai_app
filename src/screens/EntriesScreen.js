@@ -335,7 +335,10 @@ export default function EntriesScreen({ navigation, route }) {
              (e.amount === null || e.amount === undefined || e.amount === '')
       );
       
-      console.log(`Filling ${previousEmptyEntries.length} previous empty entries with 0 and today's date`);
+      console.log(`⭐ Current entry serial: ${currentSerialNumber}`);
+      console.log(`⭐ Total entries found: ${allEntries.length}`);
+      console.log(`⭐ Previous empty entries to fill: ${previousEmptyEntries.length}`);
+      console.log(`⭐ Empty entries details:`, previousEmptyEntries.map(e => ({ serial: e.serialNumber, amount: e.amount, id: e.id })));
       
       // Fill ONLY previous empty entries with 0 amount and today's date if no date
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -349,15 +352,20 @@ export default function EntriesScreen({ navigation, route }) {
           const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
           const balance = (book.loanAmount || 0) - totalPaidBefore;
           
-          await updateEntryStorage(emptyEntry.id, {
+          const updateData = {
             ...emptyEntry,
             date: emptyEntry.date || today, // Fill date if empty
             amount: 0,
             remaining: balance,
-          });
-          console.log(`Filled entry ${emptyEntry.serialNumber} with 0 credit`);
+          };
+          console.log(`⭐ Updating entry ${emptyEntry.serialNumber} with data:`, updateData);
+          await updateEntryStorage(emptyEntry.id, updateData);
+          console.log(`✅ Successfully filled entry ${emptyEntry.serialNumber} with 0 credit`);
+        } else {
+          console.log(`⚠️ Entry ${emptyEntry.serialNumber} has no ID, skipping`);
         }
       }
+      console.log(`⭐ Auto-fill complete`);
 
       // STEP 2: Save the current entry being edited
       if (selectedEntry.id) {
@@ -708,12 +716,12 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? entry.amount : ''}
+                      {(entry.amount !== null && entry.amount !== undefined && entry.amount !== '') || entry.amount === 0 ? entry.amount : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '' ? entry.remaining : ''}
+                      {(entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '') || entry.remaining === 0 ? entry.remaining : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>

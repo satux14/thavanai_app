@@ -421,8 +421,14 @@ const translations = {
   },
 };
 
-// Language Context
-const LanguageContext = createContext();
+// Language Context with default values
+const LanguageContext = createContext({
+  language: 'en',
+  changeLanguage: () => {},
+  setLanguage: () => {},
+  t: (key) => key,
+  isLoading: false,
+});
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('en'); // Default to English
@@ -438,9 +444,10 @@ export const LanguageProvider = ({ children }) => {
       if (savedLang && (savedLang === 'en' || savedLang === 'ta')) {
         setLanguage(savedLang);
       }
+      // Always set loading to false after attempting to load
+      setIsLoading(false);
     } catch (error) {
       console.error('Error loading language:', error);
-    } finally {
       setIsLoading(false);
     }
   };

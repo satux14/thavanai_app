@@ -32,6 +32,7 @@ export default function DashboardScreen({ navigation }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('updated'); // 'updated', 'name', 'amount', 'date'
+  const [showSearch, setShowSearch] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [bookStatusFilter, setBookStatusFilter] = useState('active'); // 'active', 'closed', 'all'
   const [viewMode, setViewMode] = useState('owner'); // 'owner' or 'borrower'
@@ -606,12 +607,6 @@ export default function DashboardScreen({ navigation }) {
           )}
         </View>
         <View style={styles.headerRight}>
-          <Text style={styles.headerCount}>
-            {viewMode === 'owner' 
-              ? t('booksCount', { filtered: filteredOwnedBooks.length, total: ownedBooks.length })
-              : t('booksCount', { filtered: filteredSharedBooks.length, total: sharedBooks.length })
-            }
-          </Text>
           <View style={styles.headerButtons}>
             <LanguageToggle />
             <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
@@ -626,12 +621,9 @@ export default function DashboardScreen({ navigation }) {
         <Text style={styles.appTitle}>
           {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
         </Text>
-        {language === 'ta' && (
-          <Text style={styles.appTitleEnglish}>Daily Installment Book</Text>
-        )}
       </View>
 
-      {/* View Mode Toggle */}
+      {/* View Mode Toggle with Search/Filter Icon */}
       <View style={styles.viewModeContainer}>
         <TouchableOpacity
           style={[styles.viewModeTab, viewMode === 'owner' && styles.viewModeTabActive]}
@@ -649,38 +641,55 @@ export default function DashboardScreen({ navigation }) {
             🤝 {t('asBorrower')} ({sharedBooks.length})
           </Text>
         </TouchableOpacity>
-      </View>
-
-      {/* Search and Filter Bar */}
-      <View style={styles.searchContainer}>
-        {/* Search Input */}
-        <View style={styles.searchInputContainer}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder={t('searchPlaceholder')}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#999"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Text style={styles.clearIcon}>✕</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        {/* Filter Toggle Button */}
+        
+        {/* Search Toggle Icon */}
         <TouchableOpacity
-          style={styles.filterToggleButton}
-          onPress={() => setShowFilters(!showFilters)}
+          style={styles.filterToggleIconButton}
+          onPress={() => {
+            setShowSearch(!showSearch);
+            if (showSearch) {
+              // Closing search, reset everything
+              setShowFilters(false);
+              setSearchQuery('');
+            }
+          }}
         >
-          <Text style={styles.filterIcon}>⚙️</Text>
+          <Text style={styles.filterIconSmall}>{showSearch ? '✕' : '🔍'}</Text>
         </TouchableOpacity>
       </View>
 
+      {/* Search Bar - Collapsible */}
+      {showSearch && (
+        <View style={styles.searchContainer}>
+          {/* Search Input */}
+          <View style={styles.searchInputContainer}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t('searchPlaceholder')}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor="#999"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Text style={styles.clearIcon}>✕</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          
+          {/* Filter Toggle Button */}
+          <TouchableOpacity
+            style={styles.filterToggleButton}
+            onPress={() => setShowFilters(!showFilters)}
+          >
+            <Text style={styles.filterIcon}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Sort Options - Collapsible */}
-      {showFilters && (
+      {showSearch && showFilters && (
         <View style={styles.filterPanel}>
           <Text style={styles.filterLabel}>{t('sortBy')}</Text>
           <View style={styles.sortButtons}>
@@ -1266,7 +1275,9 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#2196F3',
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingTop: 50,
+    paddingBottom: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1334,6 +1345,24 @@ const styles = StyleSheet.create({
   },
   viewModeTabTextActive: {
     color: '#fff',
+  },
+  filterToggleIconButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#2196F3',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  filterIconSmall: {
+    fontSize: 16,
   },
   headerButtons: {
     flexDirection: 'row',

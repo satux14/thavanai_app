@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const adminAuth = (req, res, next) => {
   // User is already authenticated by the JWT middleware
   // Now check if they have admin role
-  const userId = req.user.userId;
+  const userId = req.user.id;
   
   db.get('SELECT role FROM users WHERE id = ?', [userId], (err, user) => {
     if (err) {

@@ -699,7 +699,13 @@ export default function EntriesScreen({ navigation, route }) {
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={true}
             >
-              {currentPageEntries.map((entry, index) => (
+              {currentPageEntries.map((entry, index) => {
+                // Debug: Log entry data for first few entries
+                if (entry.serialNumber <= 3 || entry.serialNumber === 9) {
+                  console.log(`Entry ${entry.serialNumber}: amount=${entry.amount} (type: ${typeof entry.amount}), remaining=${entry.remaining}`);
+                }
+                
+                return (
                 <TouchableOpacity
                   key={index}
                   style={[
@@ -716,12 +722,12 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.amount !== null && entry.amount !== undefined && String(entry.amount).trim() !== '' ? entry.amount : ''}
+                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.remaining !== null && entry.remaining !== undefined && String(entry.remaining).trim() !== '' ? entry.remaining : ''}
+                      {entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '' ? String(entry.remaining) : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>
@@ -773,7 +779,8 @@ export default function EntriesScreen({ navigation, route }) {
                     })()}
                   </View>
                 </TouchableOpacity>
-              ))}
+                );
+              })}
             </ScrollView>
           </View>
         </ScrollView>

@@ -43,6 +43,7 @@ export default function DashboardScreen({ navigation }) {
   const [sharedUsers, setSharedUsers] = useState([]);
   const [bookToViewShares, setBookToViewShares] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [connectionError, setConnectionError] = useState(false);
 
   useEffect(() => {
     loadBooks();
@@ -77,55 +78,65 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const loadBooks = async (forceRefresh = false) => {
-    const user = await getCurrentUser();
-    if (!user) return;
+    try {
+      setConnectionError(false); // Reset error state
+      
+      const user = await getCurrentUser();
+      if (!user) return;
 
-    const allBooks = await getAllBooks(forceRefresh);
-    
-    // Load entries for each book to calculate balance and pending signatures
-    const booksWithBalance = await Promise.all(
-      allBooks.map(async (book) => {
-        const entries = await getEntries(book.id);
-        const balance = calculateBalance(book.loanAmount, entries);
-        
-        // Count pending signature requests that need THIS user's action
-        // (where they are NOT the requester)
-        const pendingSignatures = entries.filter(
-          e => e.signatureStatus === 'signature_requested' && 
-               e.signatureRequestedBy !== user.id
-        ).length;
-        
-        return { ...book, balance, entryCount: entries.length, pendingSignatures };
-      })
-    );
-    
-    // Separate owned and shared books
-    const owned = booksWithBalance.filter(book => book.isOwned === true);
-    const shared = booksWithBalance.filter(book => book.isShared === true);
-    
-    setBooks(booksWithBalance);
-    setOwnedBooks(owned);
-    setSharedBooks(shared);
-    
-    // Auto-switch to borrower view if no owner books but has shared books
-    if (owned.length === 0 && shared.length > 0) {
-      setViewMode('borrower');
-    } else {
-      // Default to owner view
-      setViewMode('owner');
-    }
-    
-    console.log('Total books:', booksWithBalance.length);
-    console.log('Owned books:', owned.length);
-    console.log('Shared books:', shared.length);
-    
-    // Debug: Log book dates
-    if (booksWithBalance.length > 0) {
-      console.log('First book dates:', {
-        name: booksWithBalance[0].name,
-        startDate: booksWithBalance[0].startDate,
-        endDate: booksWithBalance[0].endDate
-      });
+      const allBooks = await getAllBooks(forceRefresh);
+      
+      // Load entries for each book to calculate balance and pending signatures
+      const booksWithBalance = await Promise.all(
+        allBooks.map(async (book) => {
+          const entries = await getEntries(book.id);
+          const balance = calculateBalance(book.loanAmount, entries);
+          
+          // Count pending signature requests that need THIS user's action
+          // (where they are NOT the requester)
+          const pendingSignatures = entries.filter(
+            e => e.signatureStatus === 'signature_requested' && 
+                 e.signatureRequestedBy !== user.id
+          ).length;
+          
+          return { ...book, balance, entryCount: entries.length, pendingSignatures };
+        })
+      );
+      
+      // Separate owned and shared books
+      const owned = booksWithBalance.filter(book => book.isOwned === true);
+      const shared = booksWithBalance.filter(book => book.isShared === true);
+      
+      setBooks(booksWithBalance);
+      setOwnedBooks(owned);
+      setSharedBooks(shared);
+      
+      // Auto-switch to borrower view if no owner books but has shared books
+      if (owned.length === 0 && shared.length > 0) {
+        setViewMode('borrower');
+      } else {
+        // Default to owner view
+        setViewMode('owner');
+      }
+      
+      console.log('Total books:', booksWithBalance.length);
+      console.log('Owned books:', owned.length);
+      console.log('Shared books:', shared.length);
+      
+      // Debug: Log book dates
+      if (booksWithBalance.length > 0) {
+        console.log('First book dates:', {
+          name: booksWithBalance[0].name,
+          startDate: booksWithBalance[0].startDate,
+          endDate: booksWithBalance[0].endDate
+        });
+      }
+    } catch (error) {
+      console.error('Error loading books:', error);
+      // Check if it's a network error
+      if (error.message && (error.message.includes('Network') || error.message.includes('fetch') || error.message.includes('ECONNREFUSED'))) {
+        setConnectionError(true);
+      }
     }
   };
 
@@ -788,7 +799,21 @@ export default function DashboardScreen({ navigation }) {
         {/* Show books based on view mode */}
         {viewMode === 'owner' ? (
           // Owner View
-          ownedBooks.length === 0 ? (
+          connectionError ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⚠️</Text>
+              <Text style={styles.emptyTitle}>{t('connectionError')}</Text>
+              <Text style={styles.emptyText}>
+                {t('connectionErrorDesc')}
+              </Text>
+              <TouchableOpacity
+                style={styles.clearSearchButton}
+                onPress={() => loadBooks(true)}
+              >
+                <Text style={styles.clearSearchButtonText}>{t('retry')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : ownedBooks.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>📖</Text>
               <Text style={styles.emptyTitle}>{t('noOwnedBooks')}</Text>
@@ -996,7 +1021,21 @@ export default function DashboardScreen({ navigation }) {
           )
         ) : (
           // Borrower View
-          sharedBooks.length === 0 ? (
+          connectionError ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⚠️</Text>
+              <Text style={styles.emptyTitle}>{t('connectionError')}</Text>
+              <Text style={styles.emptyText}>
+                {t('connectionErrorDesc')}
+              </Text>
+              <TouchableOpacity
+                style={styles.clearSearchButton}
+                onPress={() => loadBooks(true)}
+              >
+                <Text style={styles.clearSearchButtonText}>{t('retry')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : sharedBooks.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>🤝</Text>
               <Text style={styles.emptyTitle}>{t('noSharedBooks')}</Text>

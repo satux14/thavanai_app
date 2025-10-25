@@ -3,23 +3,29 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { useLanguage } from '../utils/i18n';
 
 export default function LanguageToggle() {
+  console.log('=== LanguageToggle RENDERING ===');
   const { language, changeLanguage } = useLanguage();
+  console.log('LanguageToggle: current language:', language, 'Type:', typeof language);
 
   const toggleLanguage = () => {
     const newLang = language === 'en' ? 'ta' : 'en';
     changeLanguage(newLang);
   };
 
+  console.log('LanguageToggle: About to render with language:', language);
   return (
     <TouchableOpacity style={styles.container} onPress={toggleLanguage}>
       <View style={styles.button}>
-        <Text style={[styles.lang, language === 'en' && styles.activeLang]}>
+        {console.log('LanguageToggle: Rendering EN text, isActive:', language === 'en')}
+        <Text style={language === 'en' ? [styles.lang, styles.activeLang] : styles.lang}>
           EN
         </Text>
         <Text style={styles.separator}>|</Text>
-        <Text style={[styles.lang, language === 'ta' && styles.activeLang]}>
+        {console.log('LanguageToggle: Rendering TA text, isActive:', language === 'ta')}
+        <Text style={language === 'ta' ? [styles.lang, styles.activeLang] : styles.lang}>
           த
         </Text>
+        {console.log('✅ LanguageToggle rendered successfully!')}
       </View>
     </TouchableOpacity>
   );

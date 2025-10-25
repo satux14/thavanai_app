@@ -14,7 +14,9 @@ import { registerUser, loginUser } from '../utils/auth';
 import { useLanguage } from '../utils/i18n';
 
 export default function RegisterScreen({ navigation }) {
+  console.log('=== RegisterScreen COMPONENT CALLED ===');
   const { t, setLanguage } = useLanguage();
+  console.log('RegisterScreen: useLanguage hook OK');
   const [formData, setFormData] = useState({
     username: '',
     fullName: '',
@@ -23,6 +25,7 @@ export default function RegisterScreen({ navigation }) {
     preferredLanguage: 'en', // Default to English
   });
   const [loading, setLoading] = useState(false);
+  console.log('RegisterScreen: All hooks initialized, loading:', loading, 'Type:', typeof loading);
 
   const handleRegister = async () => {
     console.log('Register button clicked!');
@@ -139,10 +142,11 @@ export default function RegisterScreen({ navigation }) {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      enabled={true}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps={true}
       >
         {/* Header */}
         <View style={styles.header}>
@@ -193,7 +197,7 @@ export default function RegisterScreen({ navigation }) {
                 setFormData({ ...formData, password: text })
               }
               placeholder="Choose a strong password"
-              secureTextEntry
+              secureTextEntry={true}
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="next"
@@ -210,7 +214,7 @@ export default function RegisterScreen({ navigation }) {
                 setFormData({ ...formData, confirmPassword: text })
               }
               placeholder="Re-enter your password"
-              secureTextEntry
+              secureTextEntry={true}
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="next"
@@ -257,15 +261,24 @@ export default function RegisterScreen({ navigation }) {
             </View>
           </View>
 
+          {(() => {
+            const buttonStyle = loading ? [styles.registerButton, styles.buttonDisabled] : styles.registerButton;
+            console.log('Register button style computed:', Array.isArray(buttonStyle) ? 'array' : 'object', 'loading:', loading);
+            if (Array.isArray(buttonStyle)) {
+              console.log('Style array has', buttonStyle.length, 'items, contains false?', buttonStyle.includes(false));
+            }
+            return null;
+          })()}
           <TouchableOpacity
-            style={[styles.registerButton, loading && styles.buttonDisabled]}
+            style={loading ? [styles.registerButton, styles.buttonDisabled] : styles.registerButton}
             onPress={handleRegister}
-            disabled={loading}
+            disabled={Boolean(loading)}
           >
             <Text style={styles.registerButtonText}>
               {loading ? t('creatingAccount') : t('createAccount')}
             </Text>
           </TouchableOpacity>
+          {console.log('✅ Register TouchableOpacity rendered successfully!')}
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>{t('alreadyHaveAccount')}</Text>

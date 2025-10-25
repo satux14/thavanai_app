@@ -14,10 +14,12 @@ import { loginUser } from '../utils/auth';
 import { useLanguage } from '../utils/i18n';
 
 export default function LoginScreen({ navigation }) {
+  console.log('=== LoginScreen RENDERING ===');
   const { setLanguage } = useLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  console.log('LoginScreen state - loading:', loading, '| Type:', typeof loading);
 
   const handleLogin = async () => {
     console.log('Login attempt:', { username });
@@ -63,14 +65,27 @@ export default function LoginScreen({ navigation }) {
     navigation.navigate('Register');
   };
 
-  return (
+  console.log('=== LoginScreen ABOUT TO RENDER JSX ===');
+  console.log('Disabled prop will be:', Boolean(loading));
+  console.log('Platform.OS:', Platform.OS);
+  console.log('KeyboardAvoidingView behavior:', Platform.OS === 'ios' ? 'padding' : 'height');
+  
+  const keyboardAvoidingBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
+  const keyboardShouldPersist = true; // Changed from 'handled' to boolean for iOS/Hermes
+  console.log('KeyboardAvoidingView behavior type:', typeof keyboardAvoidingBehavior);
+  console.log('keyboardShouldPersistTaps value:', keyboardShouldPersist, '| Type:', typeof keyboardShouldPersist);
+
+  try {
+    console.log('=== STARTING LOGINSCREEN RENDER ===');
+    return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={keyboardAvoidingBehavior}
+      enabled={true}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps={keyboardShouldPersist}
       >
         {/* Logo/Title */}
         <View style={styles.header}>
@@ -85,6 +100,7 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Username</Text>
+            {console.log('About to render Username TextInput with autoCorrect:', false, 'Type:', typeof false)}
             <TextInput
               style={styles.input}
               value={username}
@@ -102,12 +118,13 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
+            {console.log('About to render Password TextInput with secureTextEntry:', true, 'Type:', typeof true, 'autoCorrect:', false)}
             <TextInput
               style={styles.input}
               value={password}
               onChangeText={setPassword}
               placeholder="Enter your password"
-              secureTextEntry
+              secureTextEntry={true}
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="go"
@@ -115,15 +132,25 @@ export default function LoginScreen({ navigation }) {
             />
           </View>
 
+          {console.log('About to render Login TouchableOpacity with disabled:', Boolean(loading), 'Type:', typeof Boolean(loading))}
+          {(() => {
+            const buttonStyle = loading ? [styles.loginButton, styles.buttonDisabled] : styles.loginButton;
+            console.log('Login button style computed:', Array.isArray(buttonStyle) ? 'array' : 'object', 'loading:', loading);
+            if (Array.isArray(buttonStyle)) {
+              console.log('Style array has', buttonStyle.length, 'items, contains false?', buttonStyle.includes(false));
+            }
+            return null;
+          })()}
           <TouchableOpacity
-            style={[styles.loginButton, loading && styles.buttonDisabled]}
+            style={loading ? [styles.loginButton, styles.buttonDisabled] : styles.loginButton}
             onPress={handleLogin}
-            disabled={loading}
+            disabled={Boolean(loading)}
           >
             <Text style={styles.loginButtonText}>
               {loading ? 'Logging in...' : 'Login'}
             </Text>
           </TouchableOpacity>
+          {console.log('✅ Login TouchableOpacity rendered successfully!')}
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Don't have an account?</Text>
@@ -148,9 +175,17 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.featureText}>Track Payments</Text>
           </View>
         </View>
+        {console.log('✅✅✅ ALL LoginScreen JSX RENDERED SUCCESSFULLY ✅✅✅')}
       </ScrollView>
     </KeyboardAvoidingView>
   );
+  } catch (error) {
+    console.error('=== LOGINSCREEN RENDER ERROR ===');
+    console.error('Error during render:', error);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    throw error;
+  }
 }
 
 const styles = StyleSheet.create({

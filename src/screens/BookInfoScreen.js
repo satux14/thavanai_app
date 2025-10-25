@@ -17,8 +17,11 @@ import { useLanguage } from '../utils/i18n';
 import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
 
 export default function BookInfoScreen({ navigation, route }) {
+  console.log('=== BookInfoScreen COMPONENT CALLED ===');
   const { t, language } = useLanguage();
+  console.log('BookInfoScreen: useLanguage hook OK, language:', language);
   const { bookId } = route.params || {};
+  console.log('BookInfoScreen: route.params bookId:', bookId);
   const [bookInfo, setBookInfo] = useState({
     dlNo: '',
     name: '',
@@ -198,7 +201,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.address}
               onChangeText={(text) => setBookInfo({ ...bookInfo, address: text })}
               placeholder="Enter address"
-              multiline
+              multiline={true}
               numberOfLines={3}
             />
           </View>

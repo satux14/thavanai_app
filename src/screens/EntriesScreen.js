@@ -19,9 +19,13 @@ import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 const ENTRIES_PER_PAGE = 10;
 
 export default function EntriesScreen({ navigation, route }) {
+  console.log('=== EntriesScreen COMPONENT CALLED ===');
   const { bookId } = route.params;
+  console.log('EntriesScreen: route.params bookId:', bookId);
   const { t, language } = useLanguage();
+  console.log('EntriesScreen: useLanguage hook OK, language:', language);
   const [book, setBook] = useState(null);
+  console.log('EntriesScreen: book state initialized');
   const [entries, setEntries] = useState([]);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [maxPageNumber, setMaxPageNumber] = useState(1);

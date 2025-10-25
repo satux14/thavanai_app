@@ -19,8 +19,11 @@ import LanguageToggle from '../components/LanguageToggle';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 export default function DashboardScreen({ navigation }) {
+  console.log('=== DashboardScreen COMPONENT CALLED ===');
   const { t, language } = useLanguage();
+  console.log('DashboardScreen: useLanguage hook OK, language:', language);
   const [books, setBooks] = useState([]);
+  console.log('DashboardScreen: books state initialized');
   const [ownedBooks, setOwnedBooks] = useState([]);
   const [sharedBooks, setSharedBooks] = useState([]);
   const [filteredOwnedBooks, setFilteredOwnedBooks] = useState([]);

@@ -50,8 +50,8 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Dashboard focused - reloading books...');
-      loadBooks();
+      console.log('Dashboard focused - reloading books with force refresh...');
+      loadBooks(true); // Force refresh when navigating back to dashboard
       loadCurrentUser();
     });
     return unsubscribe;
@@ -75,11 +75,11 @@ export default function DashboardScreen({ navigation }) {
     return loan - totalPaid;
   };
 
-  const loadBooks = async () => {
+  const loadBooks = async (forceRefresh = false) => {
     const user = await getCurrentUser();
     if (!user) return;
 
-    const allBooks = await getAllBooks();
+    const allBooks = await getAllBooks(forceRefresh);
     
     // Load entries for each book to calculate balance and pending signatures
     const booksWithBalance = await Promise.all(
@@ -130,7 +130,7 @@ export default function DashboardScreen({ navigation }) {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadBooks();
+    await loadBooks(true); // Force refresh to bypass cache
     setRefreshing(false);
   };
 

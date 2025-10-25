@@ -50,7 +50,7 @@ export const saveBook = async (bookData) => {
 /**
  * Get all books for the current user (owned + shared)
  */
-export const getAllBooks = async () => {
+export const getAllBooks = async (forceRefresh = false) => {
   try {
     const currentUser = await getCurrentUser();
     
@@ -58,7 +58,7 @@ export const getAllBooks = async () => {
       return [];
     }
 
-    const books = await booksAPI.getAllBooks();
+    const books = await booksAPI.getAllBooks(forceRefresh);
     return books;
   } catch (error) {
     console.error('Error getting all books:', error);

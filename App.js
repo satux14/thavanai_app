@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { initDatabase } from './src/utils/database';
 import { getCurrentUser } from './src/utils/auth';
 import { LanguageProvider, useLanguage } from './src/utils/i18n';
 import ErrorBoundary from './src/components/ErrorBoundary';
@@ -35,10 +34,6 @@ function AppNavigator() {
   const initializeApp = async () => {
     try {
       console.log('=== APP INITIALIZATION START ===');
-      console.log('Initializing database...');
-      await initDatabase();
-      console.log('Database initialized successfully');
-      
       console.log('Checking login status...');
       const user = await getCurrentUser();
       console.log('getCurrentUser returned:', user);

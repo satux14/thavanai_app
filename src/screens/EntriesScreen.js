@@ -328,16 +328,17 @@ export default function EntriesScreen({ navigation, route }) {
       const currentSerialNumber = selectedEntry.serialNumber;
       const allEntries = await getEntries(bookId);
       
-      // Find all entries BEFORE current that have dates but no amount filled
+      // Find all entries BEFORE current that have no amount filled (regardless of date)
+      // But skip entries that already have 0 - they've been filled
       const previousEmptyEntries = allEntries.filter(
         e => e.serialNumber < currentSerialNumber && 
-             e.date && 
              (e.amount === null || e.amount === undefined || e.amount === '')
       );
       
-      console.log(`Filling ${previousEmptyEntries.length} previous empty entries with 0`);
+      console.log(`Filling ${previousEmptyEntries.length} previous empty entries with 0 and today's date`);
       
-      // Fill ONLY previous empty entries with 0 amount
+      // Fill ONLY previous empty entries with 0 amount and today's date if no date
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
       for (const emptyEntry of previousEmptyEntries) {
         if (emptyEntry.id) {
           // Calculate balance for this entry
@@ -350,9 +351,11 @@ export default function EntriesScreen({ navigation, route }) {
           
           await updateEntryStorage(emptyEntry.id, {
             ...emptyEntry,
+            date: emptyEntry.date || today, // Fill date if empty
             amount: 0,
             remaining: balance,
           });
+          console.log(`Filled entry ${emptyEntry.serialNumber} with 0 credit`);
         }
       }
 

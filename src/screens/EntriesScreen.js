@@ -385,35 +385,35 @@ export default function EntriesScreen({ navigation, route }) {
         await saveEntry(entryData);
       }
 
-      // STEP 3: Recalculate balances ONLY for future entries that ALREADY have amounts
-      // DO NOT fill future empty entries - leave them empty
+      // STEP 3: Recalculate balances for ALL entries (including those with and without amounts)
       const updatedEntries = await getEntries(bookId);
-      const entriesAfterCurrent = updatedEntries.filter(
-        e => e.serialNumber > currentSerialNumber && 
-             e.amount !== null && 
-             e.amount !== undefined && 
-             e.amount !== ''  // Only entries that have been filled
-      );
       
-      console.log(`Recalculating ${entriesAfterCurrent.length} future entries (not filling empty ones)`);
+      // Get ALL entries, sorted by serial number
+      const allEntriesSorted = updatedEntries.sort((a, b) => a.serialNumber - b.serialNumber);
       
-      for (const entry of entriesAfterCurrent) {
-        const entriesBeforeThis = updatedEntries.filter(
-          e => e.serialNumber < entry.serialNumber && 
-               e.amount !== null && 
-               e.amount !== undefined && 
-               e.amount !== ''
-        );
+      console.log(`⭐ Recalculating balances for ALL ${allEntriesSorted.length} entries`);
+      
+      // Recalculate balance for each entry based on cumulative payments
+      for (const entry of allEntriesSorted) {
+        // Calculate total paid up to (but not including) this entry
+        const entriesBeforeThis = allEntriesSorted.filter(e => e.serialNumber < entry.serialNumber);
         const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-        const balance = (book.loanAmount || 0) - totalPaidBefore - (parseFloat(entry.amount) || 0);
         
-        if (entry.id) {
+        // Balance at this entry = Loan Amount - Total Paid Before - Amount Paid at This Entry
+        const amountAtThisEntry = parseFloat(entry.amount) || 0;
+        const balance = (book.loanAmount || 0) - totalPaidBefore - amountAtThisEntry;
+        
+        // Update the entry's balance if it has changed
+        if (entry.id && entry.remaining !== balance) {
           await updateEntryStorage(entry.id, {
             ...entry,
             remaining: balance,
           });
+          console.log(`✅ Updated entry ${entry.serialNumber}: balance ${balance}`);
         }
       }
+      
+      console.log(`⭐ Balance recalculation complete`);
 
       // Reload data
       await loadData();

@@ -75,25 +75,12 @@ function AppNavigator() {
   const initialRoute = isLoggedIn ? 'Dashboard' : 'Login';
   console.log('initialRoute value:', initialRoute, '| Type:', typeof initialRoute);
   
-  // Log all props that will be passed to Navigator
-  const screenOptions = {
-    headerStyle: {
-      backgroundColor: '#2196F3',
-    },
-    headerTintColor: '#fff',
-    headerTitleStyle: {
-      fontWeight: '700',
-    },
-  };
-  console.log('screenOptions object created:', JSON.stringify(screenOptions));
-
   console.log('=== ABOUT TO RETURN JSX FROM AppNavigator ===');
   return (
     <NavigationContainer>
       {console.log('1️⃣ NavigationContainer JSX start')}
       <Stack.Navigator
         initialRouteName={initialRoute}
-        screenOptions={screenOptions}
       >
       {console.log('2️⃣ Stack.Navigator JSX start')}
         {console.log('Stack.Navigator is rendering with initialRouteName:', initialRoute)}
@@ -112,8 +99,8 @@ function AppNavigator() {
           name="Register"
           component={RegisterScreen}
           options={{
-            title: 'Register', // Hardcoded for now to eliminate t() function
-            headerTitleAlign: 'center',
+            title: 'Register',
+            headerShown: true, // Explicit
           }}
         />
         {console.log('Register Stack.Screen registered successfully')}
@@ -131,8 +118,8 @@ function AppNavigator() {
           name="BookInfo"
           component={BookInfoScreen}
           options={{
-            title: 'Book Info', // Hardcoded
-            headerTitleAlign: 'center',
+            title: 'Book Info',
+            headerShown: true,
           }}
         />
         {console.log('BookInfo Stack.Screen registered successfully')}
@@ -140,8 +127,8 @@ function AppNavigator() {
           name="Entries"
           component={EntriesScreen}
           options={{
-            title: 'Daily Entries', // Hardcoded
-            headerTitleAlign: 'center',
+            title: 'Daily Entries',
+            headerShown: true,
           }}
         />
         {console.log('Entries Stack.Screen registered successfully')}

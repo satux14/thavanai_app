@@ -591,12 +591,24 @@ export default function EntriesScreen({ navigation, route }) {
 
       {/* Book Info Header */}
       <View style={styles.bookHeader}>
-        <Text style={styles.bookHeaderText}>
-          {book.name} | D.L.No: {book.dlNo || 'N/A'}
-        </Text>
-        <Text style={styles.bookHeaderSubtext}>
-          {t('loanAmount')}: ₹{book.loanAmount}
-        </Text>
+        <View style={styles.bookHeaderLeft}>
+          <Text style={styles.bookHeaderText}>
+            {book.name} | D.L.No: {book.dlNo || 'N/A'}
+          </Text>
+        </View>
+        <View style={styles.bookHeaderRight}>
+          <Text style={styles.bookHeaderSubtext}>
+            {t('loanAmount')}: ₹{book.loanAmount}
+          </Text>
+          <Text style={styles.bookHeaderSubtext}>
+            {t('balance')}: ₹{(() => {
+              const loanAmount = parseFloat(book.loanAmount) || 0;
+              const totalPaid = entries.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
+              const balance = loanAmount - totalPaid;
+              return balance.toFixed(2);
+            })()}
+          </Text>
+        </View>
       </View>
 
       {/* Page Navigation */}
@@ -629,7 +641,13 @@ export default function EntriesScreen({ navigation, route }) {
 
       {/* Table */}
       <View style={styles.tableWrapper}>
-        <ScrollView horizontal={true} style={styles.horizontalScroll}>
+        <ScrollView 
+          horizontal={true} 
+          showsHorizontalScrollIndicator={true}
+          bounces={false}
+          style={styles.horizontalScroll}
+          contentContainerStyle={styles.scrollContentContainer}
+        >
           <View style={styles.tableContainer}>
             {/* Table Header */}
             <View style={styles.tableHeader}>
@@ -650,8 +668,12 @@ export default function EntriesScreen({ navigation, route }) {
               </View>
             </View>
 
-            {/* Table Rows */}
-            <View style={styles.tableBody}>
+            {/* Table Rows - Scrollable */}
+            <ScrollView 
+              style={styles.tableBodyScroll}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+            >
               {currentPageEntries.map((entry, index) => (
                 <TouchableOpacity
                   key={index}
@@ -727,7 +749,7 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                 </TouchableOpacity>
               ))}
-            </View>
+            </ScrollView>
           </View>
         </ScrollView>
       </View>
@@ -946,6 +968,16 @@ const styles = StyleSheet.create({
   bookHeader: {
     backgroundColor: '#2196F3',
     padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bookHeaderLeft: {
+    flex: 1,
+    marginRight: 10,
+  },
+  bookHeaderRight: {
+    alignItems: 'flex-end',
   },
   bookHeaderText: {
     color: '#fff',
@@ -956,6 +988,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     marginTop: 5,
+    fontWeight: '600',
   },
   pageNavigation: {
     flexDirection: 'row',
@@ -986,18 +1019,22 @@ const styles = StyleSheet.create({
   },
   tableWrapper: {
     flex: 1,
+    marginBottom: 10,
   },
   horizontalScroll: {
     flex: 1,
   },
+  scrollContentContainer: {
+    paddingHorizontal: 10,
+  },
   tableContainer: {
-    flex: 1,
-    margin: 10,
+    marginVertical: 10,
     borderWidth: 2,
     borderColor: '#2196F3',
     borderRadius: 8,
     backgroundColor: '#fff',
-    minWidth: '98%',
+    // Fixed width = sum of all column widths (80 + 140 + 140 + 140 + 150 = 650)
+    width: 650,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -1005,8 +1042,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: '#e91e63',
   },
-  tableBody: {
-    // Removed flexGrow to prevent empty space
+  tableBodyScroll: {
+    maxHeight: 500, // Allows vertical scrolling for rows
   },
   tableRow: {
     flexDirection: 'row',
@@ -1038,7 +1075,7 @@ const styles = StyleSheet.create({
     width: 140,
   },
   signatureCell: {
-    width: 120,
+    width: 150,
     borderRightWidth: 0,
   },
   headerText: {

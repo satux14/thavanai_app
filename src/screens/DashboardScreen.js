@@ -445,150 +445,119 @@ export default function DashboardScreen({ navigation }) {
       // Fetch entries for the book
       const entries = await getEntries(book.id);
       
-      // Create new PDF document
-      const doc = new jsPDF();
+      // Sort entries by serial number
+      const sortedEntries = entries.sort((a, b) => a.serialNumber - b.serialNumber);
       
-      // Title
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Daily Installment Book', 105, 20, { align: 'center' });
-      
-      // Book Information Section
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Book Information', 20, 35);
-      
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      let yPos = 45;
-      
-      doc.text(`D.L. Number: ${book.dlNo || 'N/A'}`, 20, yPos);
-      yPos += 7;
-      doc.text(`Borrower Name: ${book.name || 'N/A'}`, 20, yPos);
-      
-      if (book.fatherName) {
-        yPos += 7;
-        doc.text(`Father's Name: ${book.fatherName}`, 20, yPos);
-      }
-      
-      yPos += 7;
-      doc.text(`Address: ${book.address || 'N/A'}`, 20, yPos);
-      yPos += 7;
-      doc.text(`Loan Amount: Rs. ${book.loanAmount || 'N/A'}`, 20, yPos);
-      yPos += 7;
-      doc.text(`Current Balance: Rs. ${book.balance != null ? book.balance.toFixed(2) : 'N/A'}`, 20, yPos);
-      yPos += 7;
-      doc.text(`Start Date: ${formatDate(book.startDate)}`, 20, yPos);
-      doc.text(`End Date: ${formatDate(book.endDate)}`, 110, yPos);
-      
-      // Daily Entries Table
-      if (entries && entries.length > 0) {
-        yPos += 15;
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Payment Records', 20, yPos);
-        
-        yPos += 10;
-        
-        // Table setup
-        const tableStartY = yPos;
-        const colWidths = [25, 40, 35, 35, 55]; // S.No, Date, Credit, Balance, Signature
-        const colPositions = [20, 45, 85, 120, 155]; // X positions for each column
-        const rowHeight = 8;
-        
-        // Draw table header
-        doc.setFillColor(66, 139, 202); // Blue header
-        doc.rect(20, yPos - 5, 190, rowHeight, 'F');
-        
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(255, 255, 255); // White text
-        doc.text('S.No', colPositions[0] + 2, yPos);
-        doc.text('Date', colPositions[1] + 2, yPos);
-        doc.text('Credit (Rs)', colPositions[2] + 2, yPos);
-        doc.text('Balance (Rs)', colPositions[3] + 2, yPos);
-        doc.text('Signature', colPositions[4] + 2, yPos);
-        
-        yPos += rowHeight;
-        
-        // Reset text color for table body
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        
-        // Draw table rows
-        entries.sort((a, b) => a.serialNumber - b.serialNumber).forEach((entry, index) => {
-          // Check if we need a new page
-          if (yPos > 270) {
-            doc.addPage();
-            yPos = 20;
+      // Generate HTML for PDF
+      const html = `
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: 'Arial', sans-serif; padding: 20px; }
+              h1 { text-align: center; color: #2196F3; margin-bottom: 30px; }
+              h2 { color: #2196F3; border-bottom: 2px solid #2196F3; padding-bottom: 5px; margin-top: 30px; }
+              .info-section { margin: 20px 0; }
+              .info-row { display: flex; justify-content: space-between; margin: 8px 0; }
+              .info-label { font-weight: bold; color: #666; }
+              .info-value { color: #333; }
+              table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+              th { background-color: #2196F3; color: white; padding: 12px; text-align: left; font-weight: bold; }
+              td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+              tr:nth-child(even) { background-color: #f9f9f9; }
+              tr:hover { background-color: #f5f5f5; }
+              .footer { margin-top: 30px; text-align: center; color: #999; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            <h1>Daily Installment Book</h1>
             
-            // Redraw header on new page
-            doc.setFillColor(66, 139, 202);
-            doc.rect(20, yPos - 5, 190, rowHeight, 'F');
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(255, 255, 255);
-            doc.text('S.No', colPositions[0] + 2, yPos);
-            doc.text('Date', colPositions[1] + 2, yPos);
-            doc.text('Credit (Rs)', colPositions[2] + 2, yPos);
-            doc.text('Balance (Rs)', colPositions[3] + 2, yPos);
-            doc.text('Signature', colPositions[4] + 2, yPos);
-            yPos += rowHeight;
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'normal');
-          }
-          
-          // Alternate row colors for better readability
-          if (index % 2 === 0) {
-            doc.setFillColor(240, 240, 240);
-            doc.rect(20, yPos - 5, 190, rowHeight, 'F');
-          }
-          
-          // Draw cell borders
-          doc.setDrawColor(200, 200, 200);
-          doc.rect(20, yPos - 5, colWidths[0], rowHeight);
-          doc.rect(45, yPos - 5, colWidths[1], rowHeight);
-          doc.rect(85, yPos - 5, colWidths[2], rowHeight);
-          doc.rect(120, yPos - 5, colWidths[3], rowHeight);
-          doc.rect(155, yPos - 5, colWidths[4], rowHeight);
-          
-          // Add data
-          doc.text(String(entry.serialNumber || ''), colPositions[0] + 2, yPos);
-          doc.text(entry.date || '', colPositions[1] + 2, yPos);
-          doc.text(entry.amount ? String(entry.amount) : '', colPositions[2] + 2, yPos);
-          doc.text(entry.remaining ? String(entry.remaining) : '', colPositions[3] + 2, yPos);
-          doc.text(entry.signature ? 'Signed' : '', colPositions[4] + 2, yPos);
-          
-          yPos += rowHeight;
-        });
-        
-        // Draw final border around entire table
-        doc.setDrawColor(66, 139, 202);
-        doc.setLineWidth(0.5);
-        doc.rect(20, tableStartY - 5, 190, (entries.length + 1) * rowHeight);
-      } else {
-        yPos += 15;
-        doc.setFontSize(12);
-        doc.text('No payment records found.', 20, yPos);
-      }
+            <div class="info-section">
+              <h2>Book Information</h2>
+              <div class="info-row">
+                <span class="info-label">D.L. Number:</span>
+                <span class="info-value">${book.dlNo || 'N/A'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Borrower Name:</span>
+                <span class="info-value">${book.name || 'N/A'}</span>
+              </div>
+              ${book.fatherName ? `
+              <div class="info-row">
+                <span class="info-label">Father Name:</span>
+                <span class="info-value">${book.fatherName}</span>
+              </div>` : ''}
+              <div class="info-row">
+                <span class="info-label">Address:</span>
+                <span class="info-value">${book.address || 'N/A'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Loan Amount:</span>
+                <span class="info-value">₹${book.loanAmount || 'N/A'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Current Balance:</span>
+                <span class="info-value">₹${book.balance != null ? book.balance.toFixed(2) : 'N/A'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Start Date:</span>
+                <span class="info-value">${formatDate(book.startDate)}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">End Date:</span>
+                <span class="info-value">${formatDate(book.endDate)}</span>
+              </div>
+            </div>
+            
+            <h2>Payment Records</h2>
+            ${sortedEntries.length > 0 ? `
+            <table>
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Date</th>
+                  <th>Credit (₹)</th>
+                  <th>Balance (₹)</th>
+                  <th>Signature</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${sortedEntries.map(entry => `
+                  <tr>
+                    <td>${entry.serialNumber || ''}</td>
+                    <td>${entry.date || ''}</td>
+                    <td>${entry.amount || ''}</td>
+                    <td>${entry.remaining || ''}</td>
+                    <td>${entry.signatureStatus === 'signed_by_request' ? '✓ Signed' : ''}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            ` : '<p>No payment records found.</p>'}
+            
+            <div class="footer">
+              Generated on: ${new Date().toLocaleString()}
+            </div>
+          </body>
+        </html>
+      `;
       
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(9);
-        doc.setTextColor(128, 128, 128);
-        doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 290);
-      }
+      // Generate PDF using expo-print
+      const { uri } = await Print.printToFileAsync({ html });
       
-      // Save the PDF
-      const fileName = `DailyInstallment_${book.name || book.dlNo || 'book'}_${new Date().getTime()}.pdf`;
-      doc.save(fileName);
-      
+      // Share or download the PDF
       if (Platform.OS === 'web') {
+        // On web, trigger download
+        const link = document.createElement('a');
+        link.href = uri;
+        link.download = `DailyInstallment_${book.name || book.dlNo || 'book'}_${new Date().getTime()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         alert(t('pdfExported'));
       } else {
-        Alert.alert(t('success'), t('pdfExported'));
+        // On mobile, use sharing
+        await Sharing.shareAsync(uri);
       }
     } catch (error) {
       console.error('Error exporting PDF:', error);
@@ -783,15 +752,14 @@ export default function DashboardScreen({ navigation }) {
       )}
 
       {/* Books List - Scrollable Content */}
-      <View style={styles.scrollWrapper}>
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={true}
-          bounces={true}
-          scrollEnabled={true}
-          nestedScrollEnabled={true}
-        >
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={true}
+        bounces={true}
+        scrollEnabled={true}
+        nestedScrollEnabled={true}
+      >
         {/* Show books based on view mode */}
         {viewMode === 'owner' ? (
           // Owner View
@@ -1158,8 +1126,7 @@ export default function DashboardScreen({ navigation }) {
         
         {/* Add some bottom padding in scroll content */}
         <View style={{ height: 20 }} />
-        </ScrollView>
-      </View>
+      </ScrollView>
 
       {/* Create Button - Fixed at bottom */}
       <View style={styles.createButtonContainer}>
@@ -1279,6 +1246,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+    ...(Platform.OS === 'web' ? { height: '100vh' } : {}),
   },
   header: {
     backgroundColor: '#2196F3',
@@ -1514,7 +1482,7 @@ const styles = StyleSheet.create({
   },
   scrollWrapper: {
     flex: 1,
-    overflow: 'hidden',
+    ...(Platform.OS === 'web' ? { overflow: 'auto', display: 'flex' } : {}),
   },
   scrollView: {
     flex: 1,
@@ -1523,6 +1491,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: 15,
     paddingBottom: 30,
+    flexGrow: 1,
   },
   emptyState: {
     alignItems: 'center',
@@ -1622,9 +1591,10 @@ const styles = StyleSheet.create({
   },
   ownerInfo: {
     fontSize: 9,
-    color: '#666',
+    color: '#000',
     fontStyle: 'italic',
     marginTop: 3,
+    fontWeight: '600',
     backgroundColor: 'rgba(255, 255, 255, 0.90)',
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -1665,8 +1635,9 @@ const styles = StyleSheet.create({
   },
   loanLabel: {
     fontSize: 11,
-    color: '#666',
+    color: '#000',
     marginBottom: 4,
+    fontWeight: '600',
   },
   loanAmount: {
     fontSize: 22,
@@ -1675,8 +1646,9 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     fontSize: 11,
-    color: '#666',
+    color: '#000',
     marginBottom: 4,
+    fontWeight: '600',
   },
   balanceAmount: {
     fontSize: 22,
@@ -1713,12 +1685,13 @@ const styles = StyleSheet.create({
   },
   dateLabel: {
     fontSize: 11,
-    color: '#666',
+    color: '#000',
     marginBottom: 4,
+    fontWeight: '600',
   },
   dateValue: {
     fontSize: 16,
-    color: '#333',
+    color: '#000',
     fontWeight: 'bold',
   },
   infoSection: {
@@ -1755,7 +1728,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: '#333',
+    color: '#000',
     fontWeight: '600',
   },
   statusBadge: {

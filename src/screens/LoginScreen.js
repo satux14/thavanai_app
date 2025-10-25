@@ -71,7 +71,7 @@ export default function LoginScreen({ navigation }) {
   console.log('KeyboardAvoidingView behavior:', Platform.OS === 'ios' ? 'padding' : 'height');
   
   const keyboardAvoidingBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
-  const keyboardShouldPersist = true; // Changed from 'handled' to boolean for iOS/Hermes
+  const keyboardShouldPersist = 'handled'; // Changed from 'handled' to boolean for iOS/Hermes
   console.log('KeyboardAvoidingView behavior type:', typeof keyboardAvoidingBehavior);
   console.log('keyboardShouldPersistTaps value:', keyboardShouldPersist, '| Type:', typeof keyboardShouldPersist);
 

@@ -1,8 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration
+// Use your local machine's IP address for testing on physical devices
 const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api' 
+  ? 'http://192.168.1.17:3000/api'  // Your local machine IP
   : 'https://your-production-server.com/api';
 
 // Local cache for performance

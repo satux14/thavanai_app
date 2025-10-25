@@ -164,6 +164,7 @@ router.put('/:id', (req, res) => {
     fatherName,
     address,
     loanAmount,
+    numberOfDays,
     startDate,
     endDate,
     backgroundColor,
@@ -187,7 +188,7 @@ router.put('/:id', (req, res) => {
 
     const query = `
       UPDATE books SET
-        dl_no = ?, name = ?, father_name = ?, address = ?, loan_amount = ?,
+        dl_no = ?, name = ?, father_name = ?, address = ?, loan_amount = ?, number_of_days = ?,
         start_date = ?, end_date = ?, background_color = ?, background_image = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
@@ -195,7 +196,7 @@ router.put('/:id', (req, res) => {
 
     db.run(
       query,
-      [dlNo, name, fatherName, address, loanAmount, startDate, endDate, backgroundColor, backgroundImage, req.params.id],
+      [dlNo, name, fatherName, address, loanAmount, numberOfDays || 100, startDate, endDate, backgroundColor, backgroundImage, req.params.id],
       function(err) {
         if (err) {
           console.error('Update book error:', err);

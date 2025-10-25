@@ -30,6 +30,7 @@ export const saveBook = async (bookData) => {
       fatherName: bookData.fatherName,
       address: bookData.address,
       loanAmount: bookData.loanAmount,
+      numberOfDays: bookData.numberOfDays || '100',
       startDate: bookData.startDate,
       endDate: bookData.endDate,
       backgroundColor: bookData.backgroundColor || '#2196F3',
@@ -39,7 +40,7 @@ export const saveBook = async (bookData) => {
     await booksAPI.createBook(newBook);
 
     console.log('Book saved:', bookId);
-    return { ...newBook, ownerId: currentUser.id, status: 'active' };
+    return { ...newBook, ownerId: currentUser.id, status: 'active', numberOfDays: parseInt(bookData.numberOfDays) || 100 };
   } catch (error) {
     console.error('Error saving book:', error);
     throw error;
@@ -89,6 +90,7 @@ export const updateBook = async (bookId, bookData) => {
       fatherName: bookData.fatherName,
       address: bookData.address,
       loanAmount: bookData.loanAmount,
+      numberOfDays: bookData.numberOfDays || 100,
       startDate: bookData.startDate,
       endDate: bookData.endDate,
       backgroundColor: bookData.backgroundColor,

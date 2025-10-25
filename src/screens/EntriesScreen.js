@@ -101,17 +101,8 @@ export default function EntriesScreen({ navigation, route }) {
       const actualMaxPage = Math.max(calculatedMaxPage, storedMaxPage);
       setMaxPageNumber(actualMaxPage);
       
-      // After auto-fill, always start at page 1, otherwise go to last page with entry
-      if (justAutoFilled) {
-        // Just auto-filled, go to page 1
-        setCurrentPageNumber(1);
-      } else if (loadedEntries.length > 0) {
-        // Find the last page with entries
-        const lastPageWithEntry = findLastPageWithEntry(loadedEntries);
-        setCurrentPageNumber(lastPageWithEntry);
-      } else {
-        setCurrentPageNumber(1);
-      }
+      // Always start at page 1 when opening a book
+      setCurrentPageNumber(1);
       
       setLoading(false);
     } catch (error) {

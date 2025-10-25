@@ -40,6 +40,7 @@ router.get('/', (req, res) => {
       fatherName: book.father_name,
       address: book.address,
       loanAmount: book.loan_amount,
+      numberOfDays: book.number_of_days || 100,
       startDate: book.start_date,
       endDate: book.end_date,
       status: book.status,
@@ -88,6 +89,7 @@ router.get('/:id', (req, res) => {
       fatherName: book.father_name,
       address: book.address,
       loanAmount: book.loan_amount,
+      numberOfDays: book.number_of_days || 100,
       startDate: book.start_date,
       endDate: book.end_date,
       status: book.status,
@@ -108,6 +110,7 @@ router.post('/', (req, res) => {
     fatherName,
     address,
     loanAmount,
+    numberOfDays,
     startDate,
     endDate,
     backgroundColor,
@@ -120,14 +123,14 @@ router.post('/', (req, res) => {
 
   const query = `
     INSERT INTO books (
-      id, owner_id, dl_no, name, father_name, address, loan_amount, 
+      id, owner_id, dl_no, name, father_name, address, loan_amount, number_of_days,
       start_date, end_date, background_color, background_image, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
   `;
 
   db.run(
     query,
-    [id, req.user.id, dlNo, name, fatherName, address, loanAmount, startDate, endDate, backgroundColor, backgroundImage],
+    [id, req.user.id, dlNo, name, fatherName, address, loanAmount, numberOfDays || 100, startDate, endDate, backgroundColor, backgroundImage],
     function(err) {
       if (err) {
         console.error('Create book error:', err);
@@ -142,6 +145,7 @@ router.post('/', (req, res) => {
         fatherName,
         address,
         loanAmount,
+        numberOfDays: numberOfDays || 100,
         startDate,
         endDate,
         status: 'active',

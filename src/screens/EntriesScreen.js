@@ -76,10 +76,11 @@ export default function EntriesScreen({ navigation, route }) {
       console.log('Users loaded:', users.length);
       console.log('Current user:', user?.username, 'Is owner:', user?.id === loadedBook?.ownerId);
       
-      // Auto-fill 100 days of entries if this is a new book with start date
+      // Auto-fill entries if this is a new book with start date
       if (loadedEntries.length === 0 && loadedBook.startDate) {
-        console.log('Auto-filling 100 days of entries from start date:', loadedBook.startDate);
-        await autoFill100DaysEntries(loadedBook);
+        const days = parseInt(loadedBook.numberOfDays) || 100;
+        console.log(`Auto-filling ${days} days of entries from start date:`, loadedBook.startDate);
+        await autoFillEntries(loadedBook, days);
         // Reload entries after auto-fill
         loadedEntries = await getEntries(bookId);
         console.log('Entries after auto-fill:', loadedEntries.length);
@@ -122,12 +123,12 @@ export default function EntriesScreen({ navigation, route }) {
     }
   };
 
-  // Auto-fill 100 days of entries with dates from start date
-  const autoFill100DaysEntries = async (book) => {
+  // Auto-fill entries with dates from start date
+  const autoFillEntries = async (book, numberOfDays) => {
     try {
       const startDate = new Date(book.startDate);
-      const totalDays = 100;
-      const totalPages = Math.ceil(totalDays / ENTRIES_PER_PAGE); // 10 pages
+      const totalDays = parseInt(numberOfDays) || 100;
+      const totalPages = Math.ceil(totalDays / ENTRIES_PER_PAGE);
       
       console.log(`Creating ${totalDays} entries across ${totalPages} pages`);
       
@@ -154,7 +155,7 @@ export default function EntriesScreen({ navigation, route }) {
       // Save the max page number
       await saveMaxPage(book.id, totalPages);
       
-      console.log('Auto-fill complete: 100 days of entries created');
+      console.log(`Auto-fill complete: ${totalDays} days of entries created`);
     } catch (error) {
       console.error('Error auto-filling entries:', error);
       // Don't throw - let the app continue even if auto-fill fails

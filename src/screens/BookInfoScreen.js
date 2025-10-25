@@ -28,6 +28,7 @@ export default function BookInfoScreen({ navigation, route }) {
     fatherName: '',
     address: '',
     loanAmount: '',
+    numberOfDays: '100', // Default to 100 days
     startDate: '',
     endDate: '',
     backgroundColor: '#2196F3',
@@ -37,18 +38,36 @@ export default function BookInfoScreen({ navigation, route }) {
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('nature');
 
-  // Auto-calculate end date when start date changes
+  // Auto-calculate end date when start date or numberOfDays changes
   const handleStartDateChange = (date) => {
-    if (date) {
+    if (date && bookInfo.numberOfDays) {
       const startDate = new Date(date);
       const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 100);
+      const days = parseInt(bookInfo.numberOfDays) || 100;
+      endDate.setDate(startDate.getDate() + days);
       
       // Format as YYYY-MM-DD
       const formattedEndDate = endDate.toISOString().split('T')[0];
       setBookInfo(prev => ({ ...prev, startDate: date, endDate: formattedEndDate }));
     } else {
       setBookInfo({ ...bookInfo, startDate: date });
+    }
+  };
+
+  // Handle number of days change and recalculate end date
+  const handleNumberOfDaysChange = (text) => {
+    setBookInfo(prev => ({ ...prev, numberOfDays: text }));
+    
+    // Recalculate end date if start date exists
+    if (bookInfo.startDate && text) {
+      const startDate = new Date(bookInfo.startDate);
+      const endDate = new Date(startDate);
+      const days = parseInt(text) || 100;
+      endDate.setDate(startDate.getDate() + days);
+      
+      // Format as YYYY-MM-DD
+      const formattedEndDate = endDate.toISOString().split('T')[0];
+      setBookInfo(prev => ({ ...prev, endDate: formattedEndDate }));
     }
   };
 
@@ -216,6 +235,21 @@ export default function BookInfoScreen({ navigation, route }) {
               placeholder="Enter loan amount"
               keyboardType="numeric"
             />
+          </View>
+
+          {/* Number of Days */}
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>நாட்களின் எண்ணிக்கை (Number of Days) *</Text>
+            <TextInput
+              style={styles.input}
+              value={bookInfo.numberOfDays}
+              onChangeText={handleNumberOfDaysChange}
+              placeholder="Enter number of days (e.g., 100)"
+              keyboardType="numeric"
+            />
+            <Text style={styles.helperText}>
+              This will create {bookInfo.numberOfDays || '100'} daily entries
+            </Text>
           </View>
 
           {/* Start Date */}
@@ -709,5 +743,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textAlign: 'center',
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+    fontStyle: 'italic',
   },
 });

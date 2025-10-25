@@ -1,10 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration
-// Use your local machine's IP address for testing on physical devices
-const API_BASE_URL = __DEV__ 
-  ? 'http://192.168.1.17:3000/api'  // Your local machine IP
-  : 'https://your-production-server.com/api';
+// IMPORTANT: For testing on physical devices, always use your local IP
+// Change this to your production URL when deploying
+const API_BASE_URL = 'http://192.168.1.17:3000/api';
+
+// For production, uncomment this:
+// const API_BASE_URL = 'https://your-production-server.com/api';
 
 // Local cache for performance
 const cache = {
@@ -58,21 +60,28 @@ async function apiRequest(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const url = `${API_BASE_URL}${endpoint}`;
+  console.log('🌐 API Request:', options.method || 'GET', url);
+
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(url, {
       ...options,
       headers,
     });
 
+    console.log('📡 API Response:', response.status, endpoint);
+
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('❌ API Error:', data.error || 'Request failed');
       throw new Error(data.error || 'Request failed');
     }
 
+    console.log('✅ API Success:', endpoint);
     return data;
   } catch (error) {
-    console.error('API request error:', endpoint, error);
+    console.error('🔥 API request error:', endpoint, error.message);
     throw error;
   }
 }

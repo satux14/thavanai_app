@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color: '#000', // Explicit text color for Android
   },
   loginButton: {
     backgroundColor: '#2196F3',

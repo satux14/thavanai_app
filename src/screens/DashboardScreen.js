@@ -849,9 +849,10 @@ export default function DashboardScreen({ navigation }) {
                     <View style={styles.bookTitleSection}>
                       <View style={styles.headerTopRow}>
                         <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
-                        <Text style={styles.lastUpdatedCompact}>
-                          {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
-                        </Text>
+                        <View style={styles.updatedContainer}>
+                          <Text style={styles.updatedLabel}>{t('updated')}</Text>
+                          <Text style={styles.updatedTime}>{formatDateTime(book.updatedAt)}</Text>
+                        </View>
                       </View>
                       <View style={styles.nameRow}>
                         <Text style={styles.bookName}>
@@ -1056,9 +1057,10 @@ export default function DashboardScreen({ navigation }) {
                       <View style={styles.headerTopRow}>
                         <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
                         <View style={styles.lastUpdatedContainer}>
-                          <Text style={styles.lastUpdatedCompact}>
-                            {t('lastUpdated')}: {formatDateTime(book.updatedAt)}
-                          </Text>
+                          <View style={styles.updatedContainer}>
+                            <Text style={styles.updatedLabel}>{t('updated')}</Text>
+                            <Text style={styles.updatedTime}>{formatDateTime(book.updatedAt)}</Text>
+                          </View>
                           <Text style={styles.ownerInfo}>
                             {t('asOwner')}: {book.ownerName} (@{book.ownerUsername})
                           </Text>
@@ -1371,13 +1373,13 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 12,
-    color: '#fff',
+    color: '#000',
     opacity: 0.9,
   },
   userName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
   },
   headerCount: {
     fontSize: 14,
@@ -1624,15 +1626,26 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-end',
   },
-  lastUpdatedCompact: {
-    fontSize: 10,
+  updatedContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 4,
+  },
+  updatedLabel: {
+    fontSize: 9,
+    color: '#000',
+    fontWeight: '700',
+    lineHeight: 12,
+  },
+  updatedTime: {
+    fontSize: 9,
     color: '#000',
     fontStyle: 'italic',
     fontWeight: '600',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    lineHeight: 11,
   },
   ownerInfo: {
     fontSize: 9,

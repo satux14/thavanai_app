@@ -1063,7 +1063,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#e91e63',
-    minHeight: 45,
+    minHeight: 38,
     backgroundColor: '#fff',
   },
   tableRowFilled: {
@@ -1072,13 +1072,13 @@ const styles = StyleSheet.create({
   cell: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
     borderRightWidth: 1,
     borderRightColor: '#e91e63',
   },
   headerCell: {
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   serialCell: {
     width: 80,

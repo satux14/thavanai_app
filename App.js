@@ -32,16 +32,19 @@ function AppNavigator() {
       
       console.log('Checking login status...');
       const user = await getCurrentUser();
-      setIsLoggedIn(user !== null);
-      console.log('Login status checked:', user !== null);
+      // Ensure boolean conversion
+      setIsLoggedIn(Boolean(user !== null));
+      console.log('Login status checked:', Boolean(user !== null));
     } catch (error) {
       console.error('Error initializing app:', error);
+      setIsLoggedIn(false); // Explicitly set to boolean
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Explicitly false, not string
     }
   };
 
-  if (isLoading) {
+  // Ensure isLoading is boolean
+  if (isLoading === true) {
     // You can show a splash screen here
     return null;
   }

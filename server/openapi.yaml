@@ -1,0 +1,470 @@
+openapi: 3.0.0
+info:
+  title: Thavanai API - Daily Installment Book
+  description: API for managing daily installment books with user authentication and sharing
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        fullName:
+          type: string
+        preferredLanguage:
+          type: string
+          enum: [en, ta]
+
+    Book:
+      type: object
+      properties:
+        id:
+          type: string
+        ownerId:
+          type: integer
+        ownerUsername:
+          type: string
+        ownerName:
+          type: string
+        dlNo:
+          type: string
+        name:
+          type: string
+        fatherName:
+          type: string
+        address:
+          type: string
+        loanAmount:
+          type: number
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [active, closed]
+        backgroundColor:
+          type: string
+        backgroundImage:
+          type: string
+        isOwned:
+          type: boolean
+        isShared:
+          type: boolean
+
+    Entry:
+      type: object
+      properties:
+        id:
+          type: string
+        bookId:
+          type: string
+        serialNumber:
+          type: integer
+        pageNumber:
+          type: integer
+        date:
+          type: string
+        amount:
+          type: number
+        remaining:
+          type: number
+        signatureStatus:
+          type: string
+          enum: [none, signature_requested, signed_by_request, request_rejected]
+        signatureRequestedBy:
+          type: integer
+        signedBy:
+          type: integer
+        signedAt:
+          type: string
+          format: date-time
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [System]
+      responses:
+        '200':
+          description: Server is healthy
+
+  /api/auth/register:
+    post:
+      summary: Register new user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, fullName]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                fullName:
+                  type: string
+                preferredLanguage:
+                  type: string
+                  default: en
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+
+  /api/auth/login:
+    post:
+      summary: Login user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+
+  /api/auth/me:
+    get:
+      summary: Get current user
+      tags: [Authentication]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /api/auth/users:
+    get:
+      summary: Get all users
+      tags: [Authentication]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/books:
+    get:
+      summary: Get all books (owned + shared)
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+
+    post:
+      summary: Create new book
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '201':
+          description: Book created
+
+  /api/books/{id}:
+    get:
+      summary: Get book by ID
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+
+    put:
+      summary: Update book
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '200':
+          description: Book updated
+
+    delete:
+      summary: Delete book
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book deleted
+
+  /api/books/{id}/close:
+    patch:
+      summary: Close book
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book closed
+
+  /api/books/{id}/reopen:
+    patch:
+      summary: Reopen book
+      tags: [Books]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Book reopened
+
+  /api/entries/book/{bookId}:
+    get:
+      summary: Get all entries for a book
+      tags: [Entries]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entry'
+
+  /api/entries:
+    post:
+      summary: Create or update entry
+      tags: [Entries]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Entry'
+      responses:
+        '201':
+          description: Entry saved
+
+  /api/entries/{entryId}/request-signature:
+    post:
+      summary: Request signature for entry
+      tags: [Entries]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signature requested
+
+  /api/entries/{entryId}/approve-signature:
+    post:
+      summary: Approve signature request
+      tags: [Entries]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signature approved
+
+  /api/entries/{entryId}/reject-signature:
+    post:
+      summary: Reject signature request
+      tags: [Entries]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Signature rejected
+
+  /api/sharing:
+    post:
+      summary: Share book with user
+      tags: [Sharing]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bookId:
+                  type: string
+                username:
+                  type: string
+      responses:
+        '201':
+          description: Book shared
+
+  /api/sharing/{bookId}:
+    get:
+      summary: Get users book is shared with
+      tags: [Sharing]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /api/sharing/{bookId}/{userId}:
+    delete:
+      summary: Unshare book from user
+      tags: [Sharing]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Book unshared
+

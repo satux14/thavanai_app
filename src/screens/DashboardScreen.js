@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   Alert,
   Platform,
   ImageBackground,
@@ -40,6 +41,7 @@ export default function DashboardScreen({ navigation }) {
   const [showSharedUsersModal, setShowSharedUsersModal] = useState(false);
   const [sharedUsers, setSharedUsers] = useState([]);
   const [bookToViewShares, setBookToViewShares] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadBooks();
@@ -124,6 +126,12 @@ export default function DashboardScreen({ navigation }) {
         endDate: booksWithBalance[0].endDate
       });
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadBooks();
+    setRefreshing(false);
   };
 
   const filterAndSortBooks = () => {
@@ -759,6 +767,14 @@ export default function DashboardScreen({ navigation }) {
         bounces={true}
         scrollEnabled={true}
         nestedScrollEnabled={true}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#2196F3']} // Android
+            tintColor="#2196F3"   // iOS
+          />
+        }
       >
         {/* Show books based on view mode */}
         {viewMode === 'owner' ? (

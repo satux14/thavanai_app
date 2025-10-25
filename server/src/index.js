@@ -10,7 +10,7 @@ const booksRoutes = require('./routes/books');
 const entriesRoutes = require('./routes/entries');
 const sharingRoutes = require('./routes/sharing');
 const adminRoutes = require('./routes/admin');
-const authMiddleware = require('./middleware/auth');
+const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,7 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/books', booksRoutes);
 app.use('/api/entries', entriesRoutes);
 app.use('/api/sharing', sharingRoutes);
-app.use('/api/admin', authMiddleware, adminRoutes); // Admin routes (protected)
+app.use('/api/admin', authenticateToken, adminRoutes); // Admin routes (protected)
 
 // OpenAPI/Swagger Documentation
 try {

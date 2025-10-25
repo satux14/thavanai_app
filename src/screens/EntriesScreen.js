@@ -37,6 +37,7 @@ export default function EntriesScreen({ navigation, route }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
+  const [fontSize, setFontSize] = useState(14); // Default font size
 
   useEffect(() => {
     loadData();
@@ -633,6 +634,23 @@ export default function EntriesScreen({ navigation, route }) {
         >
           <Text style={styles.pageNavButtonText}>{t('next')}</Text>
         </TouchableOpacity>
+        
+        {/* Font Size Controls */}
+        <View style={styles.fontSizeControls}>
+          <TouchableOpacity
+            style={styles.fontSizeButton}
+            onPress={() => setFontSize(Math.max(10, fontSize - 1))}
+          >
+            <Text style={styles.fontSizeButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.fontSizeText}>{fontSize}</Text>
+          <TouchableOpacity
+            style={styles.fontSizeButton}
+            onPress={() => setFontSize(Math.min(20, fontSize + 1))}
+          >
+            <Text style={styles.fontSizeButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Table */}
@@ -680,18 +698,18 @@ export default function EntriesScreen({ navigation, route }) {
                   onPress={() => handleEditEntry(entry)}
                 >
                   <View style={[styles.cell, styles.serialCell]}>
-                    <Text style={styles.cellText}>{entry.serialNumber}</Text>
+                    <Text style={[styles.cellText, { fontSize }]}>{entry.serialNumber}</Text>
                   </View>
                   <View style={[styles.cell, styles.dateCell]}>
-                    <Text style={styles.cellText}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
+                    <Text style={[styles.cellText, { fontSize }]}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={styles.cellText}>
+                    <Text style={[styles.cellText, { fontSize }]}>
                       {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? entry.amount : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={styles.cellText}>
+                    <Text style={[styles.cellText, { fontSize }]}>
                       {entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '' ? entry.remaining : ''}
                     </Text>
                   </View>
@@ -1045,7 +1063,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#e91e63',
-    height: 60,
+    minHeight: 45,
     backgroundColor: '#fff',
   },
   tableRowFilled: {
@@ -1054,12 +1072,13 @@ const styles = StyleSheet.create({
   cell: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     borderRightWidth: 1,
     borderRightColor: '#e91e63',
   },
   headerCell: {
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   serialCell: {
     width: 80,
@@ -1347,5 +1366,33 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
+  },
+  fontSizeControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+    padding: 4,
+    gap: 8,
+  },
+  fontSizeButton: {
+    width: 32,
+    height: 32,
+    backgroundColor: '#2196F3',
+    borderRadius: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fontSizeButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  fontSizeText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+    minWidth: 24,
+    textAlign: 'center',
   },
 });

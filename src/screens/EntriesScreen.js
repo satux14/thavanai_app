@@ -77,6 +77,7 @@ export default function EntriesScreen({ navigation, route }) {
       console.log('Current user:', user?.username, 'Is owner:', user?.id === loadedBook?.ownerId);
       
       // Auto-fill entries if this is a new book with start date
+      let justAutoFilled = false;
       if (loadedEntries.length === 0 && loadedBook.startDate) {
         const days = parseInt(loadedBook.numberOfDays) || 100;
         console.log(`Auto-filling ${days} days of entries from start date:`, loadedBook.startDate);
@@ -84,6 +85,7 @@ export default function EntriesScreen({ navigation, route }) {
         // Reload entries after auto-fill
         loadedEntries = await getEntries(bookId);
         console.log('Entries after auto-fill:', loadedEntries.length);
+        justAutoFilled = true;
       }
       
       setBook(loadedBook);
@@ -100,8 +102,8 @@ export default function EntriesScreen({ navigation, route }) {
       setMaxPageNumber(actualMaxPage);
       
       // After auto-fill, always start at page 1, otherwise go to last page with entry
-      if (loadedEntries.length > 0 && loadedEntries.length === 100) {
-        // Likely just auto-filled, go to page 1
+      if (justAutoFilled) {
+        // Just auto-filled, go to page 1
         setCurrentPageNumber(1);
       } else if (loadedEntries.length > 0) {
         // Find the last page with entries

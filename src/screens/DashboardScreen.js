@@ -73,7 +73,10 @@ export default function DashboardScreen({ navigation }) {
   const calculateBalance = (loanAmount, entries) => {
     const loan = parseFloat(loanAmount) || 0;
     if (!entries || entries.length === 0) return loan;
-    const totalPaid = entries.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
+    // Exclude rejected entries from balance calculation
+    const totalPaid = entries
+      .filter(entry => entry.signatureStatus !== 'request_rejected')
+      .reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
     return loan - totalPaid;
   };
 

@@ -38,6 +38,7 @@ export default function EntriesScreen({ navigation, route }) {
   const [editFormData, setEditFormData] = useState(null);
   const [originalAmount, setOriginalAmount] = useState(null); // Track original amount to check for changes
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false); // Track saving state to prevent double-clicks
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
@@ -378,6 +379,12 @@ export default function EntriesScreen({ navigation, route }) {
   };
 
   const handleSaveEntry = async () => {
+    // Prevent double-clicks while saving
+    if (saving) {
+      console.log('⚠️ Already saving, ignoring duplicate click');
+      return;
+    }
+    
     if (!editFormData.date) {
       if (Platform.OS === 'web') {
         alert('Please fill in the date');
@@ -398,6 +405,7 @@ export default function EntriesScreen({ navigation, route }) {
       return;
     }
 
+    setSaving(true); // Start saving
     try {
       // Check if anyone is editing a signed entry - clear signature status
       const wasSigned = selectedEntry.signatureStatus === 'signed_by_request';
@@ -538,8 +546,10 @@ export default function EntriesScreen({ navigation, route }) {
       await loadData();
       setShowEditModal(false);
       setSelectedEntry(null);
+      setSaving(false); // Done saving
     } catch (error) {
       console.error('Error saving entry:', error);
+      setSaving(false); // Done saving (even on error)
       if (Platform.OS === 'web') {
         alert('Failed to save entry: ' + error.message);
       } else {
@@ -1126,13 +1136,20 @@ export default function EntriesScreen({ navigation, route }) {
 
               {/* Save/Cancel Buttons */}
               <View style={styles.modalButtonContainer}>
-                <TouchableOpacity style={styles.saveButton} onPress={handleSaveEntry}>
-                  <Text style={styles.saveButtonText}>{t('save')}</Text>
+                <TouchableOpacity 
+                  style={[styles.saveButton, saving && styles.saveButtonDisabled]} 
+                  onPress={handleSaveEntry}
+                  disabled={saving}
+                >
+                  <Text style={styles.saveButtonText}>
+                    {saving ? t('saving') || 'Saving...' : t('save')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.cancelButton}
                   onPress={() => setShowEditModal(false)}
+                  disabled={saving}
                 >
                   <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
                 </TouchableOpacity>
@@ -1805,6 +1822,10 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#9E9E9E',
+    opacity: 0.6,
   },
   saveButtonText: {
     color: '#fff',

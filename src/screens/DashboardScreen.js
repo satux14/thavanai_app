@@ -44,6 +44,7 @@ export default function DashboardScreen({ navigation }) {
   const [sharedUsers, setSharedUsers] = useState([]);
   const [bookToViewShares, setBookToViewShares] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true); // Initial loading state
   const [connectionError, setConnectionError] = useState(false);
 
   useEffect(() => {
@@ -83,10 +84,16 @@ export default function DashboardScreen({ navigation }) {
 
   const loadBooks = async (forceRefresh = false) => {
     try {
+      if (!refreshing) {
+        setLoading(true); // Show loading only for initial load, not for refresh
+      }
       setConnectionError(false); // Reset error state
       
       const user = await getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
 
       const allBooks = await getAllBooks(forceRefresh);
       
@@ -135,8 +142,11 @@ export default function DashboardScreen({ navigation }) {
           endDate: booksWithBalance[0].endDate
         });
       }
+      
+      setLoading(false); // Done loading
     } catch (error) {
       console.error('Error loading books:', error);
+      setLoading(false); // Done loading even on error
       // Check if it's a network error
       if (error.message && (error.message.includes('Network') || error.message.includes('fetch') || error.message.includes('ECONNREFUSED'))) {
         setConnectionError(true);
@@ -820,6 +830,14 @@ export default function DashboardScreen({ navigation }) {
                 <Text style={styles.clearSearchButtonText}>{t('retry')}</Text>
               </TouchableOpacity>
             </View>
+          ) : loading ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⏳</Text>
+              <Text style={styles.emptyTitle}>{t('loadingBooks') || 'Loading Books...'}</Text>
+              <Text style={styles.emptyText}>
+                {t('pleaseWait') || 'Please wait while we fetch your books'}
+              </Text>
+            </View>
           ) : ownedBooks.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyIcon}>📖</Text>
@@ -1041,6 +1059,14 @@ export default function DashboardScreen({ navigation }) {
               >
                 <Text style={styles.clearSearchButtonText}>{t('retry')}</Text>
               </TouchableOpacity>
+            </View>
+          ) : loading ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>⏳</Text>
+              <Text style={styles.emptyTitle}>{t('loadingBooks') || 'Loading Books...'}</Text>
+              <Text style={styles.emptyText}>
+                {t('pleaseWait') || 'Please wait while we fetch your books'}
+              </Text>
             </View>
           ) : sharedBooks.length === 0 ? (
             <View style={styles.emptyState}>

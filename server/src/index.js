@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
@@ -16,6 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(compression()); // Enable gzip compression for all responses
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));

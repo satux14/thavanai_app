@@ -707,12 +707,18 @@ export default function EntriesScreen({ navigation, route }) {
       {/* Offline Indicator */}
       <OfflineIndicator />
       
-      {/* User Info - Top Left */}
+      {/* User Info - Top Left with Home Icon - Top Right */}
       {currentUser && (
         <View style={styles.userInfoHeader}>
           <Text style={styles.userInfoText}>
             👤 {currentUser.fullName} (@{currentUser.username})
           </Text>
+          <TouchableOpacity 
+            style={styles.homeIconButton}
+            onPress={() => navigation.navigate('Dashboard')}
+          >
+            <Text style={styles.homeIcon}>🏠</Text>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -1017,17 +1023,10 @@ export default function EntriesScreen({ navigation, route }) {
         </ScrollView>
       </View>
 
-      {/* Bottom Actions */}
+      {/* Bottom Actions - Compact for Ad Space */}
       <View style={styles.bottomActions}>
         <TouchableOpacity style={styles.addPageButton} onPress={handleAddPage}>
           <Text style={styles.addPageButtonText}>{t('addNewPage')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.navigate('Dashboard')}
-        >
-          <Text style={styles.backButtonText}>{t('backToDashboard')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -1257,16 +1256,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userInfoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     backgroundColor: '#f5f5f5',
-    padding: 10,
+    padding: 8,
     paddingLeft: 15,
+    paddingRight: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
   userInfoText: {
     fontSize: 14,
+    flex: 1,
     color: '#333',
     fontWeight: '600',
+  },
+  homeIconButton: {
+    padding: 6,
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    marginLeft: 10,
+  },
+  homeIcon: {
+    fontSize: 20,
   },
   bookHeader: {
     backgroundColor: '#2196F3',
@@ -1322,7 +1335,7 @@ const styles = StyleSheet.create({
   },
   tableWrapper: {
     flex: 1,
-    marginBottom: 10,
+    marginBottom: 2,
   },
   horizontalScroll: {
     flex: 1,
@@ -1331,7 +1344,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   tableContainer: {
-    marginVertical: 10,
+    marginVertical: 5,
     borderWidth: 2,
     borderColor: '#2196F3',
     borderRadius: 8,
@@ -1352,7 +1365,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#e91e63',
-    minHeight: 38,
+    minHeight: 32,
     backgroundColor: '#fff',
   },
   tableRowFilled: {
@@ -1361,13 +1374,13 @@ const styles = StyleSheet.create({
   cell: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 6,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
     borderRightWidth: 1,
     borderRightColor: '#e91e63',
   },
   headerCell: {
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   serialCell: {
     width: 80,
@@ -1605,15 +1618,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomActions: {
-    padding: 15,
+    padding: 8,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#ddd',
-    gap: 10,
   },
   addPageButton: {
     backgroundColor: '#4CAF50',
-    padding: 15,
+    padding: 12,
     borderRadius: 8,
     alignItems: 'center',
   },

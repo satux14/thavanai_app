@@ -1,0 +1,41 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Option 2: Circular Badge with eT Monogram -->
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="badge2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFC107;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB300;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#bg2)"/>
+  
+  <g transform="translate(256, 256)">
+    <!-- Outer circle badge -->
+    <circle cx="0" cy="0" r="170" fill="url(#badge2)" opacity="0.9"/>
+    <circle cx="0" cy="0" r="150" fill="white"/>
+    
+    <!-- Book icon simplified -->
+    <rect x="-80" y="-90" width="160" height="120" rx="8" fill="#2196F3" opacity="0.15"/>
+    <rect x="-80" y="-90" width="20" height="120" rx="8" fill="#2196F3" opacity="0.3"/>
+    
+    <!-- Ledger lines inside -->
+    <line x1="-50" y1="-60" x2="70" y2="-60" stroke="#2196F3" stroke-width="3" opacity="0.4"/>
+    <line x1="-50" y1="-35" x2="70" y2="-35" stroke="#2196F3" stroke-width="3" opacity="0.4"/>
+    <line x1="-50" y1="-10" x2="70" y2="-10" stroke="#2196F3" stroke-width="3" opacity="0.4"/>
+    
+    <!-- Large eT monogram -->
+    <text x="0" y="70" font-family="Arial, sans-serif" font-size="90" font-weight="bold" fill="#1976D2" text-anchor="middle" dominant-baseline="central">eT</text>
+    
+    <!-- Small rupee symbol -->
+    <g transform="translate(75, -70) scale(0.4)">
+      <line x1="-25" y1="-20" x2="25" y2="-20" stroke="#FFC107" stroke-width="8" stroke-linecap="round"/>
+      <line x1="-25" y1="0" x2="15" y2="0" stroke="#FFC107" stroke-width="8" stroke-linecap="round"/>
+      <line x1="-10" y1="0" x2="25" y2="40" stroke="#FFC107" stroke-width="10" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
+

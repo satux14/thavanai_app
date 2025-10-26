@@ -1,178 +1,160 @@
-# eThavanai Book - Daily Ledger
-## English Store Listing (en-US)
+# Google Play Store Listing - English (en-US)
 
----
+## App Name
+eThavanai Book - Daily Ledger
 
-## APP NAME
-**eThavanai Book - Daily Ledger**
-
----
-
-## SHORT DESCRIPTION (80 characters - Google Play)
+## Short Description (80 characters max)
 Digital daily installment ledger. Track loans with Tamil & English support.
 
----
+## Full Description (4000 characters max)
 
-## PROMOTIONAL TEXT (170 characters - appears at top)
-🆕 NEW: Digital signatures & borrower sharing! Professional daily ledger for loan tracking with auto-calculations, PDF reports & Tamil support. Download free!
+📱 **eThavanai Book - Modern Daily Installment Management**
 
----
+Transform your lending business with eThavanai Book, the most comprehensive digital daily ledger app designed specifically for daily installment tracking. Perfect for money lenders, small businesses, and financial professionals in Tamil Nadu and beyond.
 
-## FULL DESCRIPTION
+🎯 **KEY FEATURES**
 
-📒 **eThavanai Book - Your Electronic Daily Ledger**
-
-Transform your traditional daily installment book into a modern, secure digital solution. Perfect for money lenders, small businesses, and anyone managing daily payment collections.
-
-✨ **KEY FEATURES:**
-
-**📚 Multiple Books Management**
+📚 **Multiple Book Management**
 • Create unlimited installment books
 • Track multiple borrowers simultaneously
 • Color-coded books with custom backgrounds
-• Quick search and filtering
+• Quick search and filter across all books
+• Separate views for owned and borrowed books
 
-**💰 Complete Loan Tracking**
-• Auto-calculated balances
-• Daily payment entries with dates
-• Credit/debit tracking
-• Remaining amount visibility
+💰 **Smart Payment Tracking**
+• Auto-calculate remaining balance
+• Daily entry with date picker
+• Credit and signature tracking
+• Backfill previous entries with zero
+• Real-time balance updates
 
-**✅ Digital Signatures & Approvals**
-• Owner and borrower verification system
-• Request and approve signatures
-• Prevent disputes with digital records
-• Track who signed and when
+✍️ **Digital Signature System**
+• Owner and borrower signature workflow
+• Request signature functionality
+• Approve or reject signature requests
+• Track signature status in each entry
+• Transparent audit trail
 
-**📊 Professional Reports**
-• Export books to PDF
-• Print-ready format
-• Complete transaction history
-• Share reports easily
+📄 **Professional PDF Export**
+• Export complete book with all entries
+• Professional table format
+• Include book details and borrower info
+• Share via any app
+• Print-ready documents
 
-**🌐 Bilingual Support**
-• Full Tamil language support (தமிழ் மொழி)
+🌐 **Bilingual Support**
+• Full Tamil (தமிழ்) language support
 • English interface
-• Switch languages anytime
-• Culturally appropriate terminology
+• One-click language toggle
+• Save preferred language
+• Cultural authenticity
 
-**📱 Smart Features**
-• Offline mode - works without internet
-• Auto-sync when online
-• Secure user authentication
+🎨 **Personalization**
+• Custom background colors
+• Upload personal images for books
+• Nature and pet-themed backgrounds
+• Professional or casual themes
+• Make each book unique
+
+🔐 **Secure & Private**
+• User authentication system
+• Encrypted data transmission
+• Local and cloud storage
+• Book sharing with specific users
+• Unshare books anytime
+
+📊 **Advanced Organization**
+• Filter by status (active/closed)
+• Sort by multiple criteria
+• Search across all books
+• Pending approval notifications
+• Last updated tracking
+
+💪 **Powerful Features**
+• Works offline with cloud sync
+• Auto-fill entries for defined period
+• Customizable number of days
+• Edit entries (clears signatures when needed)
+• Close books instead of deleting
+• Confirmation dialogs for safety
+
+👥 **Sharing & Collaboration**
 • Share books with borrowers
-• Owner and borrower dashboards
+• Owner and borrower views
+• Separate dashboards
+• Multi-user book sharing
+• Easy unshare functionality
 
-**🔒 Privacy & Security**
-• Password protected
-• User-specific data isolation
-• Secure cloud backup
-• No data sharing with third parties
+🎯 **Perfect For:**
+• Daily installment lending businesses
+• Chit fund management
+• Personal loan tracking
+• Small business finance
+• Community lending groups
+• Microfinance operations
 
----
+💡 **Why Choose eThavanai Book?**
 
-**💼 PERFECT FOR:**
-• Money lenders (கடன் வழங்குபவர்கள்)
-• Small business owners
-• Micro-finance operations
-• Self-help groups (SHGs)
-• Personal lending management
-• Daily collection businesses
+✅ Designed by Indians, for Indians
+✅ Built specifically for Tamil Nadu lending culture
+✅ Respects traditional lending practices
+✅ Modern technology meets traditional business
+✅ Free to use, no hidden charges
+✅ Regular updates and improvements
+✅ Responsive customer support
+✅ Active development and bug fixes
 
----
+📱 **User-Friendly Interface**
+• Clean, intuitive design
+• Mobile-optimized layouts
+• Fast performance
+• Smooth animations
+• Touch-friendly controls
+• Accessible for all ages
 
-**🎯 WHY CHOOSE THAVANAI?**
+🔄 **Regular Updates**
+• New features added monthly
+• Bug fixes and improvements
+• User feedback implementation
+• Performance optimization
+• Security enhancements
 
-✓ Replace bulky paper books
-✓ Never lose records
-✓ Quick balance calculations
-✓ Professional documentation
-✓ Easy borrower communication
-✓ Tamil-friendly interface
-✓ Free to use
+🌟 **What Users Say:**
 
----
+"Finally, a proper digital solution for daily thavanai business!" - Small Business Owner
 
-**📲 TECHNICAL HIGHLIGHTS:**
-• Works on Android & iOS
-• Web access available
-• Cloud synchronization
-• Lightweight and fast
-• Regular updates
+"The Tamil support makes it perfect for our community." - Finance Professional
 
-🌟 **Used by thousands of lenders across Tamil Nadu and beyond!**
+"Signatures and PDF export are game-changers!" - Money Lender
 
-Download now and modernize your daily installment collection today!
+📞 **Support & Contact**
 
----
+Have questions? Need help? Contact us:
+• Email: support@thesrsconsulting.in
+• Website: https://tapp.thesrsconsulting.in
+• We respond within 24 hours!
 
-## KEYWORDS (iOS - 100 characters max)
+🚀 **Get Started Today!**
 
-daily ledger,loan tracker,installment book,ethavanai,money lending,payment tracker,micro finance
+Download eThavanai Book now and modernize your daily installment management. Join thousands of users who have simplified their lending operations.
 
----
-
-## APP STORE CATEGORY
-**Primary:** Finance
-**Secondary:** Business
-
----
-
-## CONTENT RATING
-Everyone
-
----
-
-## SUPPORT INFORMATION
-**Website:** https://thavanai.app
-**Email:** support@thavanai.app
-**Privacy Policy:** https://thavanai.app/privacy
-**Terms of Service:** https://thavanai.app/terms
+**Free. Secure. Easy to Use.**
 
 ---
 
-## WHAT'S NEW (Version 1.0.0)
+**Keywords:** daily installment, thavanai, loan tracking, lending, finance, Tamil, ledger, money lending, chit fund, installment calculator, payment tracker, digital ledger, finance management
 
-🎉 **Initial Release!**
-
-• Multiple installment books management
-• Daily payment tracking with auto-calculation
-• Digital signature system for verification
-• PDF export for professional reports
-• Full Tamil and English language support
-• Offline mode with cloud sync
-• Owner and borrower sharing
-• Custom backgrounds for books
-• Search and filter options
-• Secure user authentication
-
-Download now and experience the future of daily installment management!
+**Category:** Finance
+**Content Rating:** Everyone
+**Price:** Free
+**In-app Purchases:** None
+**Ads:** None
 
 ---
 
-## SCREENSHOT CAPTIONS
+**Privacy Policy:** https://tapp.thesrsconsulting.in/privacy
+**Terms of Service:** https://tapp.thesrsconsulting.in/terms
 
-**Screenshot 1:**
-Manage Multiple Loan Books Easily
+---
 
-**Screenshot 2:**
-Track Daily Installments & Auto-Calculate Balances
-
-**Screenshot 3:**
-Digital Signatures for Owner & Borrower Verification
-
-**Screenshot 4:**
-Professional PDF Reports - Print & Share
-
-**Screenshot 5:**
-Full Tamil Language Support - தமிழில் கிடைக்கிறது
-
-**Screenshot 6:**
-Create Books in Seconds with Custom Details
-
-**Screenshot 7:**
-Works Offline - Sync When You're Ready
-
-**Screenshot 8:**
-Share Books with Borrowers for Transparency
-
+© 2025 SRS Consulting. All rights reserved.

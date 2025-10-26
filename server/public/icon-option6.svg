@@ -1,0 +1,46 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Option 6: Tamil-forward with Book -->
+  <defs>
+    <linearGradient id="bg6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1E88E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#bg6)"/>
+  
+  <g transform="translate(256, 256)">
+    <!-- Book base -->
+    <rect x="-130" y="-150" width="260" height="300" rx="18" fill="white" opacity="0.95"/>
+    
+    <!-- Spine shadow -->
+    <rect x="-130" y="-150" width="35" height="300" rx="18" fill="rgba(0,0,0,0.06)"/>
+    
+    <!-- Ledger grid -->
+    <line x1="-80" y1="-100" x2="110" y2="-100" stroke="#2196F3" stroke-width="3" opacity="0.25"/>
+    <line x1="-80" y1="-50" x2="110" y2="-50" stroke="#2196F3" stroke-width="3" opacity="0.25"/>
+    <line x1="-80" y1="0" x2="110" y2="0" stroke="#2196F3" stroke-width="3" opacity="0.25"/>
+    <line x1="-80" y1="50" x2="110" y2="50" stroke="#2196F3" stroke-width="3" opacity="0.25"/>
+    <line x1="-80" y1="100" x2="110" y2="100" stroke="#2196F3" stroke-width="3" opacity="0.25"/>
+    
+    <!-- Vertical line -->
+    <line x1="-20" y1="-100" x2="-20" y2="120" stroke="#2196F3" stroke-width="2" opacity="0.2"/>
+    
+    <!-- Tamil "த" (tha) prominently -->
+    <text x="20" y="-30" font-family="Arial, sans-serif" font-size="140" font-weight="bold" fill="#1976D2" text-anchor="middle" dominant-baseline="central">த</text>
+    
+    <!-- Small rupee badge -->
+    <circle cx="100" cy="-110" r="35" fill="#FFC107"/>
+    <g transform="translate(100, -110) scale(0.5)">
+      <line x1="-25" y1="-15" x2="25" y2="-15" stroke="white" stroke-width="6" stroke-linecap="round"/>
+      <line x1="-25" y1="0" x2="15" y2="0" stroke="white" stroke-width="6" stroke-linecap="round"/>
+      <line x1="-10" y1="0" x2="25" y2="35" stroke="white" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- "eThavanai" at bottom -->
+  <text x="256" y="445" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="white" text-anchor="middle">eT</text>
+  <text x="256" y="475" font-family="Arial, sans-serif" font-size="20" font-weight="normal" fill="white" opacity="0.8" text-anchor="middle">Book</text>
+</svg>
+

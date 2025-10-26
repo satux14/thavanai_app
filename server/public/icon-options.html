@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eThavanai App Icon - Choose Your Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: white;
+            text-align: center;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            font-size: 1.2rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+
+        .option-card.selected {
+            border: 4px solid #FFC107;
+            background: #fffbf0;
+        }
+
+        .option-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-title {
+            font-size: 1.5rem;
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .option-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .icon-preview {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .icon-preview img {
+            width: 200px;
+            height: 200px;
+            border-radius: 20%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .icon-sizes {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .icon-sizes img {
+            border-radius: 15%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .features-list {
+            list-style: none;
+            margin-top: 1rem;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 0.5rem 0;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .features-list li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .download-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .download-btn.gold {
+            background: linear-gradient(135deg, #FFC107 0%, #FFB300 100%);
+        }
+
+        .specs {
+            background: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        .specs h4 {
+            color: #2196F3;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .back-link a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .option-card {
+                padding: 1.5rem;
+            }
+
+            .icon-preview img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Choose Your eThavanai Icon</h1>
+        <p class="subtitle">Pick the design that best represents your app. All use your brand colors!</p>
+
+        <div class="options-grid">
+            <!-- Option 1 -->
+            <div class="option-card" onclick="selectOption(1)">
+                <div class="option-header">
+                    <div class="option-title">Option 1: Clean Ledger</div>
+                    <div class="option-description">Classic book with prominent central rupee symbol</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option1.svg" alt="Option 1">
+                    <div class="icon-sizes">
+                        <img src="/icon-option1.svg" width="64" height="64">
+                        <img src="/icon-option1.svg" width="48" height="48">
+                        <img src="/icon-option1.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Large center rupee (₹) in gold</li>
+                    <li>Clean ledger lines</li>
+                    <li>"eT" branding at bottom</li>
+                    <li>Professional & trustworthy</li>
+                </ul>
+            </div>
+
+            <!-- Option 2 -->
+            <div class="option-card" onclick="selectOption(2)">
+                <div class="option-header">
+                    <div class="option-title">Option 2: Badge Style</div>
+                    <div class="option-description">Circular badge with large eT monogram</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option2.svg" alt="Option 2">
+                    <div class="icon-sizes">
+                        <img src="/icon-option2.svg" width="64" height="64">
+                        <img src="/icon-option2.svg" width="48" height="48">
+                        <img src="/icon-option2.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Gold circular badge design</li>
+                    <li>Prominent "eT" monogram</li>
+                    <li>Subtle book in background</li>
+                    <li>Modern & distinctive</li>
+                </ul>
+            </div>
+
+            <!-- Option 3 -->
+            <div class="option-card" onclick="selectOption(3)">
+                <div class="option-header">
+                    <div class="option-title">Option 3: Minimalist</div>
+                    <div class="option-description">Simple book outline with gold rupee badge</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option3.svg" alt="Option 3">
+                    <div class="icon-sizes">
+                        <img src="/icon-option3.svg" width="64" height="64">
+                        <img src="/icon-option3.svg" width="48" height="48">
+                        <img src="/icon-option3.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Clean white outline book</li>
+                    <li>Gold rupee badge corner</li>
+                    <li>"eT" pill at bottom</li>
+                    <li>Elegant & simple</li>
+                </ul>
+            </div>
+
+            <!-- Option 4 -->
+            <div class="option-card" onclick="selectOption(4)">
+                <div class="option-header">
+                    <div class="option-title">Option 4: Split Design</div>
+                    <div class="option-description">Modern geometric split - book left, rupee right</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option4.svg" alt="Option 4">
+                    <div class="icon-sizes">
+                        <img src="/icon-option4.svg" width="64" height="64">
+                        <img src="/icon-option4.svg" width="48" height="48">
+                        <img src="/icon-option4.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Bold split design</li>
+                    <li>White book | Gold rupee</li>
+                    <li>Modern geometric style</li>
+                    <li>Eye-catching & unique</li>
+                </ul>
+            </div>
+
+            <!-- Option 5 -->
+            <div class="option-card" onclick="selectOption(5)">
+                <div class="option-header">
+                    <div class="option-title">Option 5: Rupee Focus</div>
+                    <div class="option-description">Large rupee on gold circle with book background</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option5.svg" alt="Option 5">
+                    <div class="icon-sizes">
+                        <img src="/icon-option5.svg" width="64" height="64">
+                        <img src="/icon-option5.svg" width="48" height="48">
+                        <img src="/icon-option5.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Massive gold rupee badge</li>
+                    <li>Subtle book in background</li>
+                    <li>Finance-first approach</li>
+                    <li>Bold & memorable</li>
+                </ul>
+            </div>
+
+            <!-- Option 6 -->
+            <div class="option-card" onclick="selectOption(6)">
+                <div class="option-header">
+                    <div class="option-title">Option 6: Tamil Forward</div>
+                    <div class="option-description">Prominent Tamil "த" (tha) with ledger</div>
+                </div>
+                <div class="icon-preview">
+                    <img src="/icon-option6.svg" alt="Option 6">
+                    <div class="icon-sizes">
+                        <img src="/icon-option6.svg" width="64" height="64">
+                        <img src="/icon-option6.svg" width="48" height="48">
+                        <img src="/icon-option6.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Large Tamil "த" character</li>
+                    <li>Cultural identity emphasized</li>
+                    <li>Small rupee badge</li>
+                    <li>Perfect for Tamil audience</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="download-section">
+            <h2 style="color: #2196F3; margin-bottom: 1rem;">Download Your Chosen Icon</h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">Right-click on any icon above to save, or use the links below</p>
+            
+            <div>
+                <a href="/icon-option1.svg" download class="download-btn">📥 Download Option 1</a>
+                <a href="/icon-option2.svg" download class="download-btn">📥 Download Option 2</a>
+                <a href="/icon-option3.svg" download class="download-btn">📥 Download Option 3</a>
+            </div>
+            <div>
+                <a href="/icon-option4.svg" download class="download-btn">📥 Download Option 4</a>
+                <a href="/icon-option5.svg" download class="download-btn">📥 Download Option 5</a>
+                <a href="/icon-option6.svg" download class="download-btn">📥 Download Option 6</a>
+            </div>
+
+            <div class="specs">
+                <h4>All Icons Include:</h4>
+                <ul>
+                    <li><strong>Format:</strong> SVG (scalable to any size)</li>
+                    <li><strong>Primary Color:</strong> #2196F3 (Blue)</li>
+                    <li><strong>Secondary:</strong> #1976D2 (Dark Blue)</li>
+                    <li><strong>Accent:</strong> #FFC107 (Gold)</li>
+                    <li><strong>Elements:</strong> Book/Ledger + Rupee (₹) + eT Branding</li>
+                    <li><strong>Shape:</strong> Rounded square (110px radius)</li>
+                </ul>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 8px; border-left: 4px solid #FFC107;">
+                <strong>💡 Pro Tip:</strong> Use <a href="https://appicon.co" target="_blank" style="color: #2196F3;">appicon.co</a> to generate all required sizes for iOS and Android from your chosen SVG!
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/">← Back to Home</a> | 
+            <a href="/icon-preview.html">Original Icon</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+
+        function selectOption(num) {
+            // Remove previous selection
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selection to clicked card
+            event.currentTarget.classList.add('selected');
+            selectedOption = num;
+
+            console.log('Selected Option:', num);
+        }
+    </script>
+</body>
+</html>
+

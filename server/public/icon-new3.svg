@@ -1,0 +1,44 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- NEW Option 3: Orange Energy -->
+  <defs>
+    <linearGradient id="orange1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6F00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E65100;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#orange1)"/>
+  
+  <g transform="translate(256, 256)">
+    <!-- White book base -->
+    <rect x="-140" y="-150" width="280" height="300" rx="22" fill="white" opacity="0.95"/>
+    
+    <!-- Orange spine accent -->
+    <rect x="-140" y="-150" width="45" height="300" rx="22" fill="#FF6F00" opacity="0.2"/>
+    
+    <!-- Ledger lines -->
+    <line x1="-80" y1="-100" x2="120" y2="-100" stroke="#FF6F00" stroke-width="4" opacity="0.35"/>
+    <line x1="-80" y1="-50" x2="120" y2="-50" stroke="#FF6F00" stroke-width="4" opacity="0.35"/>
+    <line x1="-80" y1="0" x2="120" y2="0" stroke="#FF6F00" stroke-width="4" opacity="0.35"/>
+    <line x1="-80" y1="50" x2="120" y2="50" stroke="#FF6F00" stroke-width="4" opacity="0.35"/>
+    <line x1="-80" y1="100" x2="120" y2="100" stroke="#FF6F00" stroke-width="4" opacity="0.35"/>
+    
+    <!-- Large eT monogram -->
+    <text x="20" y="10" font-family="Arial, sans-serif" font-size="160" font-weight="bold" fill="#FF6F00" opacity="0.25" text-anchor="middle" dominant-baseline="central">eT</text>
+    
+    <!-- Rupee symbol overlay -->
+    <g transform="translate(20, -20)">
+      <circle cx="0" cy="0" r="70" fill="#FFC107"/>
+      <line x1="-40" y1="-25" x2="40" y2="-25" stroke="white" stroke-width="10" stroke-linecap="round"/>
+      <line x1="-40" y1="-5" x2="30" y2="-5" stroke="white" stroke-width="10" stroke-linecap="round"/>
+      <line x1="-20" y1="-5" x2="40" y2="45" stroke="white" stroke-width="12" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- Bottom label -->
+  <g transform="translate(256, 440)">
+    <rect x="-55" y="-22" width="110" height="44" rx="22" fill="white" opacity="0.25"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">Book</text>
+  </g>
+</svg>
+

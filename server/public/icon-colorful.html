@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eThavanai App Icon - Colorful Options</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            font-size: 1.2rem;
+        }
+
+        .note {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .option-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.4);
+        }
+
+        .option-card.selected {
+            border: 4px solid #FFC107;
+            background: #fffbf0;
+        }
+
+        .color-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .green { background: linear-gradient(135deg, #4CAF50, #388E3C); }
+        .purple { background: linear-gradient(135deg, #9C27B0, #7B1FA2); }
+        .orange { background: linear-gradient(135deg, #FF6F00, #E65100); }
+        .teal { background: linear-gradient(135deg, #00897B, #00695C); }
+        .maroon { background: linear-gradient(135deg, #C62828, #B71C1C); }
+        .navy { background: linear-gradient(135deg, #283593, #1A237E); }
+
+        .option-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .option-description {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .icon-preview {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .icon-preview img {
+            width: 200px;
+            height: 200px;
+            border-radius: 20%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .icon-sizes {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .icon-sizes img {
+            border-radius: 15%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 0.4rem 0;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .features-list li:before {
+            content: "✓ ";
+            color: #4CAF50;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .download-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 0.5rem;
+            transition: transform 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin: 0 1rem;
+        }
+
+        .back-link a:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .option-card {
+                padding: 1.5rem;
+            }
+
+            .icon-preview img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Colorful eThavanai Icons</h1>
+        <p class="subtitle">Fresh, vibrant designs with different color themes!</p>
+        
+        <div class="note">
+            💡 <strong>New Color Palettes!</strong> These designs move away from blue to offer unique brand identities.
+        </div>
+
+        <div class="options-grid">
+            <!-- Option 1: Green -->
+            <div class="option-card" onclick="selectOption(1)">
+                <span class="color-badge green">Green Growth</span>
+                <div class="option-title">Fresh & Prosperous</div>
+                <div class="option-description">Green symbolizes growth, money, and prosperity. Perfect for financial success.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new1.svg" alt="Green Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new1.svg" width="64" height="64">
+                        <img src="/icon-new1.svg" width="48" height="48">
+                        <img src="/icon-new1.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Green gradient background</li>
+                    <li>Gold accent stripe on book</li>
+                    <li>Growth-oriented theme</li>
+                    <li>Money & prosperity vibes</li>
+                </ul>
+            </div>
+
+            <!-- Option 2: Purple -->
+            <div class="option-card" onclick="selectOption(2)">
+                <span class="color-badge purple">Purple Premium</span>
+                <div class="option-title">Luxury & Professional</div>
+                <div class="option-description">Purple conveys luxury, wisdom, and professionalism. Premium positioning.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new2.svg" alt="Purple Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new2.svg" width="64" height="64">
+                        <img src="/icon-new2.svg" width="48" height="48">
+                        <img src="/icon-new2.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Rich purple gradient</li>
+                    <li>Gold rupee badge</li>
+                    <li>Premium & luxurious</li>
+                    <li>Professional appeal</li>
+                </ul>
+            </div>
+
+            <!-- Option 3: Orange -->
+            <div class="option-card" onclick="selectOption(3)">
+                <span class="color-badge orange">Orange Energy</span>
+                <div class="option-title">Bold & Energetic</div>
+                <div class="option-description">Orange brings energy, enthusiasm, and warmth. Bold and memorable.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new3.svg" alt="Orange Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new3.svg" width="64" height="64">
+                        <img src="/icon-new3.svg" width="48" height="48">
+                        <img src="/icon-new3.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Vibrant orange theme</li>
+                    <li>Large eT watermark</li>
+                    <li>Energetic & bold</li>
+                    <li>Highly memorable</li>
+                </ul>
+            </div>
+
+            <!-- Option 4: Teal -->
+            <div class="option-card" onclick="selectOption(4)">
+                <span class="color-badge teal">Teal Modern</span>
+                <div class="option-title">Fresh & Contemporary</div>
+                <div class="option-description">Teal offers sophistication and modern appeal. Perfect balance of professionalism.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new4.svg" alt="Teal Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new4.svg" width="64" height="64">
+                        <img src="/icon-new4.svg" width="48" height="48">
+                        <img src="/icon-new4.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Modern teal gradient</li>
+                    <li>Orange rupee badge</li>
+                    <li>Contemporary design</li>
+                    <li>Sophisticated look</li>
+                </ul>
+            </div>
+
+            <!-- Option 5: Maroon -->
+            <div class="option-card" onclick="selectOption(5)">
+                <span class="color-badge maroon">Maroon Premium</span>
+                <div class="option-title">Elegant & Trustworthy</div>
+                <div class="option-description">Maroon represents stability, elegance, and trust. Classic premium feel.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new5.svg" alt="Maroon Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new5.svg" width="64" height="64">
+                        <img src="/icon-new5.svg" width="48" height="48">
+                        <img src="/icon-new5.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Rich maroon/red</li>
+                    <li>Gold trim elegance</li>
+                    <li>Traditional & trustworthy</li>
+                    <li>Premium positioning</li>
+                </ul>
+            </div>
+
+            <!-- Option 6: Navy -->
+            <div class="option-card" onclick="selectOption(6)">
+                <span class="color-badge navy">Navy Professional</span>
+                <div class="option-title">Classic & Authoritative</div>
+                <div class="option-description">Dark navy conveys authority, trust, and professionalism. Corporate appeal.</div>
+                <div class="icon-preview">
+                    <img src="/icon-new6.svg" alt="Navy Option">
+                    <div class="icon-sizes">
+                        <img src="/icon-new6.svg" width="64" height="64">
+                        <img src="/icon-new6.svg" width="48" height="48">
+                        <img src="/icon-new6.svg" width="32" height="32">
+                    </div>
+                </div>
+                <ul class="features-list">
+                    <li>Professional navy</li>
+                    <li>Tamil character included</li>
+                    <li>Classic & authoritative</li>
+                    <li>Corporate friendly</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Download Section -->
+        <div class="download-section">
+            <h2 style="color: #333; margin-bottom: 1rem;">Download Your Chosen Icon</h2>
+            <p style="color: #666; margin-bottom: 1.5rem;">Click to download any design in SVG format</p>
+            
+            <div>
+                <a href="/icon-new1.svg" download class="download-btn" style="background: linear-gradient(135deg, #4CAF50, #388E3C);">📥 Green</a>
+                <a href="/icon-new2.svg" download class="download-btn" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">📥 Purple</a>
+                <a href="/icon-new3.svg" download class="download-btn" style="background: linear-gradient(135deg, #FF6F00, #E65100);">📥 Orange</a>
+            </div>
+            <div>
+                <a href="/icon-new4.svg" download class="download-btn" style="background: linear-gradient(135deg, #00897B, #00695C);">📥 Teal</a>
+                <a href="/icon-new5.svg" download class="download-btn" style="background: linear-gradient(135deg, #C62828, #B71C1C);">📥 Maroon</a>
+                <a href="/icon-new6.svg" download class="download-btn" style="background: linear-gradient(135deg, #283593, #1A237E);">📥 Navy</a>
+            </div>
+
+            <div style="margin-top: 2rem; padding: 1rem; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196F3;">
+                <strong>💡 Pro Tip:</strong> Use <a href="https://appicon.co" target="_blank" style="color: #2196F3;">appicon.co</a> to generate all required sizes for iOS and Android!
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="/">← Home</a> | 
+            <a href="/icon-options.html">Blue Options</a> |
+            <a href="/icon-preview.html">Original</a>
+        </div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+
+        function selectOption(num) {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            selectedOption = num;
+            console.log('Selected Colorful Option:', num);
+        }
+    </script>
+</body>
+</html>
+

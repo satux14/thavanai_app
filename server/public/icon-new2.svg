@@ -1,0 +1,40 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- NEW Option 2: Purple Professional -->
+  <defs>
+    <linearGradient id="purple1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#9C27B0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7B1FA2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#purple1)"/>
+  
+  <g transform="translate(256, 256)">
+    <!-- Sleek book -->
+    <rect x="-120" y="-130" width="240" height="260" rx="16" fill="white" opacity="0.95"/>
+    
+    <!-- Subtle spine -->
+    <rect x="-120" y="-130" width="28" height="260" rx="16" fill="rgba(156,39,176,0.1)"/>
+    
+    <!-- Grid pattern -->
+    <line x1="-85" y1="-80" x2="100" y2="-80" stroke="#9C27B0" stroke-width="3" opacity="0.3"/>
+    <line x1="-85" y1="-35" x2="100" y2="-35" stroke="#9C27B0" stroke-width="3" opacity="0.3"/>
+    <line x1="-85" y1="10" x2="100" y2="10" stroke="#9C27B0" stroke-width="3" opacity="0.3"/>
+    <line x1="-85" y1="55" x2="100" y2="55" stroke="#9C27B0" stroke-width="3" opacity="0.3"/>
+    
+    <!-- Vertical line -->
+    <line x1="-30" y1="-80" x2="-30" y2="110" stroke="#9C27B0" stroke-width="2" opacity="0.2"/>
+    
+    <!-- Gold rupee circle badge -->
+    <circle cx="80" cy="-90" r="50" fill="#FFD700"/>
+    <g transform="translate(80, -90) scale(0.8)">
+      <line x1="-30" y1="-20" x2="30" y2="-20" stroke="#7B1FA2" stroke-width="7" stroke-linecap="round"/>
+      <line x1="-30" y1="0" x2="20" y2="0" stroke="#7B1FA2" stroke-width="7" stroke-linecap="round"/>
+      <line x1="-15" y1="0" x2="30" y2="40" stroke="#7B1FA2" stroke-width="9" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- eT text -->
+  <text x="256" y="450" font-family="Arial, sans-serif" font-size="52" font-weight="bold" fill="white" text-anchor="middle">eT</text>
+</svg>
+

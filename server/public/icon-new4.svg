@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- NEW Option 4: Teal Modern -->
+  <defs>
+    <linearGradient id="teal1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00897B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00695C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" rx="110" fill="url(#teal1)"/>
+  
+  <g transform="translate(256, 256)">
+    <!-- Modern split book design -->
+    <rect x="-125" y="-135" width="250" height="270" rx="18" fill="white" opacity="0.95"/>
+    
+    <!-- Teal accent bar -->
+    <rect x="-125" y="-135" width="35" height="270" rx="18" fill="#00897B" opacity="0.15"/>
+    
+    <!-- Clean ledger lines -->
+    <line x1="-75" y1="-85" x2="105" y2="-85" stroke="#00897B" stroke-width="3" opacity="0.35"/>
+    <line x1="-75" y1="-40" x2="105" y2="-40" stroke="#00897B" stroke-width="3" opacity="0.35"/>
+    <line x1="-75" y1="5" x2="105" y2="5" stroke="#00897B" stroke-width="3" opacity="0.35"/>
+    <line x1="-75" y1="50" x2="105" y2="50" stroke="#00897B" stroke-width="3" opacity="0.35"/>
+    <line x1="-75" y1="95" x2="105" y2="95" stroke="#00897B" stroke-width="3" opacity="0.35"/>
+    
+    <!-- Rupee in circle -->
+    <circle cx="15" cy="0" r="85" fill="#FFA726"/>
+    <circle cx="15" cy="0" r="75" fill="#FF9800"/>
+    <g transform="translate(15, 0)">
+      <line x1="-45" y1="-30" x2="45" y2="-30" stroke="white" stroke-width="10" stroke-linecap="round"/>
+      <line x1="-45" y1="-5" x2="35" y2="-5" stroke="white" stroke-width="10" stroke-linecap="round"/>
+      <line x1="-20" y1="-5" x2="45" y2="50" stroke="white" stroke-width="12" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- eT badge at bottom -->
+  <g transform="translate(256, 425)">
+    <circle cx="0" cy="0" r="45" fill="#FFB74D"/>
+    <text x="0" y="5" font-family="Arial, sans-serif" font-size="38" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">eT</text>
+  </g>
+</svg>
+

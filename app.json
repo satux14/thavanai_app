@@ -10,6 +10,7 @@
     "newArchEnabled": false,
     "description": "Electronic daily installment ledger for modern lenders. Track loans digitally with Tamil & English support, digital signatures, and offline mode.",
     "privacy": "public",
+    "privacyPolicyUrl": "https://tapp.thesrsconsulting.in/privacy.html",
     "primaryColor": "#2196F3",
     "splash": {
       "image": "./assets/splash-icon.png",

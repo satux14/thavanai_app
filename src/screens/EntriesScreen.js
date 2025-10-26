@@ -32,6 +32,8 @@ export default function EntriesScreen({ navigation, route }) {
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
+  const [showApproveRejectModal, setShowApproveRejectModal] = useState(false);
+  const [selectedEntryForApproval, setSelectedEntryForApproval] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
@@ -57,11 +59,11 @@ export default function EntriesScreen({ navigation, route }) {
     });
   }, [t, navigation]);
 
-  const loadData = async () => {
+  const loadData = async (forceRefresh = false) => {
     try {
-      console.log('Loading book:', bookId);
+      console.log('Loading book:', bookId, '| Force refresh:', forceRefresh);
       const loadedBook = await getBook(bookId);
-      let loadedEntries = await getEntries(bookId);
+      let loadedEntries = await getEntries(bookId, forceRefresh);
       
       // Load current user and check if they are the owner
       const user = await getCurrentUser();
@@ -292,7 +294,7 @@ export default function EntriesScreen({ navigation, route }) {
     setEditFormData({
       serialNumber: entry.serialNumber,
       date: entry.date || today,  // Auto-fill today's date
-      amount: entry.amount || '',
+      amount: entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : '',  // Allow 0, convert to string
       remaining: entry.remaining || currentBalance.toFixed(2),  // Auto-calculate balance
       signature: entry.signature || '',
     });
@@ -475,20 +477,28 @@ export default function EntriesScreen({ navigation, route }) {
     }
 
     try {
+      console.log('🔔 Requesting signature for entry:', selectedEntry.id);
       await requestSignature(selectedEntry.id, currentUser.id);
+      
+      // Force a delay to ensure DB write completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log('📥 Reloading data after signature request...');
+      // Force refresh from server (bypass cache)
+      await loadData(true);
+      
       if (Platform.OS === 'web') {
         alert(t('signatureRequested'));
       } else {
         Alert.alert(t('success'), t('signatureRequested'));
       }
-      await loadData();
       setShowEditModal(false);
     } catch (error) {
       console.error('Error requesting signature:', error);
       if (Platform.OS === 'web') {
-        alert(t('requestFailed'));
+        alert(t('requestFailed') + ': ' + error.message);
       } else {
-        Alert.alert(t('error'), t('requestFailed'));
+        Alert.alert(t('error'), t('requestFailed') + ': ' + error.message);
       }
     }
   };
@@ -511,12 +521,16 @@ export default function EntriesScreen({ navigation, route }) {
 
     try {
       await approveSignatureRequest(selectedEntry.id, currentUser.id);
+      
+      // Force a delay to ensure DB write completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (Platform.OS === 'web') {
         alert(t('signatureApproved'));
       } else {
         Alert.alert(t('success'), t('signatureApproved'));
       }
-      await loadData();
+      await loadData(true); // Force refresh
       setShowEditModal(false);
     } catch (error) {
       console.error('Error approving signature:', error);
@@ -546,12 +560,16 @@ export default function EntriesScreen({ navigation, route }) {
 
     try {
       await rejectSignatureRequest(selectedEntry.id);
+      
+      // Force a delay to ensure DB write completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       if (Platform.OS === 'web') {
         alert(t('signatureRejected'));
       } else {
         Alert.alert(t('success'), t('signatureRejected'));
       }
-      await loadData();
+      await loadData(true); // Force refresh
       setShowEditModal(false);
     } catch (error) {
       console.error('Error rejecting signature:', error);
@@ -760,6 +778,9 @@ export default function EntriesScreen({ navigation, route }) {
                       const status = entry.signatureStatus || 'none';
                       const requesterId = entry.signatureRequestedBy;
                       const signedById = entry.signedBy;
+                      const isRequester = requesterId === currentUser?.id;
+                      const canApprove = status === 'signature_requested' && !isRequester && entry.id;
+                      const canRequest = (status === 'none' || status === 'request_rejected') && entry.id && entry.amount;
                       
                       // Find usernames
                       const requester = allUsers.find(u => u.id === requesterId);
@@ -771,35 +792,134 @@ export default function EntriesScreen({ navigation, route }) {
                         case 'signature_requested':
                           return (
                             <View style={styles.signatureStatusContainer}>
-                              <Text style={styles.signatureRequestedText}>⏳ {t('pending')}</Text>
-                              <Text style={styles.signatureDetailText}>
-                                {t('reqBy')} {requesterName}
-                              </Text>
+                              {isRequester ? (
+                                // Requester sees "Pending Approval" button (non-clickable)
+                                <View style={styles.pendingApprovalButton}>
+                                  <Text style={styles.pendingApprovalButtonText}>{t('pendingApproval')}</Text>
+                                </View>
+                              ) : canApprove ? (
+                                // Approver sees "Approve/Reject" button
+                                <TouchableOpacity
+                                  style={styles.approveRejectButton}
+                                  onPress={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEntryForApproval(entry);
+                                    setShowApproveRejectModal(true);
+                                  }}
+                                >
+                                  <Text style={styles.approveRejectButtonText}>{t('approveReject')}</Text>
+                                </TouchableOpacity>
+                              ) : (
+                                // Other users just see pending status button
+                                <View style={styles.pendingApprovalButton}>
+                                  <Text style={styles.pendingApprovalButtonText}>{t('pending')}</Text>
+                                </View>
+                              )}
                             </View>
                           );
                         case 'signed_by_request':
+                          // Approved - show info + "Request Sign" button for re-signing
                           return (
                             <View style={styles.signatureStatusContainer}>
-                              <Text style={styles.signatureStatusText}>✓ {t('approved')}</Text>
-                              <Text style={styles.signatureDetailText}>
-                                {t('reqBy')} {requesterName}
-                              </Text>
-                              <Text style={styles.signatureDetailText}>
-                                {t('approvedBy')} {signerName}
-                              </Text>
+                              <View style={styles.approvedInfoBox}>
+                                <Text style={styles.approvedInfoText}>✓ {t('approved')}</Text>
+                                <Text style={styles.approvedDetailText}>
+                                  {t('reqBy')} {requesterName}
+                                </Text>
+                                <Text style={styles.approvedDetailText}>
+                                  {t('approvedBy')} {signerName}
+                                </Text>
+                              </View>
+                              {canRequest && (
+                                <TouchableOpacity
+                                  style={styles.reSignRequestButton}
+                                  onPress={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await requestSignature(entry.id, currentUser.id);
+                                      await new Promise(resolve => setTimeout(resolve, 500));
+                                      await loadData(true);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('signatureRequested'));
+                                      } else {
+                                        Alert.alert(t('success'), t('signatureRequested'));
+                                      }
+                                    } catch (error) {
+                                      console.error('Error:', error);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('requestFailed'));
+                                      } else {
+                                        Alert.alert(t('error'), t('requestFailed'));
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <Text style={styles.reSignRequestButtonText}>{t('reqSign')}</Text>
+                                </TouchableOpacity>
+                              )}
                             </View>
                           );
                         case 'request_rejected':
                           return (
                             <View style={styles.signatureStatusContainer}>
-                              <Text style={styles.signatureRejectedText}>✗ {t('rejected')}</Text>
-                              <Text style={styles.signatureDetailText}>
-                                {t('reqBy')} {requesterName}
-                              </Text>
+                              {canRequest && (
+                                <TouchableOpacity
+                                  style={styles.inlineRequestButton}
+                                  onPress={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await requestSignature(entry.id, currentUser.id);
+                                      await new Promise(resolve => setTimeout(resolve, 500));
+                                      await loadData(true);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('signatureRequested'));
+                                      } else {
+                                        Alert.alert(t('success'), t('signatureRequested'));
+                                      }
+                                    } catch (error) {
+                                      console.error('Error:', error);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('requestFailed'));
+                                      } else {
+                                        Alert.alert(t('error'), t('requestFailed'));
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <Text style={styles.inlineRequestButtonText}>{t('reqSign')}</Text>
+                                </TouchableOpacity>
+                              )}
                             </View>
                           );
                         default:
-                          return <Text style={styles.cellText}></Text>;
+                          // No signature - always show "Request Sign" button if entry has amount
+                          return canRequest ? (
+                            <TouchableOpacity
+                              style={styles.inlineRequestButton}
+                              onPress={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  await requestSignature(entry.id, currentUser.id);
+                                  await new Promise(resolve => setTimeout(resolve, 500));
+                                  await loadData(true);
+                                  if (Platform.OS === 'web') {
+                                    alert(t('signatureRequested'));
+                                  } else {
+                                    Alert.alert(t('success'), t('signatureRequested'));
+                                  }
+                                } catch (error) {
+                                  console.error('Error:', error);
+                                  if (Platform.OS === 'web') {
+                                    alert(t('requestFailed'));
+                                  } else {
+                                    Alert.alert(t('error'), t('requestFailed'));
+                                  }
+                                }
+                              }}
+                            >
+                              <Text style={styles.inlineRequestButtonText}>{t('reqSign')}</Text>
+                            </TouchableOpacity>
+                          ) : <Text style={styles.cellText}></Text>;
                       }
                     })()}
                   </View>
@@ -996,6 +1116,89 @@ export default function EntriesScreen({ navigation, route }) {
           />
         </View>
       </Modal>
+
+      {/* Approve/Reject Modal */}
+      <Modal
+        visible={showApproveRejectModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowApproveRejectModal(false)}
+      >
+        <View style={styles.approveRejectModalOverlay}>
+          <View style={styles.approveRejectModalContent}>
+            <Text style={styles.approveRejectModalTitle}>{t('approveReject')}</Text>
+            <Text style={styles.approveRejectModalText}>
+              {t('chooseAction')}
+            </Text>
+            
+            <View style={styles.approveRejectModalButtons}>
+              <TouchableOpacity
+                style={[styles.modalActionButton, styles.modalApproveButton]}
+                onPress={async () => {
+                  try {
+                    await approveSignatureRequest(selectedEntryForApproval.id, currentUser.id);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await loadData(true);
+                    setShowApproveRejectModal(false);
+                    setSelectedEntryForApproval(null);
+                    if (Platform.OS === 'web') {
+                      alert(t('signatureApproved'));
+                    } else {
+                      Alert.alert(t('success'), t('signatureApproved'));
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    if (Platform.OS === 'web') {
+                      alert(t('approveFailed'));
+                    } else {
+                      Alert.alert(t('error'), t('approveFailed'));
+                    }
+                  }
+                }}
+              >
+                <Text style={styles.modalActionButtonText}>✓ {t('approve')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalActionButton, styles.modalRejectButton]}
+                onPress={async () => {
+                  try {
+                    await rejectSignatureRequest(selectedEntryForApproval.id);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await loadData(true);
+                    setShowApproveRejectModal(false);
+                    setSelectedEntryForApproval(null);
+                    if (Platform.OS === 'web') {
+                      alert(t('signatureRejected'));
+                    } else {
+                      Alert.alert(t('success'), t('signatureRejected'));
+                    }
+                  } catch (error) {
+                    console.error('Error:', error);
+                    if (Platform.OS === 'web') {
+                      alert(t('rejectFailed'));
+                    } else {
+                      Alert.alert(t('error'), t('rejectFailed'));
+                    }
+                  }
+                }}
+              >
+                <Text style={styles.modalActionButtonText}>✗ {t('reject')}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalCancelButton}
+              onPress={() => {
+                setShowApproveRejectModal(false);
+                setSelectedEntryForApproval(null);
+              }}
+            >
+              <Text style={styles.modalCancelButtonText}>{t('cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -1090,8 +1293,8 @@ const styles = StyleSheet.create({
     borderColor: '#2196F3',
     borderRadius: 8,
     backgroundColor: '#fff',
-    // Fixed width = sum of all column widths (80 + 140 + 140 + 140 + 150 = 650)
-    width: 650,
+    // Fixed width = sum of all column widths (80 + 140 + 140 + 140 + 200 = 700)
+    width: 700,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -1133,7 +1336,7 @@ const styles = StyleSheet.create({
     width: 140,
   },
   signatureCell: {
-    width: 150,
+    width: 200,
     borderRightWidth: 0,
   },
   headerText: {
@@ -1186,6 +1389,173 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 2,
     textAlign: 'center',
+  },
+  inlineSignatureButtons: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  inlineButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  inlineApproveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  inlineRejectButton: {
+    backgroundColor: '#f44336',
+  },
+  inlineButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  inlineRequestButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#2196F3',
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  inlineRequestButtonText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  pendingApprovalButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#FFF3E0',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FF9800',
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  pendingApprovalButtonText: {
+    color: '#FF9800',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  approveRejectButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    backgroundColor: '#673AB7',
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  approveRejectButtonText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  approvedInfoBox: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#4CAF50',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    marginBottom: 4,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  approvedInfoText: {
+    color: '#4CAF50',
+    fontSize: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  approvedDetailText: {
+    fontSize: 8,
+    color: '#2E7D32',
+    marginTop: 2,
+    textAlign: 'center',
+  },
+  reSignRequestButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    backgroundColor: '#2196F3',
+    borderRadius: 6,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  reSignRequestButtonText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  approveRejectModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  approveRejectModalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  approveRejectModalTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  approveRejectModalText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  approveRejectModalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  modalActionButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalApproveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalRejectButton: {
+    backgroundColor: '#f44336',
+  },
+  modalActionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalCancelButton: {
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  modalCancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
   },
   bottomActions: {
     padding: 15,

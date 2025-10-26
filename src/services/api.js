@@ -281,12 +281,17 @@ export const entriesAPI = {
   },
 
   async requestSignature(entryId) {
-    await apiRequest(`/entries/${entryId}/request-signature`, {
+    console.log('🔔 Requesting signature for entry:', entryId);
+    const result = await apiRequest(`/entries/${entryId}/request-signature`, {
       method: 'POST',
     });
 
     // Invalidate entries cache
     cache.entries = {};
+    cache.books = null;
+    
+    console.log('✅ Signature request successful');
+    return result;
   },
 
   async approveSignature(entryId) {

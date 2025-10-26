@@ -218,17 +218,27 @@ export default function EntriesScreen({ navigation, route }) {
       return 1; // First page
     }
 
-    // Find the highest page number with data
-    let lastPage = 1;
+    // Find the entry with the highest serial number that has amount filled
+    // This is the last entry the user actually worked on
+    let lastFilledEntry = null;
+    let highestSerialWithAmount = 0;
+    
     allEntries.forEach(entry => {
-      if (entry.date || entry.amount || entry.remaining) {
-        if (entry.pageNumber > lastPage) {
-          lastPage = entry.pageNumber;
+      // Only consider entries with amount (actual credit payment)
+      if (entry.amount !== null && entry.amount !== undefined && entry.amount !== '') {
+        if (entry.serialNumber > highestSerialWithAmount) {
+          highestSerialWithAmount = entry.serialNumber;
+          lastFilledEntry = entry;
         }
       }
     });
     
-    return lastPage;
+    // If no filled entry found, start at page 1
+    if (!lastFilledEntry) {
+      return 1;
+    }
+    
+    return lastFilledEntry.pageNumber;
   };
 
   // Calculate correct balance for an entry (excluding rejected entries)

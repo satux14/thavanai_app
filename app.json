@@ -18,7 +18,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sathishkumarmnm.thavanai",
+      "bundleIdentifier": "com.thesrsconsulting.tapp",
       "buildNumber": "1.0.0",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -35,7 +35,7 @@
         "backgroundColor": "#2196F3"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sathishkumarmnm.thavanai",
+      "package": "com.thesrsconsulting.tapp",
       "versionCode": 1,
       "permissions": [
         "CAMERA",

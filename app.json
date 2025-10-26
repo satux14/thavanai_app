@@ -1,32 +1,47 @@
 {
   "expo": {
-    "name": "thavanai_mobile",
-    "slug": "thavanai_mobile",
+    "name": "Thavanai - Daily Installment Book",
+    "slug": "thavanai-daily-installment",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "jsEngine": "hermes",
     "newArchEnabled": false,
+    "description": "Track daily installments & loans digitally. Perfect for money lenders with Tamil & English support, digital signatures, and offline mode.",
+    "privacy": "public",
+    "primaryColor": "#2196F3",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2196F3"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sathishkumarmnm.tapp",
+      "bundleIdentifier": "com.sathishkumarmnm.thavanai",
+      "buildNumber": "1.0.0",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Allow Thavanai to access your camera to take photos for book backgrounds.",
+        "NSPhotoLibraryUsageDescription": "Allow Thavanai to access your photo library to select backgrounds for your books."
+      },
+      "config": {
+        "usesNonExemptEncryption": false
       }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#2196F3"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sathishkumarmnm.tapp"
+      "package": "com.sathishkumarmnm.thavanai",
+      "versionCode": 1,
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

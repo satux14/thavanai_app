@@ -267,14 +267,29 @@ export default function EntriesScreen({ navigation, route }) {
     const status = entry.signatureStatus || 'none';
     const isSigned = status === 'signed_by_request';
     
-    // No one can edit approved/signed entries - it requires both parties' agreement
+    // Allow editing of approved entries, but warn that signature will be cleared
     if (isSigned) {
-      if (Platform.OS === 'web') {
-        alert(t('cannotEditApprovedEntry'));
-      } else {
-        Alert.alert(t('error'), t('cannotEditApprovedEntry'));
+      const confirmed = Platform.OS === 'web'
+        ? window.confirm(t('editSignedWarning'))
+        : false; // Will show alert below
+      
+      if (Platform.OS !== 'web') {
+        Alert.alert(
+          t('warning'),
+          t('editSignedWarning'),
+          [
+            { text: t('cancel'), style: 'cancel' },
+            { 
+              text: t('continue'), 
+              onPress: () => proceedToEdit(entry),
+              style: 'default'
+            }
+          ]
+        );
+        return;
       }
-      return;
+      
+      if (!confirmed) return;
     }
 
     proceedToEdit(entry);
@@ -780,7 +795,10 @@ export default function EntriesScreen({ navigation, route }) {
                       const signedById = entry.signedBy;
                       const isRequester = requesterId === currentUser?.id;
                       const canApprove = status === 'signature_requested' && !isRequester && entry.id;
-                      const canRequest = (status === 'none' || status === 'request_rejected') && entry.id && entry.amount;
+                      // Allow request for any entry with id (allow 0 amounts)
+                      const hasAmount = entry.amount !== null && entry.amount !== undefined && entry.amount !== '';
+                      const canRequest = entry.id && hasAmount;
+                      const canReRequest = status === 'signed_by_request' && entry.id && hasAmount; // Allow re-request after approval
                       
                       // Find usernames
                       const requester = allUsers.find(u => u.id === requesterId);
@@ -830,7 +848,7 @@ export default function EntriesScreen({ navigation, route }) {
                                   {t('approvedBy')} {signerName}
                                 </Text>
                               </View>
-                              {canRequest && (
+                              {canReRequest && (
                                 <TouchableOpacity
                                   style={styles.reSignRequestButton}
                                   onPress={async (e) => {

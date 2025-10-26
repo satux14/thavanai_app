@@ -35,6 +35,7 @@ export default function EntriesScreen({ navigation, route }) {
   const [showApproveRejectModal, setShowApproveRejectModal] = useState(false);
   const [selectedEntryForApproval, setSelectedEntryForApproval] = useState(null);
   const [editFormData, setEditFormData] = useState(null);
+  const [originalAmount, setOriginalAmount] = useState(null); // Track original amount to check for changes
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
@@ -301,15 +302,23 @@ export default function EntriesScreen({ navigation, route }) {
     // Auto-fill date to today if empty
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     
-    // Calculate current balance (loan amount - sum of all previous payments)
-    const previousEntries = entries.filter(e => e.serialNumber < entry.serialNumber && e.amount);
+    // Calculate current balance (loan amount - sum of all previous payments, excluding rejected entries)
+    const previousEntries = entries.filter(
+      e => e.serialNumber < entry.serialNumber && 
+           e.amount &&
+           e.signatureStatus !== 'request_rejected' // Exclude rejected entries
+    );
     const totalPaid = previousEntries.reduce((sum, e) => sum + (e.amount || 0), 0);
     const currentBalance = (book.loanAmount || 0) - totalPaid;
+    
+    // Store original amount to check for changes
+    const originalAmountValue = entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : '';
+    setOriginalAmount(originalAmountValue);
     
     setEditFormData({
       serialNumber: entry.serialNumber,
       date: entry.date || today,  // Auto-fill today's date
-      amount: entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : '',  // Allow 0, convert to string
+      amount: originalAmountValue,  // Allow 0, convert to string
       remaining: entry.remaining || currentBalance.toFixed(2),  // Auto-calculate balance
       signature: entry.signature || '',
     });
@@ -322,6 +331,17 @@ export default function EntriesScreen({ navigation, route }) {
         alert('Please fill in the date');
       } else {
         Alert.alert('Error', 'Please fill in the date');
+      }
+      return;
+    }
+
+    // Check if credit amount has changed
+    const currentAmount = editFormData.amount || '';
+    if (currentAmount === originalAmount) {
+      if (Platform.OS === 'web') {
+        alert(t('creditNotChanged'));
+      } else {
+        Alert.alert(t('error'), t('creditNotChanged'));
       }
       return;
     }
@@ -371,10 +391,11 @@ export default function EntriesScreen({ navigation, route }) {
       
       for (const emptyEntry of previousEmptyEntries) {
         if (emptyEntry.id) {
-          // Calculate balance for this entry
+          // Calculate balance for this entry (excluding rejected entries)
           const entriesBeforeThis = allEntries.filter(
             e => e.serialNumber < emptyEntry.serialNumber && 
-                 e.amount !== null && e.amount !== undefined && e.amount !== ''
+                 e.amount !== null && e.amount !== undefined && e.amount !== '' &&
+                 e.signatureStatus !== 'request_rejected' // Exclude rejected entries from balance calculation
           );
           const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
           const balance = (book.loanAmount || 0) - totalPaidBefore;
@@ -428,14 +449,18 @@ export default function EntriesScreen({ navigation, route }) {
       
       const balanceUpdates = [];
       
-      // Recalculate balance for each entry based on cumulative payments
+      // Recalculate balance for each entry based on cumulative payments (excluding rejected entries)
       for (const entry of allEntriesSorted) {
-        // Calculate total paid up to (but not including) this entry
-        const entriesBeforeThis = allEntriesSorted.filter(e => e.serialNumber < entry.serialNumber);
+        // Calculate total paid up to (but not including) this entry - exclude rejected entries
+        const entriesBeforeThis = allEntriesSorted.filter(
+          e => e.serialNumber < entry.serialNumber && 
+               e.signatureStatus !== 'request_rejected' // Exclude rejected entries
+        );
         const totalPaidBefore = entriesBeforeThis.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
         
         // Balance at this entry = Loan Amount - Total Paid Before - Amount Paid at This Entry
-        const amountAtThisEntry = parseFloat(entry.amount) || 0;
+        // If this entry itself is rejected, don't deduct its amount
+        const amountAtThisEntry = entry.signatureStatus === 'request_rejected' ? 0 : (parseFloat(entry.amount) || 0);
         const balance = (book.loanAmount || 0) - totalPaidBefore - amountAtThisEntry;
         
         // Prepare balance update if it has changed
@@ -669,7 +694,10 @@ export default function EntriesScreen({ navigation, route }) {
           <Text style={styles.bookHeaderSubtext}>
             {t('balance')}: ₹{(() => {
               const loanAmount = parseFloat(book.loanAmount) || 0;
-              const totalPaid = entries.reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
+              // Exclude rejected entries from balance calculation
+              const totalPaid = entries
+                .filter(entry => entry.signatureStatus !== 'request_rejected')
+                .reduce((sum, entry) => sum + (parseFloat(entry.amount) || 0), 0);
               const balance = loanAmount - totalPaid;
               return balance.toFixed(2);
             })()}
@@ -779,7 +807,12 @@ export default function EntriesScreen({ navigation, route }) {
                     <Text style={[styles.cellText, { fontSize }]}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={[styles.cellText, { fontSize }]}>
+                    <Text style={[
+                      styles.cellText, 
+                      { fontSize },
+                      // Strike through if rejected
+                      entry.signatureStatus === 'request_rejected' && styles.strikethrough
+                    ]}>
                       {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : (entry.amount === 0 ? '0' : '')}
                     </Text>
                   </View>
@@ -872,7 +905,7 @@ export default function EntriesScreen({ navigation, route }) {
                                     }
                                   }}
                                 >
-                                  <Text style={styles.reSignRequestButtonText}>{t('reqSign')}</Text>
+                                  <Text style={styles.reSignRequestButtonText}>{t('reReqSign')}</Text>
                                 </TouchableOpacity>
                               )}
                             </View>
@@ -987,12 +1020,11 @@ export default function EntriesScreen({ navigation, route }) {
                 <Text style={styles.readOnlyText}>{editFormData.serialNumber}</Text>
               </View>
 
-              {/* Date */}
-              <DatePicker
-                label={t('date') + ' *'}
-                value={editFormData.date}
-                onChange={(date) => setEditFormData({ ...editFormData, date })}
-              />
+              {/* Date (Read-only) */}
+              <View style={styles.fieldContainer}>
+                <Text style={styles.label}>{t('date')}</Text>
+                <Text style={styles.readOnlyText}>{editFormData.date ? formatDateDDMMYYYY(editFormData.date) : ''}</Text>
+              </View>
 
               {/* Credit Amount */}
               <View style={styles.fieldContainer}>
@@ -1001,9 +1033,13 @@ export default function EntriesScreen({ navigation, route }) {
                   style={styles.modalInput}
                   value={editFormData.amount.toString()}
                   onChangeText={(text) => {
-                    // Auto-calculate balance when credit amount changes
+                    // Auto-calculate balance when credit amount changes (excluding rejected entries)
                     const creditAmount = parseFloat(text) || 0;
-                    const previousEntries = entries.filter(e => e.serialNumber < selectedEntry.serialNumber && e.amount);
+                    const previousEntries = entries.filter(
+                      e => e.serialNumber < selectedEntry.serialNumber && 
+                           e.amount &&
+                           e.signatureStatus !== 'request_rejected' // Exclude rejected entries
+                    );
                     const totalPaid = previousEntries.reduce((sum, e) => sum + (e.amount || 0), 0);
                     const newBalance = (book.loanAmount || 0) - totalPaid - creditAmount;
                     
@@ -1031,59 +1067,6 @@ export default function EntriesScreen({ navigation, route }) {
                   keyboardType="numeric"
                   editable={true}
                 />
-              </View>
-
-              {/* Digital Signature System */}
-              <View style={styles.fieldContainer}>
-                <Text style={styles.label}>{t('digitalSignature')}</Text>
-                {(() => {
-                  const buttonConfig = getSignatureButtonConfig();
-                  if (!buttonConfig) return null;
-
-                  return (
-                    <View>
-                      {buttonConfig.action === 'approve_reject' ? (
-                        // Show approve/reject buttons for owner when signature is requested
-                        <View style={styles.approveRejectContainer}>
-                          <Text style={styles.requestWarning}>⚠️ {t('signatureRequestedByOtherParty')}</Text>
-                          <View style={styles.approveRejectButtons}>
-                            <TouchableOpacity
-                              style={[styles.approveButton, styles.signatureActionButton]}
-                              onPress={handleApproveRequest}
-                            >
-                              <Text style={styles.approveButtonText}>✓ {t('approve')}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={[styles.rejectButton, styles.signatureActionButton]}
-                              onPress={handleRejectRequest}
-                            >
-                              <Text style={styles.rejectButtonText}>✗ {t('reject')}</Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      ) : (
-                        // Show single button for other states
-                        <TouchableOpacity
-                          style={[
-                            styles.signatureStatusButton,
-                            { backgroundColor: buttonConfig.color },
-                            buttonConfig.disabled && styles.signatureButtonDisabled
-                          ]}
-                          onPress={() => {
-                            if (buttonConfig.action === 'request') {
-                              handleRequestSignature();
-                            }
-                          }}
-                          disabled={buttonConfig.disabled}
-                        >
-                          <Text style={styles.signatureStatusButtonText}>
-                            {buttonConfig.text}
-                          </Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
-                  );
-                })()}
               </View>
 
               {/* Save/Cancel Buttons */}
@@ -1373,6 +1356,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
+  },
+  strikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#999',
   },
   signatureIndicator: {
     fontSize: 24,

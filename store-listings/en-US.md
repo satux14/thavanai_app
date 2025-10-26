@@ -1,26 +1,26 @@
-# Thavanai - Daily Installment Book
+# eThavanai Book - Daily Ledger
 ## English Store Listing (en-US)
 
 ---
 
 ## APP NAME
-**Thavanai - Daily Installment Book**
+**eThavanai Book - Daily Ledger**
 
 ---
 
 ## SHORT DESCRIPTION (80 characters - Google Play)
-Track daily installments & loans digitally. Tamil & English support included.
+Digital daily installment ledger. Track loans with Tamil & English support.
 
 ---
 
 ## PROMOTIONAL TEXT (170 characters - appears at top)
-🆕 NEW: Digital signatures & borrower sharing! Track daily installments professionally with auto-calculations, PDF reports & Tamil support. Download free!
+🆕 NEW: Digital signatures & borrower sharing! Professional daily ledger for loan tracking with auto-calculations, PDF reports & Tamil support. Download free!
 
 ---
 
 ## FULL DESCRIPTION
 
-📒 **Thavanai - Your Digital Daily Installment Book**
+📒 **eThavanai Book - Your Electronic Daily Ledger**
 
 Transform your traditional daily installment book into a modern, secure digital solution. Perfect for money lenders, small businesses, and anyone managing daily payment collections.
 
@@ -108,7 +108,7 @@ Download now and modernize your daily installment collection today!
 
 ## KEYWORDS (iOS - 100 characters max)
 
-loan tracker,installment book,daily collection,money lending,thavanai,payment tracker,micro finance
+daily ledger,loan tracker,installment book,ethavanai,money lending,payment tracker,micro finance
 
 ---
 

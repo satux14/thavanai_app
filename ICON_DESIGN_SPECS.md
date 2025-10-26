@@ -1,5 +1,5 @@
 # App Icon Design Specifications
-## Thavanai - Daily Installment Book
+## eThavanai Book - Daily Ledger
 
 ---
 
@@ -38,9 +38,10 @@
 ### Primary Design (Recommended)
 
 **Visual Elements:**
-- **Book Icon** - Representing the traditional installment book
+- **Book Icon** - Representing the traditional installment book/ledger
 - **Rupee Symbol (₹)** - Indicating financial/money aspect
-- **Tamil Letter "த"** - Subtle Tamil language representation
+- **"eT" Monogram** - Modern "eThavanai" brand abbreviation (optional)
+- **Tamil Letter "த"** - Subtle Tamil language representation (optional)
 
 **Color Palette:**
 - **Primary:** #2196F3 (Blue) - Trust, professionalism, stability
@@ -222,9 +223,9 @@ Your app currently uses:
 
 ## Icon Design Brief (For Designers)
 
-**App Name:** Thavanai - Daily Installment Book
+**App Name:** eThavanai Book - Daily Ledger
 
-**Purpose:** Digital daily installment tracking app for money lenders in India
+**Purpose:** Electronic daily installment ledger app for modern lenders in India
 
 **Target Audience:** 
 - Money lenders

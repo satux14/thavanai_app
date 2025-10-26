@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "Thavanai - Daily Installment Book",
-    "slug": "thavanai-daily-installment",
+    "name": "eThavanai Book - Daily Ledger",
+    "slug": "ethavanai-book-daily-ledger",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "jsEngine": "hermes",
     "newArchEnabled": false,
-    "description": "Track daily installments & loans digitally. Perfect for money lenders with Tamil & English support, digital signatures, and offline mode.",
+    "description": "Electronic daily installment ledger for modern lenders. Track loans digitally with Tamil & English support, digital signatures, and offline mode.",
     "privacy": "public",
     "primaryColor": "#2196F3",
     "splash": {

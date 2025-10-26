@@ -1,5 +1,5 @@
 # ASO Implementation Summary
-## Thavanai - Daily Installment Book
+## eThavanai Book - Daily Ledger
 
 ---
 
@@ -9,8 +9,8 @@
 **File:** `app.json`
 
 **Changes:**
-- App name: "Thavanai - Daily Installment Book"
-- Updated bundle identifiers to `com.sathishkumarmnm.thavanai`
+- App name: "eThavanai Book - Daily Ledger"
+- Updated bundle identifiers to `com.thesrsconsulting.tapp`
 - Added app description for store listings
 - Updated splash screen background color to match brand (#2196F3)
 - Added camera and photo library permissions with descriptions

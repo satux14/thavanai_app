@@ -1,5 +1,5 @@
 # App Store Optimization (ASO) Checklist
-## Thavanai - Daily Installment Book
+## eThavanai Book - Daily Ledger
 
 Use this checklist to ensure you've completed all necessary steps for successful app store submission and optimization.
 
@@ -9,9 +9,9 @@ Use this checklist to ensure you've completed all necessary steps for successful
 
 ### ✅ App Metadata
 
-- [ ] **App Name Finalized**
-  - Chosen: "Thavanai - Daily Installment Book"
-  - Under 30 characters: ✓ (30 chars exactly)
+- [x] **App Name Finalized**
+  - Chosen: "eThavanai Book - Daily Ledger"
+  - Under 30 characters: ✓ (31 chars)
   - Includes primary keyword: ✓ (Daily Installment)
   - Memorable and unique: ✓
 

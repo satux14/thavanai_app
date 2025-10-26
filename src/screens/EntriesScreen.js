@@ -219,6 +219,28 @@ export default function EntriesScreen({ navigation, route }) {
     return lastPage;
   };
 
+  // Calculate correct balance for an entry (excluding rejected entries)
+  const calculateEntryBalance = (entry) => {
+    if (!entry || !entry.serialNumber) return '';
+    
+    // Get all entries before this one (excluding rejected)
+    const previousEntries = entries.filter(
+      e => e.serialNumber < entry.serialNumber && 
+           e.signatureStatus !== 'request_rejected' &&
+           e.amount !== null && e.amount !== undefined && e.amount !== ''
+    );
+    
+    // Calculate total paid before this entry
+    const totalPaidBefore = previousEntries.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+    
+    // Calculate balance at this entry
+    // If this entry itself is rejected, don't deduct its amount
+    const amountAtThisEntry = entry.signatureStatus === 'request_rejected' ? 0 : (parseFloat(entry.amount) || 0);
+    const balance = (book.loanAmount || 0) - totalPaidBefore - amountAtThisEntry;
+    
+    return balance.toFixed(2);
+  };
+
   // Get entries for current page
   const getCurrentPageEntries = () => {
     // Filter entries for current page
@@ -818,7 +840,7 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.remaining !== null && entry.remaining !== undefined && entry.remaining !== '' ? String(entry.remaining) : ''}
+                      {entry.id ? calculateEntryBalance(entry) : ''}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.signatureCell]}>

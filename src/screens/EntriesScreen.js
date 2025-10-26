@@ -224,12 +224,11 @@ export default function EntriesScreen({ navigation, route }) {
   const calculateEntryBalance = (entry) => {
     if (!entry || !entry.serialNumber) return '';
     
-    // Only show balance for entries that have been filled (have amount or date filled)
-    // Don't show balance for future/empty entries
+    // Only show balance for entries that have amount filled
+    // Don't show balance for future/empty entries (even if date is prefilled)
     const hasAmount = entry.amount !== null && entry.amount !== undefined && entry.amount !== '';
-    const hasDate = entry.date && entry.date !== '';
     
-    if (!hasAmount && !hasDate) {
+    if (!hasAmount) {
       return ''; // Don't show balance for future/empty entries
     }
     

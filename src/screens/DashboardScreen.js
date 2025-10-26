@@ -127,14 +127,6 @@ export default function DashboardScreen({ navigation }) {
       }
       
       
-      // Debug: Log book dates
-      if (booksWithBalance.length > 0) {
-          name: booksWithBalance[0].name,
-          startDate: booksWithBalance[0].startDate,
-          endDate: booksWithBalance[0].endDate
-        });
-      }
-      
       setLoading(false); // Done loading
     } catch (error) {
       console.error('Error loading books:', error);

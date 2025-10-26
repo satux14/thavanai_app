@@ -267,6 +267,19 @@ export const entriesAPI = {
     cache.books = null;
   },
 
+  async bulkSaveEntries(bookId, entries) {
+    console.log(`🚀 Bulk saving ${entries.length} entries for book ${bookId}`);
+    await apiRequest('/entries/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ bookId, entries }),
+    });
+
+    // Invalidate cache for this book
+    delete cache.entries[bookId];
+    cache.books = null;
+    console.log(`✅ Bulk save complete for ${entries.length} entries`);
+  },
+
   async requestSignature(entryId) {
     await apiRequest(`/entries/${entryId}/request-signature`, {
       method: 'POST',

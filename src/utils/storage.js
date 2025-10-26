@@ -188,6 +188,37 @@ export const saveEntry = async (entryData) => {
 };
 
 /**
+ * Bulk save multiple entries at once (efficient for batch operations)
+ */
+export const bulkSaveEntries = async (bookId, entriesData) => {
+  try {
+    console.log(`📦 Bulk saving ${entriesData.length} entries...`);
+    
+    const formattedEntries = entriesData.map(entryData => ({
+      id: entryData.id || generateId(),
+      bookId: bookId,
+      serialNumber: entryData.serialNumber,
+      pageNumber: entryData.pageNumber || 1,
+      date: entryData.date || null,
+      amount: entryData.amount !== undefined && entryData.amount !== null ? entryData.amount : null,
+      remaining: entryData.remaining !== undefined && entryData.remaining !== null ? entryData.remaining : null,
+      signatureStatus: entryData.signatureStatus || 'none',
+      signatureRequestedBy: entryData.signatureRequestedBy || null,
+      signedBy: entryData.signedBy || null,
+      signedAt: entryData.signedAt || null,
+    }));
+
+    await entriesAPI.bulkSaveEntries(bookId, formattedEntries);
+    console.log(`✅ Bulk saved ${entriesData.length} entries`);
+    
+    return formattedEntries;
+  } catch (error) {
+    console.error('Error bulk saving entries:', error);
+    throw error;
+  }
+};
+
+/**
  * Update an entry
  */
 export const updateEntry = async (entryId, entryData) => {

@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 import SignatureScreen from 'react-native-signature-canvas';
-import { getBook, getEntries, saveEntry, updateEntry as updateEntryStorage, signEntry, requestSignature, approveSignatureRequest, rejectSignatureRequest } from '../utils/storage';
+import { getBook, getEntries, saveEntry, bulkSaveEntries, updateEntry as updateEntryStorage, signEntry, requestSignature, approveSignatureRequest, rejectSignatureRequest } from '../utils/storage';
 import { getCurrentUser, getAllUsersForDisplay } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
@@ -342,6 +342,8 @@ export default function EntriesScreen({ navigation, route }) {
       
       // Fill ONLY previous empty entries with 0 amount and today's date if no date
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const entriesToUpdate = [];
+      
       for (const emptyEntry of previousEmptyEntries) {
         if (emptyEntry.id) {
           // Calculate balance for this entry
@@ -358,12 +360,18 @@ export default function EntriesScreen({ navigation, route }) {
             amount: 0,
             remaining: balance,
           };
-          console.log(`⭐ Updating entry ${emptyEntry.serialNumber} with data:`, updateData);
-          await updateEntryStorage(emptyEntry.id, updateData);
-          console.log(`✅ Successfully filled entry ${emptyEntry.serialNumber} with 0 credit`);
+          console.log(`⭐ Preparing entry ${emptyEntry.serialNumber} with 0 credit`);
+          entriesToUpdate.push(updateData);
         } else {
           console.log(`⚠️ Entry ${emptyEntry.serialNumber} has no ID, skipping`);
         }
+      }
+      
+      // Bulk update all empty entries at once - SINGLE API CALL!
+      if (entriesToUpdate.length > 0) {
+        console.log(`📦 Bulk updating ${entriesToUpdate.length} empty entries...`);
+        await bulkSaveEntries(bookId, entriesToUpdate);
+        console.log(`✅ Bulk update complete!`);
       }
       console.log(`⭐ Auto-fill complete`);
 
@@ -393,6 +401,8 @@ export default function EntriesScreen({ navigation, route }) {
       
       console.log(`⭐ Recalculating balances for ALL ${allEntriesSorted.length} entries`);
       
+      const balanceUpdates = [];
+      
       // Recalculate balance for each entry based on cumulative payments
       for (const entry of allEntriesSorted) {
         // Calculate total paid up to (but not including) this entry
@@ -403,14 +413,21 @@ export default function EntriesScreen({ navigation, route }) {
         const amountAtThisEntry = parseFloat(entry.amount) || 0;
         const balance = (book.loanAmount || 0) - totalPaidBefore - amountAtThisEntry;
         
-        // Update the entry's balance if it has changed
+        // Prepare balance update if it has changed
         if (entry.id && entry.remaining !== balance) {
-          await updateEntryStorage(entry.id, {
+          balanceUpdates.push({
             ...entry,
             remaining: balance,
           });
-          console.log(`✅ Updated entry ${entry.serialNumber}: balance ${balance}`);
+          console.log(`✅ Queued balance update for entry ${entry.serialNumber}: ${balance}`);
         }
+      }
+      
+      // Bulk update all balances at once - SINGLE API CALL!
+      if (balanceUpdates.length > 0) {
+        console.log(`📦 Bulk updating ${balanceUpdates.length} entry balances...`);
+        await bulkSaveEntries(bookId, balanceUpdates);
+        console.log(`✅ Bulk balance update complete!`);
       }
       
       console.log(`⭐ Balance recalculation complete`);
@@ -722,7 +739,7 @@ export default function EntriesScreen({ navigation, route }) {
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>
                     <Text style={[styles.cellText, { fontSize }]}>
-                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : ''}
+                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : (entry.amount === 0 ? '0' : '')}
                     </Text>
                   </View>
                   <View style={[styles.cell, styles.amountCell]}>

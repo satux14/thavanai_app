@@ -97,14 +97,12 @@ const updateCacheMetadata = async (updates) => {
 export const cacheBooks = async (books) => {
   try {
     const storageInfo = await getStorageInfo();
-    console.log('📦 Storage info:', storageInfo);
     
     // Limit number of books
     const booksToCache = books.slice(0, MAX_BOOKS_TO_CACHE);
     
     // Calculate size
     const sizeMB = calculateSizeMB(booksToCache);
-    console.log(`📦 Books size: ${sizeMB.toFixed(2)} MB`);
     
     if (sizeMB > storageInfo.maxUsableMB) {
       console.warn(`⚠️ Books exceed storage limit. Reducing cache size...`);
@@ -127,7 +125,6 @@ export const cacheBooks = async (books) => {
       });
     }
     
-    console.log(`✅ Cached ${booksToCache.length} books for offline use`);
     return true;
   } catch (error) {
     console.error('Error caching books:', error);
@@ -155,7 +152,6 @@ export const cacheBookEntries = async (bookId, entries) => {
   try {
     const key = `${CACHE_KEYS.ENTRIES_PREFIX}${bookId}`;
     await AsyncStorage.setItem(key, JSON.stringify(entries));
-    console.log(`✅ Cached ${entries.length} entries for book ${bookId}`);
     return true;
   } catch (error) {
     console.error('Error caching book entries:', error);
@@ -195,7 +191,6 @@ export const clearOfflineCache = async () => {
     // Remove metadata
     await AsyncStorage.removeItem(CACHE_KEYS.METADATA);
     
-    console.log('✅ Offline cache cleared');
     return true;
   } catch (error) {
     console.error('Error clearing offline cache:', error);

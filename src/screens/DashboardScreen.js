@@ -21,11 +21,8 @@ import OfflineIndicator from '../components/OfflineIndicator';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 export default function DashboardScreen({ navigation }) {
-  console.log('=== DashboardScreen COMPONENT CALLED ===');
   const { t, language } = useLanguage();
-  console.log('DashboardScreen: useLanguage hook OK, language:', language);
   const [books, setBooks] = useState([]);
-  console.log('DashboardScreen: books state initialized');
   const [ownedBooks, setOwnedBooks] = useState([]);
   const [sharedBooks, setSharedBooks] = useState([]);
   const [filteredOwnedBooks, setFilteredOwnedBooks] = useState([]);
@@ -54,7 +51,6 @@ export default function DashboardScreen({ navigation }) {
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log('Dashboard focused - reloading books with force refresh...');
       loadBooks(true); // Force refresh when navigating back to dashboard
       loadCurrentUser();
     });
@@ -130,13 +126,9 @@ export default function DashboardScreen({ navigation }) {
         setViewMode('owner');
       }
       
-      console.log('Total books:', booksWithBalance.length);
-      console.log('Owned books:', owned.length);
-      console.log('Shared books:', shared.length);
       
       // Debug: Log book dates
       if (booksWithBalance.length > 0) {
-        console.log('First book dates:', {
           name: booksWithBalance[0].name,
           startDate: booksWithBalance[0].startDate,
           endDate: booksWithBalance[0].endDate
@@ -214,15 +206,12 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const handleLogout = async () => {
-    console.log('Logout button clicked!');
     
     // Use web-compatible confirmation
     if (Platform.OS === 'web') {
       const confirmed = window.confirm(t('confirmLogout'));
       if (confirmed) {
-        console.log('User confirmed logout');
         await logoutUser();
-        console.log('User logged out, navigating to Login');
         navigation.replace('Login');
       }
     } else {
@@ -236,9 +225,7 @@ export default function DashboardScreen({ navigation }) {
             text: t('logout'),
             style: 'destructive',
             onPress: async () => {
-              console.log('User confirmed logout');
               await logoutUser();
-              console.log('User logged out, navigating to Login');
               navigation.replace('Login');
             },
           },

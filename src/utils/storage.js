@@ -39,7 +39,6 @@ export const saveBook = async (bookData) => {
 
     await booksAPI.createBook(newBook);
 
-    console.log('Book saved:', bookId);
     return { ...newBook, ownerId: currentUser.id, status: 'active', numberOfDays: parseInt(bookData.numberOfDays) || 100 };
   } catch (error) {
     console.error('Error saving book:', error);
@@ -97,7 +96,6 @@ export const updateBook = async (bookId, bookData) => {
       backgroundImage: bookData.backgroundImage,
     });
 
-    console.log('Book updated:', bookId);
   } catch (error) {
     console.error('Error updating book:', error);
     throw error;
@@ -110,7 +108,6 @@ export const updateBook = async (bookId, bookData) => {
 export const deleteBook = async (bookId) => {
   try {
     await booksAPI.deleteBook(bookId);
-    console.log('Book deleted:', bookId);
   } catch (error) {
     console.error('Error deleting book:', error);
     throw error;
@@ -123,7 +120,6 @@ export const deleteBook = async (bookId) => {
 export const closeBook = async (bookId) => {
   try {
     await booksAPI.closeBook(bookId);
-    console.log('Book closed:', bookId);
   } catch (error) {
     console.error('Error closing book:', error);
     throw error;
@@ -136,7 +132,6 @@ export const closeBook = async (bookId) => {
 export const reopenBook = async (bookId) => {
   try {
     await booksAPI.reopenBook(bookId);
-    console.log('Book reopened:', bookId);
   } catch (error) {
     console.error('Error reopening book:', error);
     throw error;
@@ -179,7 +174,6 @@ export const saveEntry = async (entryData) => {
       signedAt: entryData.signedAt || null,
     });
 
-    console.log('Entry saved:', entryId);
     return { ...entryData, id: entryId };
   } catch (error) {
     console.error('Error saving entry:', error);
@@ -192,7 +186,6 @@ export const saveEntry = async (entryData) => {
  */
 export const bulkSaveEntries = async (bookId, entriesData) => {
   try {
-    console.log(`📦 Bulk saving ${entriesData.length} entries...`);
     
     const formattedEntries = entriesData.map(entryData => ({
       id: entryData.id || generateId(),
@@ -209,7 +202,6 @@ export const bulkSaveEntries = async (bookId, entriesData) => {
     }));
 
     await entriesAPI.bulkSaveEntries(bookId, formattedEntries);
-    console.log(`✅ Bulk saved ${entriesData.length} entries`);
     
     return formattedEntries;
   } catch (error) {
@@ -237,7 +229,6 @@ export const updateEntry = async (entryId, entryData) => {
       signedAt: entryData.signedAt,
     });
 
-    console.log('Entry updated:', entryId);
   } catch (error) {
     console.error('Error updating entry:', error);
     throw error;
@@ -250,7 +241,6 @@ export const updateEntry = async (entryId, entryData) => {
 export const requestSignature = async (entryId, requesterId) => {
   try {
     await entriesAPI.requestSignature(entryId);
-    console.log('Signature requested for entry:', entryId);
   } catch (error) {
     console.error('Error requesting signature:', error);
     throw error;
@@ -263,7 +253,6 @@ export const requestSignature = async (entryId, requesterId) => {
 export const approveSignatureRequest = async (entryId, approverId) => {
   try {
     await entriesAPI.approveSignature(entryId);
-    console.log('Signature approved for entry:', entryId);
   } catch (error) {
     console.error('Error approving signature:', error);
     throw error;
@@ -276,7 +265,6 @@ export const approveSignatureRequest = async (entryId, approverId) => {
 export const rejectSignatureRequest = async (entryId) => {
   try {
     await entriesAPI.rejectSignature(entryId);
-    console.log('Signature rejected for entry:', entryId);
   } catch (error) {
     console.error('Error rejecting signature:', error);
     throw error;
@@ -291,7 +279,6 @@ export const rejectSignatureRequest = async (entryId) => {
 export const shareBook = async (bookId, username) => {
   try {
     await sharingAPI.shareBook(bookId, username);
-    console.log('Book shared:', bookId, 'with', username);
   } catch (error) {
     console.error('Error sharing book:', error);
     throw error;
@@ -317,7 +304,6 @@ export const getBookShares = async (bookId) => {
 export const unshareBook = async (bookId, userId) => {
   try {
     await sharingAPI.unshareBook(bookId, userId);
-    console.log('Book unshared:', bookId, 'from user', userId);
   } catch (error) {
     console.error('Error unsharing book:', error);
     throw error;

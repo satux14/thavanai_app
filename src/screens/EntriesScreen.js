@@ -20,13 +20,9 @@ import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 const ENTRIES_PER_PAGE = 10;
 
 export default function EntriesScreen({ navigation, route }) {
-  console.log('=== EntriesScreen COMPONENT CALLED ===');
   const { bookId } = route.params;
-  console.log('EntriesScreen: route.params bookId:', bookId);
   const { t, language } = useLanguage();
-  console.log('EntriesScreen: useLanguage hook OK, language:', language);
   const [book, setBook] = useState(null);
-  console.log('EntriesScreen: book state initialized');
   const [entries, setEntries] = useState([]);
   const [currentPageNumber, setCurrentPageNumber] = useState(1);
   const [maxPageNumber, setMaxPageNumber] = useState(1);
@@ -64,7 +60,6 @@ export default function EntriesScreen({ navigation, route }) {
 
   const loadData = async (forceRefresh = false) => {
     try {
-      console.log('Loading book:', bookId, '| Force refresh:', forceRefresh);
       const loadedBook = await getBook(bookId);
       let loadedEntries = await getEntries(bookId, forceRefresh);
       
@@ -73,15 +68,11 @@ export default function EntriesScreen({ navigation, route }) {
       setCurrentUser(user);
       setIsOwner(user && loadedBook && user.id === loadedBook.ownerId);
       
-      console.log('Book loaded:', loadedBook);
-      console.log('Entries loaded:', loadedEntries.length);
-      console.log('Current user:', user?.username, 'Is owner:', user?.id === loadedBook?.ownerId);
       
       // Load all users in background (for signature display)
       // Don't block initial render
       getAllUsersForDisplay().then(users => {
         setAllUsers(users);
-        console.log('Users loaded in background:', users.length);
       }).catch(err => {
         console.error('Error loading users:', err);
       });
@@ -94,7 +85,6 @@ export default function EntriesScreen({ navigation, route }) {
         await autoFillEntries(loadedBook, days);
         // Reload entries after auto-fill
         loadedEntries = await getEntries(bookId);
-        console.log('Entries after auto-fill:', loadedEntries.length);
         justAutoFilled = true;
       }
       
@@ -117,7 +107,6 @@ export default function EntriesScreen({ navigation, route }) {
         setCurrentPageNumber(1);
       } else {
         const lastUpdatedPage = findLastPageWithEntry(loadedEntries);
-        console.log('📄 Navigating to last updated page:', lastUpdatedPage);
         setCurrentPageNumber(lastUpdatedPage);
       }
       
@@ -140,7 +129,6 @@ export default function EntriesScreen({ navigation, route }) {
       const totalDays = parseInt(numberOfDays) || 100;
       const totalPages = Math.ceil(totalDays / ENTRIES_PER_PAGE);
       
-      console.log(`📦 Bulk creating ${totalDays} entries across ${totalPages} pages`);
       
       // Prepare all entries in memory first
       const entriesToCreate = [];
@@ -167,9 +155,7 @@ export default function EntriesScreen({ navigation, route }) {
       }
       
       // Bulk create ALL entries in a SINGLE API call!
-      console.log(`🚀 Sending bulk request for ${entriesToCreate.length} entries...`);
       await bulkSaveEntries(book.id, entriesToCreate);
-      console.log(`✅ Bulk creation complete!`);
       
       // Save the max page number
       await saveMaxPage(book.id, totalPages);
@@ -440,10 +426,6 @@ export default function EntriesScreen({ navigation, route }) {
              (e.amount === null || e.amount === undefined || e.amount === '')
       );
       
-      console.log(`⭐ Current entry serial: ${currentSerialNumber}`);
-      console.log(`⭐ Total entries found: ${allEntries.length}`);
-      console.log(`⭐ Previous empty entries to fill: ${previousEmptyEntries.length}`);
-      console.log(`⭐ Empty entries details:`, previousEmptyEntries.map(e => ({ serial: e.serialNumber, amount: e.amount, id: e.id })));
       
       // Fill ONLY previous empty entries with 0 amount and today's date if no date
       const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -466,7 +448,6 @@ export default function EntriesScreen({ navigation, route }) {
             amount: 0,
             remaining: balance,
           };
-          console.log(`⭐ Preparing entry ${emptyEntry.serialNumber} with 0 credit`);
           entriesToUpdate.push(updateData);
         } else {
           console.log(`⚠️ Entry ${emptyEntry.serialNumber} has no ID, skipping`);
@@ -475,11 +456,8 @@ export default function EntriesScreen({ navigation, route }) {
       
       // Bulk update all empty entries at once - SINGLE API CALL!
       if (entriesToUpdate.length > 0) {
-        console.log(`📦 Bulk updating ${entriesToUpdate.length} empty entries...`);
         await bulkSaveEntries(bookId, entriesToUpdate);
-        console.log(`✅ Bulk update complete!`);
       }
-      console.log(`⭐ Auto-fill complete`);
 
       // STEP 2: Save the current entry being edited
       if (selectedEntry.id) {
@@ -505,7 +483,6 @@ export default function EntriesScreen({ navigation, route }) {
       // Get ALL entries, sorted by serial number
       const allEntriesSorted = updatedEntries.sort((a, b) => a.serialNumber - b.serialNumber);
       
-      console.log(`⭐ Recalculating balances for ALL ${allEntriesSorted.length} entries`);
       
       const balanceUpdates = [];
       
@@ -529,18 +506,14 @@ export default function EntriesScreen({ navigation, route }) {
             ...entry,
             remaining: balance,
           });
-          console.log(`✅ Queued balance update for entry ${entry.serialNumber}: ${balance}`);
         }
       }
       
       // Bulk update all balances at once - SINGLE API CALL!
       if (balanceUpdates.length > 0) {
-        console.log(`📦 Bulk updating ${balanceUpdates.length} entry balances...`);
         await bulkSaveEntries(bookId, balanceUpdates);
-        console.log(`✅ Bulk balance update complete!`);
       }
       
-      console.log(`⭐ Balance recalculation complete`);
 
       // Reload data
       await loadData();
@@ -579,13 +552,11 @@ export default function EntriesScreen({ navigation, route }) {
     }
 
     try {
-      console.log('🔔 Requesting signature for entry:', selectedEntry.id);
       await requestSignature(selectedEntry.id, currentUser.id);
       
       // Force a delay to ensure DB write completes
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      console.log('📥 Reloading data after signature request...');
       // Force refresh from server (bypass cache)
       await loadData(true);
       
@@ -853,7 +824,6 @@ export default function EntriesScreen({ navigation, route }) {
               {currentPageEntries.map((entry, index) => {
                 // Debug: Log entry data for first few entries
                 if (entry.serialNumber <= 3 || entry.serialNumber === 9) {
-                  console.log(`Entry ${entry.serialNumber}: amount=${entry.amount} (type: ${typeof entry.amount}), remaining=${entry.remaining}`);
                 }
                 
                 return (

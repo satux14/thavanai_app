@@ -76,7 +76,6 @@ async function apiRequest(endpoint, options = {}) {
   }
 
   const url = `${API_BASE_URL}${endpoint}`;
-  console.log('🌐 API Request:', options.method || 'GET', url);
 
   try {
     const response = await fetch(url, {
@@ -84,7 +83,6 @@ async function apiRequest(endpoint, options = {}) {
       headers,
     });
 
-    console.log('📡 API Response:', response.status, endpoint);
 
     const data = await response.json();
 
@@ -93,7 +91,6 @@ async function apiRequest(endpoint, options = {}) {
       throw new Error(data.error || 'Request failed');
     }
 
-    console.log('✅ API Success:', endpoint);
     return data;
   } catch (error) {
     console.error('🔥 API request error:', endpoint, error.message);
@@ -183,7 +180,6 @@ export const booksAPI = {
     
     // If offline, return cached books
     if (!isOnline) {
-      console.log('📴 Offline mode: Loading books from cache');
       const cachedBooks = await getCachedBooks();
       return cachedBooks;
     }
@@ -204,7 +200,6 @@ export const booksAPI = {
       return books;
     } catch (error) {
       // If API fails, try to load from cache
-      console.log('⚠️ API failed, loading from cache:', error.message);
       const cachedBooks = await getCachedBooks();
       if (cachedBooks.length > 0) {
         return cachedBooks;
@@ -306,7 +301,6 @@ export const entriesAPI = {
     
     // If offline, return cached entries
     if (!isOnline) {
-      console.log(`📴 Offline mode: Loading entries for book ${bookId} from cache`);
       const cachedEntries = await getCachedBookEntries(bookId);
       return cachedEntries;
     }
@@ -327,7 +321,6 @@ export const entriesAPI = {
       return entries;
     } catch (error) {
       // If API fails, try to load from cache
-      console.log(`⚠️ API failed, loading entries for book ${bookId} from cache:`, error.message);
       const cachedEntries = await getCachedBookEntries(bookId);
       if (cachedEntries.length > 0) {
         return cachedEntries;
@@ -360,7 +353,6 @@ export const entriesAPI = {
       throw new Error('Cannot bulk save entries while offline. Please connect to the internet.');
     }
     
-    console.log(`🚀 Bulk saving ${entries.length} entries for book ${bookId}`);
     await apiRequest('/entries/bulk', {
       method: 'POST',
       body: JSON.stringify({ bookId, entries }),
@@ -369,7 +361,6 @@ export const entriesAPI = {
     // Invalidate cache for this book
     delete cache.entries[bookId];
     cache.books = null;
-    console.log(`✅ Bulk save complete for ${entries.length} entries`);
   },
 
   async requestSignature(entryId) {
@@ -379,7 +370,6 @@ export const entriesAPI = {
       throw new Error('Cannot request signature while offline. Please connect to the internet.');
     }
     
-    console.log('🔔 Requesting signature for entry:', entryId);
     const result = await apiRequest(`/entries/${entryId}/request-signature`, {
       method: 'POST',
     });
@@ -388,7 +378,6 @@ export const entriesAPI = {
     cache.entries = {};
     cache.books = null;
     
-    console.log('✅ Signature request successful');
     return result;
   },
 

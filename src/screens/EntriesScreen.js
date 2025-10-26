@@ -124,7 +124,10 @@ export default function EntriesScreen({ navigation, route }) {
       const totalDays = parseInt(numberOfDays) || 100;
       const totalPages = Math.ceil(totalDays / ENTRIES_PER_PAGE);
       
-      console.log(`Creating ${totalDays} entries across ${totalPages} pages`);
+      console.log(`📦 Bulk creating ${totalDays} entries across ${totalPages} pages`);
+      
+      // Prepare all entries in memory first
+      const entriesToCreate = [];
       
       for (let day = 0; day < totalDays; day++) {
         const serialNumber = day + 1;
@@ -135,8 +138,8 @@ export default function EntriesScreen({ navigation, route }) {
         entryDate.setDate(startDate.getDate() + day);
         const formattedDate = entryDate.toISOString().split('T')[0]; // YYYY-MM-DD
         
-        // Create entry with date pre-filled
-        await saveEntry({
+        // Add entry to batch array
+        entriesToCreate.push({
           bookId: book.id,
           serialNumber,
           pageNumber,
@@ -147,10 +150,15 @@ export default function EntriesScreen({ navigation, route }) {
         });
       }
       
+      // Bulk create ALL entries in a SINGLE API call!
+      console.log(`🚀 Sending bulk request for ${entriesToCreate.length} entries...`);
+      await bulkSaveEntries(book.id, entriesToCreate);
+      console.log(`✅ Bulk creation complete!`);
+      
       // Save the max page number
       await saveMaxPage(book.id, totalPages);
       
-      console.log(`Auto-fill complete: ${totalDays} days of entries created`);
+      console.log(`Auto-fill complete: ${totalDays} days of entries created in 1 API call`);
     } catch (error) {
       console.error('Error auto-filling entries:', error);
       // Don't throw - let the app continue even if auto-fill fails

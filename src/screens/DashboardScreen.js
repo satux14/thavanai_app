@@ -632,7 +632,7 @@ export default function DashboardScreen({ navigation }) {
       </View>
 
       {/* Offline Indicator */}
-      <OfflineIndicator language={language} />
+      <OfflineIndicator />
 
       {/* App Title */}
       <View style={styles.appTitleContainer}>

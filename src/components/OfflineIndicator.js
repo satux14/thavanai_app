@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
-import { translate } from '../utils/i18n';
+import { useLanguage } from '../utils/i18n';
 
-const OfflineIndicator = ({ language = 'en' }) => {
+const OfflineIndicator = () => {
   const { isOnline, isChecking, recheckConnection } = useNetworkStatus();
+  const { t } = useLanguage();
 
   // Don't show anything if online
   if (isOnline) {
@@ -17,10 +18,10 @@ const OfflineIndicator = ({ language = 'en' }) => {
         <Text style={styles.icon}>📴</Text>
         <View style={styles.textContainer}>
           <Text style={styles.title}>
-            {translate('offline_mode', language)}
+            {t('offline_mode')}
           </Text>
           <Text style={styles.subtitle}>
-            {translate('offline_viewing_cached', language)}
+            {t('offline_viewing_cached')}
           </Text>
         </View>
         <TouchableOpacity 

@@ -704,7 +704,7 @@ export default function EntriesScreen({ navigation, route }) {
   return (
     <View style={styles.container}>
       {/* Offline Indicator */}
-      <OfflineIndicator language={language} />
+      <OfflineIndicator />
       
       {/* User Info - Top Left */}
       {currentUser && (

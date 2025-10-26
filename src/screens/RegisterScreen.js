@@ -14,9 +14,7 @@ import { registerUser, loginUser } from '../utils/auth';
 import { useLanguage } from '../utils/i18n';
 
 export default function RegisterScreen({ navigation }) {
-  console.log('=== RegisterScreen COMPONENT CALLED ===');
   const { t, setLanguage } = useLanguage();
-  console.log('RegisterScreen: useLanguage hook OK');
   const [formData, setFormData] = useState({
     username: '',
     fullName: '',
@@ -25,12 +23,8 @@ export default function RegisterScreen({ navigation }) {
     preferredLanguage: 'en', // Default to English
   });
   const [loading, setLoading] = useState(false);
-  console.log('RegisterScreen: All hooks initialized, loading:', loading, 'Type:', typeof loading);
 
   const handleRegister = async () => {
-    console.log('Register button clicked!');
-    console.log('Form data:', formData);
-    
     // Validation
     if (!formData.username || !formData.fullName || !formData.password) {
       const message = 'Please fill in all fields';
@@ -39,7 +33,6 @@ export default function RegisterScreen({ navigation }) {
       } else {
         Alert.alert('Error', message);
       }
-      console.log('Validation failed: missing fields');
       return;
     }
 
@@ -50,7 +43,6 @@ export default function RegisterScreen({ navigation }) {
       } else {
         Alert.alert('Error', message);
       }
-      console.log('Validation failed: username too short');
       return;
     }
 
@@ -61,7 +53,6 @@ export default function RegisterScreen({ navigation }) {
       } else {
         Alert.alert('Error', message);
       }
-      console.log('Validation failed: password too short');
       return;
     }
 
@@ -72,14 +63,10 @@ export default function RegisterScreen({ navigation }) {
       } else {
         Alert.alert('Error', message);
       }
-      console.log('Validation failed: passwords dont match');
       return;
     }
 
-    console.log('All validations passed, starting registration...');
-
     setLoading(true);
-    console.log('Calling registerUser...');
     
     const result = await registerUser(
       formData.username,
@@ -87,29 +74,21 @@ export default function RegisterScreen({ navigation }) {
       formData.fullName,
       formData.preferredLanguage
     );
-    
-    console.log('Register result:', result);
 
     if (result.success) {
-      console.log('Registration successful, setting language and auto-logging in...');
-      
       // Set the user's preferred language immediately
       if (formData.preferredLanguage) {
         await setLanguage(formData.preferredLanguage);
-        console.log('Language set to:', formData.preferredLanguage);
       }
       
       // Auto-login after successful registration
       const loginResult = await loginUser(formData.username, formData.password);
       setLoading(false);
-      console.log('Login result:', loginResult);
       
       if (loginResult.success) {
-        console.log('Login successful, navigating to Dashboard');
         // Navigate directly to Dashboard
         navigation.replace('Dashboard');
       } else {
-        console.log('Login failed after registration');
         // Registration succeeded but login failed, go to login screen
         if (Platform.OS === 'web') {
           alert('Account created! Please login.');
@@ -125,7 +104,6 @@ export default function RegisterScreen({ navigation }) {
       }
     } else {
       setLoading(false);
-      console.log('Registration failed:', result.error);
       if (Platform.OS === 'web') {
         alert('Registration Failed: ' + result.error);
       } else {
@@ -261,14 +239,6 @@ export default function RegisterScreen({ navigation }) {
             </View>
           </View>
 
-          {(() => {
-            const buttonStyle = loading ? [styles.registerButton, styles.buttonDisabled] : styles.registerButton;
-            console.log('Register button style computed:', Array.isArray(buttonStyle) ? 'array' : 'object', 'loading:', loading);
-            if (Array.isArray(buttonStyle)) {
-              console.log('Style array has', buttonStyle.length, 'items, contains false?', buttonStyle.includes(false));
-            }
-            return null;
-          })()}
           <TouchableOpacity
             style={loading ? [styles.registerButton, styles.buttonDisabled] : styles.registerButton}
             onPress={handleRegister}
@@ -278,7 +248,6 @@ export default function RegisterScreen({ navigation }) {
               {loading ? t('creatingAccount') : t('createAccount')}
             </Text>
           </TouchableOpacity>
-          {console.log('✅ Register TouchableOpacity rendered successfully!')}
 
           <View style={styles.loginContainer}>
             <Text style={styles.loginText}>{t('alreadyHaveAccount')}</Text>

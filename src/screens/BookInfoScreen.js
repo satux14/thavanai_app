@@ -17,11 +17,8 @@ import { useLanguage } from '../utils/i18n';
 import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
 
 export default function BookInfoScreen({ navigation, route }) {
-  console.log('=== BookInfoScreen COMPONENT CALLED ===');
   const { t, language } = useLanguage();
-  console.log('BookInfoScreen: useLanguage hook OK, language:', language);
   const { bookId } = route.params || {};
-  console.log('BookInfoScreen: route.params bookId:', bookId);
   const [bookInfo, setBookInfo] = useState({
     dlNo: '',
     name: '',
@@ -110,15 +107,7 @@ export default function BookInfoScreen({ navigation, route }) {
     if (isEditing && bookId) {
       // Update existing book
       try {
-        console.log('Updating book with data:', {
-          bookId,
-          name: bookInfo.name,
-          startDate: bookInfo.startDate,
-          endDate: bookInfo.endDate,
-          loanAmount: bookInfo.loanAmount
-        });
         await updateBook(bookId, bookInfo);
-        console.log('Book updated successfully');
         if (Platform.OS === 'web') {
           alert('Book information updated successfully');
           navigation.goBack();
@@ -141,7 +130,6 @@ export default function BookInfoScreen({ navigation, route }) {
     } else {
       // Create new book
       const newBook = await saveBook(bookInfo);
-      console.log('New book created:', newBook);
       if (newBook && newBook.id) {
         // Navigate directly to entries page
         navigation.replace('Entries', { bookId: newBook.id });

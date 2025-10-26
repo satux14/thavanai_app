@@ -14,16 +14,12 @@ import { loginUser } from '../utils/auth';
 import { useLanguage } from '../utils/i18n';
 
 export default function LoginScreen({ navigation }) {
-  console.log('=== LoginScreen RENDERING ===');
   const { setLanguage } = useLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  console.log('LoginScreen state - loading:', loading, '| Type:', typeof loading);
 
   const handleLogin = async () => {
-    console.log('Login attempt:', { username });
-    
     if (!username || !password) {
       if (Platform.OS === 'web') {
         alert('Please enter username and password');
@@ -37,21 +33,15 @@ export default function LoginScreen({ navigation }) {
     const result = await loginUser(username, password);
     setLoading(false);
 
-    console.log('Login result:', result);
-
     if (result.success) {
-      console.log('Login successful, user language:', result.user.preferredLanguage);
-      
       // Set the user's preferred language
       if (result.user.preferredLanguage) {
         await setLanguage(result.user.preferredLanguage);
-        console.log('Language set to:', result.user.preferredLanguage);
       }
       
       // Navigate to Dashboard
       navigation.replace('Dashboard');
     } else {
-      console.log('Login failed:', result.error);
       
       // Better error message for network issues
       let errorMessage = result.error || 'Invalid username or password';

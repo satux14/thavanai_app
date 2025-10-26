@@ -465,33 +465,24 @@ const LanguageContext = createContext({
 });
 
 export const LanguageProvider = ({ children }) => {
-  console.log('=== LanguageProvider INITIALIZING ===');
   const [language, setLanguage] = useState('en'); // Default to English
   const [isLoading, setIsLoading] = useState(true);
-  console.log('LanguageProvider initial state - language:', language, 'isLoading:', isLoading);
 
   useEffect(() => {
-    console.log('LanguageProvider useEffect triggered');
     loadLanguage();
   }, []);
 
   const loadLanguage = async () => {
     try {
-      console.log('Loading language from AsyncStorage...');
       const savedLang = await AsyncStorage.getItem('app_language');
-      console.log('Saved language:', savedLang, '| Type:', typeof savedLang);
       
       if (savedLang && (savedLang === 'en' || savedLang === 'ta')) {
-        console.log('Setting language to:', savedLang);
         setLanguage(savedLang);
       }
       
-      console.log('Setting isLoading to false');
       setIsLoading(false);
-      console.log('Language loading complete');
     } catch (error) {
-      console.error('=== ERROR loading language ===');
-      console.error('Error:', error);
+      console.error('Error loading language:', error);
       setIsLoading(false);
     }
   };

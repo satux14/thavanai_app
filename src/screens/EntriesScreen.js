@@ -72,14 +72,18 @@ export default function EntriesScreen({ navigation, route }) {
       setCurrentUser(user);
       setIsOwner(user && loadedBook && user.id === loadedBook.ownerId);
       
-      // Load all users for signature display
-      const users = await getAllUsersForDisplay();
-      setAllUsers(users);
-      
       console.log('Book loaded:', loadedBook);
       console.log('Entries loaded:', loadedEntries.length);
-      console.log('Users loaded:', users.length);
       console.log('Current user:', user?.username, 'Is owner:', user?.id === loadedBook?.ownerId);
+      
+      // Load all users in background (for signature display)
+      // Don't block initial render
+      getAllUsersForDisplay().then(users => {
+        setAllUsers(users);
+        console.log('Users loaded in background:', users.length);
+      }).catch(err => {
+        console.error('Error loading users:', err);
+      });
       
       // Auto-fill entries if this is a new book with start date
       let justAutoFilled = false;
@@ -106,8 +110,15 @@ export default function EntriesScreen({ navigation, route }) {
       const actualMaxPage = Math.max(calculatedMaxPage, storedMaxPage);
       setMaxPageNumber(actualMaxPage);
       
-      // Always start at page 1 when opening a book
-      setCurrentPageNumber(1);
+      // Navigate to last updated page (where user was working)
+      // Unless this is a newly auto-filled book, then start at page 1
+      if (justAutoFilled) {
+        setCurrentPageNumber(1);
+      } else {
+        const lastUpdatedPage = findLastPageWithEntry(loadedEntries);
+        console.log('📄 Navigating to last updated page:', lastUpdatedPage);
+        setCurrentPageNumber(lastUpdatedPage);
+      }
       
       setLoading(false);
     } catch (error) {

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eThavanai App Icon Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .icon-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .icon-size {
+            text-align: center;
+        }
+
+        .icon-size img {
+            display: block;
+            margin: 0 auto 1rem;
+            border-radius: 15%;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .size-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .download-btn {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .specs {
+            background: #f5f5f5;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            text-align: left;
+        }
+
+        .specs h3 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+
+        .specs ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .specs li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .specs li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>📒 eThavanai App Icon Preview</h1>
+    
+    <div class="icon-container">
+        <h2>Main App Icon</h2>
+        
+        <div class="icon-grid">
+            <div class="icon-size">
+                <img src="/icon.svg" width="512" height="512" alt="1024px">
+                <div class="size-label">1024×1024</div>
+                <div style="font-size: 0.9rem; color: #888;">App Store</div>
+            </div>
+            
+            <div class="icon-size">
+                <img src="/icon.svg" width="256" height="256" alt="512px">
+                <div class="size-label">512×512</div>
+                <div style="font-size: 0.9rem; color: #888;">Play Store</div>
+            </div>
+            
+            <div class="icon-size">
+                <img src="/icon.svg" width="180" height="180" alt="180px">
+                <div class="size-label">180×180</div>
+                <div style="font-size: 0.9rem; color: #888;">iPhone</div>
+            </div>
+            
+            <div class="icon-size">
+                <img src="/icon.svg" width="120" height="120" alt="120px">
+                <div class="size-label">120×120</div>
+                <div style="font-size: 0.9rem; color: #888;">iPad</div>
+            </div>
+        </div>
+
+        <a href="/icon.svg" download="ethavanai-icon.svg" class="download-btn">⬇️ Download SVG Icon</a>
+
+        <div class="specs">
+            <h3>Icon Design Specifications</h3>
+            <ul>
+                <li><strong>Style:</strong> Modern, Flat with Gradient</li>
+                <li><strong>Primary Color:</strong> #2196F3 (Blue)</li>
+                <li><strong>Accent Color:</strong> #FFC107 (Gold)</li>
+                <li><strong>Elements:</strong> Book/Ledger + Rupee Symbol (₹)</li>
+                <li><strong>Branding:</strong> "eT" monogram in corner</li>
+                <li><strong>Shape:</strong> Rounded square (auto on iOS)</li>
+                <li><strong>Format:</strong> SVG (scalable vector)</li>
+            </ul>
+        </div>
+
+        <div class="specs">
+            <h3>Design Concept</h3>
+            <ul>
+                <li>📘 <strong>Book Icon:</strong> Represents traditional ledger/installment book</li>
+                <li>₹ <strong>Rupee Symbol:</strong> Indicates financial/money aspect in gold</li>
+                <li>📊 <strong>Ledger Lines:</strong> Horizontal blue lines suggest daily entries</li>
+                <li>eT <strong>Monogram:</strong> Modern "eThavanai" brand abbreviation</li>
+                <li>🎨 <strong>Gradient:</strong> Blue gradient conveys trust and professionalism</li>
+            </ul>
+        </div>
+
+        <div class="specs">
+            <h3>How to Use This Icon</h3>
+            <ul>
+                <li>1. Right-click the icon above and "Save Image As" for each size</li>
+                <li>2. Use online tool like <a href="https://appicon.co" target="_blank">appicon.co</a> to generate all sizes</li>
+                <li>3. Or use command: <code>convert icon.svg -resize 1024x1024 icon-1024.png</code></li>
+                <li>4. Replace placeholder icons in <code>assets/</code> folder</li>
+                <li>5. Update app.json paths if needed</li>
+            </ul>
+        </div>
+    </div>
+
+    <p style="color: white; margin-top: 2rem; text-align: center;">
+        <a href="/" style="color: white;">← Back to Home</a>
+    </p>
+</body>
+</html>
+

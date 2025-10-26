@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1976D2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bookGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f0f0;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="100" fill="url(#bgGradient)"/>
+  
+  <!-- Book icon -->
+  <g transform="translate(256, 256)">
+    <!-- Book pages/spine -->
+    <rect x="-100" y="-120" width="200" height="240" rx="12" fill="url(#bookGradient)" stroke="#1976D2" stroke-width="4"/>
+    
+    <!-- Book spine highlight -->
+    <rect x="-100" y="-120" width="20" height="240" rx="12" fill="rgba(0,0,0,0.1)"/>
+    
+    <!-- Horizontal lines representing ledger lines -->
+    <line x1="-70" y1="-60" x2="70" y2="-60" stroke="#2196F3" stroke-width="3" opacity="0.6"/>
+    <line x1="-70" y1="-20" x2="70" y2="-20" stroke="#2196F3" stroke-width="3" opacity="0.6"/>
+    <line x1="-70" y1="20" x2="70" y2="20" stroke="#2196F3" stroke-width="3" opacity="0.6"/>
+    <line x1="-70" y1="60" x2="70" y2="60" stroke="#2196F3" stroke-width="3" opacity="0.6"/>
+    
+    <!-- Rupee symbol -->
+    <g transform="translate(0, 20)">
+      <!-- Top line -->
+      <line x1="-35" y1="-50" x2="35" y2="-50" stroke="#FFC107" stroke-width="6" stroke-linecap="round"/>
+      <!-- Second line -->
+      <line x1="-35" y1="-30" x2="25" y2="-30" stroke="#FFC107" stroke-width="6" stroke-linecap="round"/>
+      <!-- Diagonal slash -->
+      <line x1="-15" y1="-30" x2="35" y2="40" stroke="#FFC107" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </g>
+  
+  <!-- "eT" monogram in bottom right (subtle) -->
+  <g transform="translate(380, 420)">
+    <circle cx="0" cy="0" r="45" fill="rgba(255,255,255,0.2)"/>
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central">eT</text>
+  </g>
+</svg>
+

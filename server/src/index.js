@@ -49,6 +49,18 @@ try {
   console.warn('⚠ OpenAPI spec not found, skipping documentation');
 }
 
+// Serve Landing Page (static files)
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Landing page routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+app.get('/home', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
 // Serve Admin UI (static files)
 app.use('/admin', express.static(path.join(__dirname, '../admin-ui')));
 app.get('/admin', (req, res) => {
@@ -73,9 +85,11 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`
 ╔═══════════════════════════════════════════════════════════╗
-║  Thavanai Server - Daily Installment Book API           ║
+║  eThavanai Book - Daily Ledger Server                   ║
 ╠═══════════════════════════════════════════════════════════╣
 ║  Server running on: http://localhost:${PORT}               ║
+║  Landing Page:      http://localhost:${PORT}/              ║
+║  Home:              http://localhost:${PORT}/home          ║
 ║  API Documentation: http://localhost:${PORT}/api-docs      ║
 ║  Admin Panel:       http://localhost:${PORT}/admin         ║
 ║  Health Check:      http://localhost:${PORT}/health        ║

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "eThavanai Book - Daily Ledger",
-    "slug": "ethavanai-book-daily-ledger",
+    "slug": "thavanai_mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -53,6 +53,7 @@
       "eas": {
         "projectId": "f07215ea-a185-46ad-b7c7-a5a1cda8ae5c"
       }
-    }
+    },
+    "owner": "sathishkumarmnm"
   }
 }

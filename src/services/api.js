@@ -1,4 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { 
+  cacheBooks, 
+  getCachedBooks, 
+  cacheBookEntries, 
+  getCachedBookEntries,
+  checkOnlineStatus 
+} from '../utils/offlineCache';
 
 // API Configuration
 // Production server
@@ -17,6 +24,15 @@ const cache = {
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
+
+// Track online status
+let isOnline = true;
+
+// Check and update online status
+async function updateOnlineStatus() {
+  isOnline = await checkOnlineStatus();
+  return isOnline;
+}
 
 // Get auth token from storage
 async function getAuthToken() {
@@ -162,22 +178,39 @@ export const authAPI = {
 // Books API
 export const booksAPI = {
   async getAllBooks(forceRefresh = false) {
+    // Check online status
+    await updateOnlineStatus();
+    
+    // If offline, return cached books
+    if (!isOnline) {
+      console.log('📴 Offline mode: Loading books from cache');
+      const cachedBooks = await getCachedBooks();
+      return cachedBooks;
+    }
+    
+    // If online and cache is valid, use cache
     if (!forceRefresh && cache.books && isCacheValid('books')) {
       return cache.books;
     }
 
-    const books = await apiRequest('/books');
-    cache.books = books;
-    cache.lastFetch['books'] = Date.now();
-    
-    // Also cache locally for offline access
     try {
-      await AsyncStorage.setItem('@books_cache', JSON.stringify(books));
-    } catch (error) {
-      console.error('Error caching books:', error);
-    }
+      const books = await apiRequest('/books');
+      cache.books = books;
+      cache.lastFetch['books'] = Date.now();
+      
+      // Cache for offline access
+      await cacheBooks(books);
 
-    return books;
+      return books;
+    } catch (error) {
+      // If API fails, try to load from cache
+      console.log('⚠️ API failed, loading from cache:', error.message);
+      const cachedBooks = await getCachedBooks();
+      if (cachedBooks.length > 0) {
+        return cachedBooks;
+      }
+      throw error;
+    }
   },
 
   async getBook(bookId) {
@@ -186,6 +219,12 @@ export const booksAPI = {
   },
 
   async createBook(bookData) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot create book while offline. Please connect to the internet.');
+    }
+    
     const book = await apiRequest('/books', {
       method: 'POST',
       body: JSON.stringify(bookData),
@@ -197,6 +236,12 @@ export const booksAPI = {
   },
 
   async updateBook(bookId, bookData) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot update book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/books/${bookId}`, {
       method: 'PUT',
       body: JSON.stringify(bookData),
@@ -207,6 +252,12 @@ export const booksAPI = {
   },
 
   async deleteBook(bookId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot delete book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/books/${bookId}`, {
       method: 'DELETE',
     });
@@ -217,6 +268,12 @@ export const booksAPI = {
   },
 
   async closeBook(bookId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot close book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/books/${bookId}/close`, {
       method: 'PATCH',
     });
@@ -226,6 +283,12 @@ export const booksAPI = {
   },
 
   async reopenBook(bookId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot reopen book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/books/${bookId}/reopen`, {
       method: 'PATCH',
     });
@@ -238,25 +301,48 @@ export const booksAPI = {
 // Entries API
 export const entriesAPI = {
   async getEntries(bookId, forceRefresh = false) {
+    // Check online status
+    await updateOnlineStatus();
+    
+    // If offline, return cached entries
+    if (!isOnline) {
+      console.log(`📴 Offline mode: Loading entries for book ${bookId} from cache`);
+      const cachedEntries = await getCachedBookEntries(bookId);
+      return cachedEntries;
+    }
+    
+    // If online and cache is valid, use cache
     if (!forceRefresh && cache.entries[bookId] && isCacheValid(`entries_${bookId}`)) {
       return cache.entries[bookId];
     }
 
-    const entries = await apiRequest(`/entries/book/${bookId}`);
-    cache.entries[bookId] = entries;
-    cache.lastFetch[`entries_${bookId}`] = Date.now();
-    
-    // Also cache locally
     try {
-      await AsyncStorage.setItem(`@entries_${bookId}`, JSON.stringify(entries));
-    } catch (error) {
-      console.error('Error caching entries:', error);
-    }
+      const entries = await apiRequest(`/entries/book/${bookId}`);
+      cache.entries[bookId] = entries;
+      cache.lastFetch[`entries_${bookId}`] = Date.now();
+      
+      // Cache for offline access
+      await cacheBookEntries(bookId, entries);
 
-    return entries;
+      return entries;
+    } catch (error) {
+      // If API fails, try to load from cache
+      console.log(`⚠️ API failed, loading entries for book ${bookId} from cache:`, error.message);
+      const cachedEntries = await getCachedBookEntries(bookId);
+      if (cachedEntries.length > 0) {
+        return cachedEntries;
+      }
+      throw error;
+    }
   },
 
   async saveEntry(entryData) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot save entry while offline. Please connect to the internet.');
+    }
+    
     await apiRequest('/entries', {
       method: 'POST',
       body: JSON.stringify(entryData),
@@ -268,6 +354,12 @@ export const entriesAPI = {
   },
 
   async bulkSaveEntries(bookId, entries) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot bulk save entries while offline. Please connect to the internet.');
+    }
+    
     console.log(`🚀 Bulk saving ${entries.length} entries for book ${bookId}`);
     await apiRequest('/entries/bulk', {
       method: 'POST',
@@ -281,6 +373,12 @@ export const entriesAPI = {
   },
 
   async requestSignature(entryId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot request signature while offline. Please connect to the internet.');
+    }
+    
     console.log('🔔 Requesting signature for entry:', entryId);
     const result = await apiRequest(`/entries/${entryId}/request-signature`, {
       method: 'POST',
@@ -295,6 +393,12 @@ export const entriesAPI = {
   },
 
   async approveSignature(entryId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot approve signature while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/entries/${entryId}/approve-signature`, {
       method: 'POST',
     });
@@ -304,6 +408,12 @@ export const entriesAPI = {
   },
 
   async rejectSignature(entryId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot reject signature while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/entries/${entryId}/reject-signature`, {
       method: 'POST',
     });
@@ -316,6 +426,12 @@ export const entriesAPI = {
 // Sharing API
 export const sharingAPI = {
   async shareBook(bookId, username) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot share book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest('/sharing', {
       method: 'POST',
       body: JSON.stringify({ bookId, username }),
@@ -331,6 +447,12 @@ export const sharingAPI = {
   },
 
   async unshareBook(bookId, userId) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot unshare book while offline. Please connect to the internet.');
+    }
+    
     await apiRequest(`/sharing/${bookId}/${userId}`, {
       method: 'DELETE',
     });
@@ -348,11 +470,15 @@ export function clearAllCaches() {
   cache.lastFetch = {};
 }
 
+// Export online status check
+export { updateOnlineStatus, checkOnlineStatus };
+
 export default {
   authAPI,
   booksAPI,
   entriesAPI,
   sharingAPI,
   clearAllCaches,
+  updateOnlineStatus,
 };
 

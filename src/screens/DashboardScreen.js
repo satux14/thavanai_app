@@ -17,6 +17,7 @@ import { getCurrentUser, logoutUser } from '../utils/auth';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import LanguageToggle from '../components/LanguageToggle';
+import OfflineIndicator from '../components/OfflineIndicator';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 export default function DashboardScreen({ navigation }) {
@@ -629,6 +630,9 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </View>
       </View>
+
+      {/* Offline Indicator */}
+      <OfflineIndicator language={language} />
 
       {/* App Title */}
       <View style={styles.appTitleContainer}>

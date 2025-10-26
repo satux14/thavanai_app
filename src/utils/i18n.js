@@ -224,6 +224,12 @@ const translations = {
     passwordsDontMatch: 'Passwords do not match',
     accountCreated: 'Account created! Please login.',
     registrationFailed: 'Registration Failed',
+    
+    // Offline Mode
+    offline_mode: 'Offline Mode',
+    offline_viewing_cached: 'Viewing cached data. Connect to sync.',
+    cannot_edit_offline: 'Cannot edit while offline. Please connect to the internet.',
+    server_not_connected: 'Cannot connect to server. Using offline data.',
   },
   ta: {
     // App Name
@@ -440,6 +446,12 @@ const translations = {
     passwordsDontMatch: 'கடவுச்சொற்கள் பொருந்தவில்லை',
     accountCreated: 'கணக்கு உருவாக்கப்பட்டது! தயவுசெய்து உள்நுழையவும்.',
     registrationFailed: 'பதிவு தோல்வியுற்றது',
+    
+    // Offline Mode
+    offline_mode: 'ஆஃப்லைன் முறை',
+    offline_viewing_cached: 'சேமித்த தரவைப் பார்க்கிறீர்கள். ஒத்திசைக்க இணைக்கவும்.',
+    cannot_edit_offline: 'ஆஃப்லைனில் திருத்த முடியாது. இணையத்துடன் இணைக்கவும்.',
+    server_not_connected: 'சேவையகத்துடன் இணைக்க முடியவில்லை. ஆஃப்லைன் தரவைப் பயன்படுத்துகிறது.',
   },
 };
 

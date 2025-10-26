@@ -14,6 +14,7 @@ import SignatureScreen from 'react-native-signature-canvas';
 import { getBook, getEntries, saveEntry, bulkSaveEntries, updateEntry as updateEntryStorage, signEntry, requestSignature, approveSignatureRequest, rejectSignatureRequest } from '../utils/storage';
 import { getCurrentUser, getAllUsersForDisplay } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
+import OfflineIndicator from '../components/OfflineIndicator';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 const ENTRIES_PER_PAGE = 10;
@@ -222,6 +223,15 @@ export default function EntriesScreen({ navigation, route }) {
   // Calculate correct balance for an entry (excluding rejected entries)
   const calculateEntryBalance = (entry) => {
     if (!entry || !entry.serialNumber) return '';
+    
+    // Only show balance for entries that have been filled (have amount or date filled)
+    // Don't show balance for future/empty entries
+    const hasAmount = entry.amount !== null && entry.amount !== undefined && entry.amount !== '';
+    const hasDate = entry.date && entry.date !== '';
+    
+    if (!hasAmount && !hasDate) {
+      return ''; // Don't show balance for future/empty entries
+    }
     
     // Get all entries before this one (excluding rejected)
     const previousEntries = entries.filter(
@@ -693,6 +703,9 @@ export default function EntriesScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      {/* Offline Indicator */}
+      <OfflineIndicator language={language} />
+      
       {/* User Info - Top Left */}
       {currentUser && (
         <View style={styles.userInfoHeader}>

@@ -1,12 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration
-// IMPORTANT: For testing on physical devices, always use your local IP
-// Change this to your production URL when deploying
-const API_BASE_URL = 'http://192.168.1.17:3000/api';
+// Production server
+const API_BASE_URL = 'https://tapi.thesrsconsulting.in/api';
 
-// For production, uncomment this:
-// const API_BASE_URL = 'https://your-production-server.com/api';
+// For local development, use:
+// const API_BASE_URL = 'http://192.168.1.17:3000/api';
 
 // Local cache for performance
 const cache = {

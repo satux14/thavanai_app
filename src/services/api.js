@@ -9,10 +9,10 @@ import {
 
 // API Configuration
 // Production server
-// const API_BASE_URL = 'https://tapi.thesrsconsulting.in/api';
+const API_BASE_URL = 'https://tapi.thesrsconsulting.in/api';
 
 // For local development, use:
-const API_BASE_URL = 'http://192.168.1.17:3000/api';
+// const API_BASE_URL = 'http://192.168.1.17:3000/api';
 
 // Local cache for performance
 const cache = {

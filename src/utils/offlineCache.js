@@ -212,8 +212,8 @@ export const checkOnlineStatus = async () => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
     
-    // Use local server for health check (change to production URL when deploying)
-    const response = await fetch('http://192.168.1.17:3000/health', {
+    // Use production server for health check
+    const response = await fetch('https://tapi.thesrsconsulting.in/health', {
       method: 'GET',
       signal: controller.signal,
     });

@@ -13,7 +13,7 @@ All documentation, scripts, and assets are prepared for Android Play Store submi
 - `app.json` - Android settings complete
   - Package: `com.thesrsconsulting.tapp`
   - Version: 1.0.0 (versionCode: 1)
-- Server: `tapp.thesrsconsulting.in` deployed
+- Server: `tapi.thesrsconsulting.in` deployed
 
 ### ✅ **2. Documentation** 
 - **ANDROID_PLAY_STORE_GUIDE.md** - Complete step-by-step guide (321 lines)
@@ -50,7 +50,7 @@ All documentation, scripts, and assets are prepared for Android Play Store submi
 - 🔴 Maroon Premium (#C62828)
 - ⚫ Navy Professional (#283593)
 
-**View at:** http://tapp.thesrsconsulting.in/icon-colorful.html
+**View at:** http://tapi.thesrsconsulting.in/icon-colorful.html
 
 ### ✅ **6. Directory Structure**
 ```
@@ -94,7 +94,7 @@ eas build --platform android --profile production
 ### **Step 2: Prepare Assets** (While build is running)
 
 **A. Choose Icon:**
-1. Visit: http://tapp.thesrsconsulting.in/icon-colorful.html
+1. Visit: http://tapi.thesrsconsulting.in/icon-colorful.html
 2. Pick your favorite color theme
 3. Download SVG
 4. Convert to 512×512 PNG: https://cloudconvert.com/svg-to-png
@@ -203,7 +203,7 @@ Before building, decide on your brand color:
 | 🔴 **Maroon** | Elegant, Traditional, Trust | Classic Indian market |
 | ⚫ **Navy** | Authority, Corporate | Business/enterprise |
 
-**Preview all:** http://tapp.thesrsconsulting.in/icon-colorful.html
+**Preview all:** https://tapi.thesrsconsulting.in/icon-colorful.html
 
 ---
 
@@ -214,7 +214,7 @@ Before running `eas build`:
 - [ ] App thoroughly tested on Android device
 - [ ] All features working (create book, entries, signatures, PDF, Tamil, sharing)
 - [ ] No critical bugs or crashes
-- [ ] Server running at tapp.thesrsconsulting.in
+- [ ] Server running at tapi.thesrsconsulting.in
 - [ ] Icon theme chosen
 - [ ] EAS CLI installed (`npm install -g eas-cli`)
 - [ ] Expo account created and logged in
@@ -272,8 +272,8 @@ Before submitting to Play Store:
 - App Icon Generator: https://appicon.co
 
 **Your Resources:**
-- App Icons: http://tapp.thesrsconsulting.in/icon-colorful.html
-- Server: https://tapp.thesrsconsulting.in
+- App Icons: http://tapi.thesrsconsulting.in/icon-colorful.html
+- Server: https://tapi.thesrsconsulting.in
 - Repository: https://github.com/satux14/thavanai_app
 
 ---

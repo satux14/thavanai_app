@@ -1,6 +1,16 @@
-import { InterstitialAd, AdEventType } from 'react-native-google-mobile-ads';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAdUnitId, AD_LIMITS, shouldShowAds } from '../config/admob';
+
+// Conditionally import AdMob only for native platforms
+let InterstitialAd = null;
+let AdEventType = null;
+
+if (Platform.OS !== 'web') {
+  const admobModule = require('react-native-google-mobile-ads');
+  InterstitialAd = admobModule.InterstitialAd;
+  AdEventType = admobModule.AdEventType;
+}
 
 const AD_STORAGE_KEYS = {
   INTERSTITIAL_COUNT: 'interstitial_ad_count',
@@ -17,6 +27,12 @@ class InterstitialAdManager {
 
   // Initialize and load interstitial ad
   async init() {
+    // Skip on web
+    if (Platform.OS === 'web' || !InterstitialAd) {
+      console.log('⚠️ Interstitial ads not available on web platform');
+      return false;
+    }
+    
     try {
       const adUnitId = getAdUnitId('interstitial');
       

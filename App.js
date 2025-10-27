@@ -2,13 +2,23 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AppState } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { getCurrentUser } from './src/utils/auth';
 import { LanguageProvider, useLanguage } from './src/utils/i18n';
 import ErrorBoundary from './src/components/ErrorBoundary';
-import { initializeAdMob } from './src/config/admob';
-import { initInterstitialAd } from './src/utils/interstitialAds';
-import { initAppOpenAd, setAppState } from './src/utils/appOpenAds';
+
+// Conditionally import AdMob modules only for native platforms
+let initializeAdMob = null;
+let initInterstitialAd = null;
+let initAppOpenAd = null;
+let setAppState = null;
+
+if (Platform.OS !== 'web') {
+  initializeAdMob = require('./src/config/admob').initializeAdMob;
+  initInterstitialAd = require('./src/utils/interstitialAds').initInterstitialAd;
+  initAppOpenAd = require('./src/utils/appOpenAds').initAppOpenAd;
+  setAppState = require('./src/utils/appOpenAds').setAppState;
+}
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -31,28 +41,34 @@ function AppNavigator() {
   useEffect(() => {
     console.log('🎯 AppNavigator MOUNTED (useEffect after render)');
     
-    // Listen to app state changes for app open ads
-    const appStateSubscription = AppState.addEventListener('change', (nextAppState) => {
-      const isInForeground = nextAppState === 'active';
-      setAppState(isInForeground);
-    });
-    
-    return () => {
-      console.log('🔄 AppNavigator UNMOUNTING');
-      appStateSubscription?.remove();
-    };
+    // Listen to app state changes for app open ads (native only)
+    if (setAppState) {
+      const appStateSubscription = AppState.addEventListener('change', (nextAppState) => {
+        const isInForeground = nextAppState === 'active';
+        setAppState(isInForeground);
+      });
+      
+      return () => {
+        console.log('🔄 AppNavigator UNMOUNTING');
+        appStateSubscription?.remove();
+      };
+    }
   }, []);
 
   const initializeApp = async () => {
     try {
       console.log('=== APP INITIALIZATION START ===');
       
-      // Initialize AdMob
-      console.log('Initializing AdMob...');
-      await initializeAdMob();
-      await initInterstitialAd();
-      await initAppOpenAd();
-      console.log('AdMob initialized');
+      // Initialize AdMob (only on native platforms)
+      if (Platform.OS !== 'web' && initializeAdMob && initInterstitialAd && initAppOpenAd) {
+        console.log('Initializing AdMob...');
+        await initializeAdMob();
+        await initInterstitialAd();
+        await initAppOpenAd();
+        console.log('AdMob initialized');
+      } else {
+        console.log('⚠️  Skipping AdMob initialization (web platform or not available)');
+      }
       
       console.log('Checking login status...');
       const user = await getCurrentUser();

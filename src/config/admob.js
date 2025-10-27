@@ -1,5 +1,10 @@
 import { Platform } from 'react-native';
-import mobileAds from 'react-native-google-mobile-ads';
+
+// Conditionally import AdMob only for native platforms
+let mobileAds = null;
+if (Platform.OS !== 'web') {
+  mobileAds = require('react-native-google-mobile-ads').default;
+}
 
 // AdMob Configuration
 export const ADMOB_CONFIG = {
@@ -82,6 +87,12 @@ export const getAdUnitId = (adType, useTest = USE_TEST_ADS) => {
 
 // Initialize AdMob
 export const initializeAdMob = async () => {
+  // Skip initialization on web
+  if (Platform.OS === 'web' || !mobileAds) {
+    console.log('⚠️  AdMob not available on web platform');
+    return false;
+  }
+  
   try {
     await mobileAds().initialize();
     

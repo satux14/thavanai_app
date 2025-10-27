@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { getAdUnitId, shouldShowAds } from '../config/admob';
+
+// Conditionally import AdMob components only for native platforms
+let BannerAd = null;
+let BannerAdSize = null;
+
+if (Platform.OS !== 'web') {
+  const admobModule = require('react-native-google-mobile-ads');
+  BannerAd = admobModule.BannerAd;
+  BannerAdSize = admobModule.BannerAdSize;
+}
 
 const BannerAdComponent = ({ user, style }) => {
   const [showAd, setShowAd] = useState(false);
@@ -19,8 +28,9 @@ const BannerAdComponent = ({ user, style }) => {
     }
   }, [user]);
 
-  if (!showAd || !adUnitId) {
-    return null; // Don't render anything if ads shouldn't be shown
+  // Don't show ads on web or if not available
+  if (Platform.OS === 'web' || !BannerAd || !showAd || !adUnitId) {
+    return null;
   }
 
   return (

@@ -1,6 +1,16 @@
-import { AppOpenAd, AdEventType } from 'react-native-google-mobile-ads';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAdUnitId, AD_LIMITS, shouldShowAds } from '../config/admob';
+
+// Conditionally import AdMob only for native platforms
+let AppOpenAd = null;
+let AdEventType = null;
+
+if (Platform.OS !== 'web') {
+  const admobModule = require('react-native-google-mobile-ads');
+  AppOpenAd = admobModule.AppOpenAd;
+  AdEventType = admobModule.AdEventType;
+}
 
 const AD_STORAGE_KEYS = {
   LAST_APP_OPEN_AD: 'last_app_open_ad_shown',
@@ -16,6 +26,12 @@ class AppOpenAdManager {
 
   // Initialize and load app open ad
   async init() {
+    // Skip on web
+    if (Platform.OS === 'web' || !AppOpenAd) {
+      console.log('⚠️ App Open ads not available on web platform');
+      return false;
+    }
+    
     try {
       const adUnitId = getAdUnitId('appOpen');
       

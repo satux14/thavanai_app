@@ -15,6 +15,7 @@ import { getBook, getEntries, saveEntry, bulkSaveEntries, updateEntry as updateE
 import { getCurrentUser, getAllUsersForDisplay } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
 import OfflineIndicator from '../components/OfflineIndicator';
+import BannerAd from '../components/BannerAd';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 const ENTRIES_PER_PAGE = 10;
@@ -1241,6 +1242,9 @@ export default function EntriesScreen({ navigation, route }) {
           </View>
         </View>
       </Modal>
+
+      {/* Banner Ad at bottom */}
+      <BannerAd user={currentUser} />
     </View>
   );
 }

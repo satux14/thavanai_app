@@ -18,6 +18,7 @@ import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import LanguageToggle from '../components/LanguageToggle';
 import OfflineIndicator from '../components/OfflineIndicator';
+import BannerAd from '../components/BannerAd';
 import { useLanguage, formatDate as formatDateDDMMYYYY } from '../utils/i18n';
 
 export default function DashboardScreen({ navigation }) {
@@ -1316,6 +1317,9 @@ export default function DashboardScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+
+      {/* Banner Ad at bottom */}
+      <BannerAd user={currentUser} />
     </View>
   );
 }

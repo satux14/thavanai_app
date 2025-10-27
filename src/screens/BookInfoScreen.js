@@ -11,10 +11,12 @@ import {
   Image,
   Modal,
 } from 'react-native';
-import { saveBook, getBook, updateBook } from '../utils/storage';
+import { saveBook, getBook, updateBook, getAllBooks } from '../utils/storage';
+import { getCurrentUser } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
 import { useLanguage } from '../utils/i18n';
 import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
+import { showInterstitialAd } from '../utils/interstitialAds';
 
 export default function BookInfoScreen({ navigation, route }) {
   const { t, language } = useLanguage();
@@ -131,6 +133,23 @@ export default function BookInfoScreen({ navigation, route }) {
       // Create new book
       const newBook = await saveBook(bookInfo);
       if (newBook && newBook.id) {
+        // Check if this is the 5th book (or every 5th book after that)
+        try {
+          const currentUser = await getCurrentUser();
+          if (currentUser) {
+            const books = await getAllBooks();
+            const userBookCount = books.filter(b => b.owner_id === currentUser.id).length;
+            
+            // Show ad on 5th, 10th, 15th, etc. book creation (multiples of 5)
+            if (userBookCount % 5 === 0) {
+              await showInterstitialAd();
+            }
+          }
+        } catch (error) {
+          console.error('Error showing ad:', error);
+          // Don't block navigation if ad fails
+        }
+        
         // Navigate directly to entries page
         navigation.replace('Entries', { bookId: newBook.id });
       } else {

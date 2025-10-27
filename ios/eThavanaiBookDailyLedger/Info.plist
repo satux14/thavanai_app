@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>thavanai_mobile</string>
+	<string>eThavanai Book - Daily Ledger</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,7 +27,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.sathishkumarmnm.tapp</string>
+				<string>com.thesrsconsulting.tapp</string>
 			</array>
 		</dict>
 		<dict>
@@ -38,7 +38,11 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>1.0.0</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-2582947091237108~3955174028</string>
+	<key>GADDelayAppMeasurementInit</key>
+	<false/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSMinimumSystemVersion</key>
@@ -52,6 +56,10 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow Thavanai to access your camera to take photos for book backgrounds.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow Thavanai to access your photo library to select backgrounds for your books.</string>
 	<key>RCTNewArchEnabled</key>
 	<false/>
 	<key>UILaunchStoryboardName</key>

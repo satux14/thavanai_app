@@ -54,7 +54,13 @@
     },
     "plugins": [
       "expo-sqlite",
-      "react-native-google-mobile-ads"
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-2582947091237108~3955174028",
+          "iosAppId": "ca-app-pub-2582947091237108~3955174028"
+        }
+      ]
     ],
     "extra": {
       "eas": {

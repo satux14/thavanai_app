@@ -61,6 +61,15 @@ app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// Legal pages
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/terms.html'));
+});
+
 // Serve Admin UI (static files)
 app.use('/admin', express.static(path.join(__dirname, '../admin-ui')));
 app.get('/admin', (req, res) => {
@@ -90,6 +99,8 @@ app.listen(PORT, () => {
 ║  Server running on: http://localhost:${PORT}               ║
 ║  Landing Page:      http://localhost:${PORT}/              ║
 ║  Home:              http://localhost:${PORT}/home          ║
+║  Privacy Policy:    http://localhost:${PORT}/privacy       ║
+║  Terms of Service:  http://localhost:${PORT}/terms         ║
 ║  API Documentation: http://localhost:${PORT}/api-docs      ║
 ║  Admin Panel:       http://localhost:${PORT}/admin         ║
 ║  Health Check:      http://localhost:${PORT}/health        ║

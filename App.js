@@ -2,9 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { AppState } from 'react-native';
 import { getCurrentUser } from './src/utils/auth';
 import { LanguageProvider, useLanguage } from './src/utils/i18n';
 import ErrorBoundary from './src/components/ErrorBoundary';
+import { initializeAdMob } from './src/config/admob';
+import { initInterstitialAd } from './src/utils/interstitialAds';
+import { initAppOpenAd, setAppState } from './src/utils/appOpenAds';
 
 // Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -26,14 +30,30 @@ function AppNavigator() {
   
   useEffect(() => {
     console.log('🎯 AppNavigator MOUNTED (useEffect after render)');
+    
+    // Listen to app state changes for app open ads
+    const appStateSubscription = AppState.addEventListener('change', (nextAppState) => {
+      const isInForeground = nextAppState === 'active';
+      setAppState(isInForeground);
+    });
+    
     return () => {
       console.log('🔄 AppNavigator UNMOUNTING');
+      appStateSubscription?.remove();
     };
   }, []);
 
   const initializeApp = async () => {
     try {
       console.log('=== APP INITIALIZATION START ===');
+      
+      // Initialize AdMob
+      console.log('Initializing AdMob...');
+      await initializeAdMob();
+      await initInterstitialAd();
+      await initAppOpenAd();
+      console.log('AdMob initialized');
+      
       console.log('Checking login status...');
       const user = await getCurrentUser();
       console.log('getCurrentUser returned:', user);

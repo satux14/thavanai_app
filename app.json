@@ -24,10 +24,12 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Allow Thavanai to access your camera to take photos for book backgrounds.",
-        "NSPhotoLibraryUsageDescription": "Allow Thavanai to access your photo library to select backgrounds for your books."
+        "NSPhotoLibraryUsageDescription": "Allow Thavanai to access your photo library to select backgrounds for your books.",
+        "GADApplicationIdentifier": "ca-app-pub-2582947091237108~3955174028"
       },
       "config": {
-        "usesNonExemptEncryption": false
+        "usesNonExemptEncryption": false,
+        "googleMobileAdsAppId": "ca-app-pub-2582947091237108~3955174028"
       }
     },
     "android": {
@@ -42,13 +44,17 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
-      ]
+      ],
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-2582947091237108~3955174028"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      "react-native-google-mobile-ads"
     ],
     "extra": {
       "eas": {

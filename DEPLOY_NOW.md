@@ -40,10 +40,10 @@ eas build --platform android --profile production
 - [ ] App tested on Android device
 - [ ] All features working
 - [ ] No critical bugs
-- [ ] Server running at tapp.thesrsconsulting.in
+- [ ] Server running at tapi.thesrsconsulting.in
 
 ### **Assets Needed:**
-- [ ] App icon (512×512 PNG) - **Choose from:** http://tapp.thesrsconsulting.in/icon-colorful.html
+- [ ] App icon (512×512 PNG) - **Choose from:** http://tapi.thesrsconsulting.in/icon-colorful.html
 - [ ] Feature graphic (1024×500 PNG) - **Create in Canva**
 - [ ] 2-8 screenshots - **See:** SCREENSHOT_GUIDE.md
 - [ ] Privacy policy URL - **Host:** PRIVACY_POLICY.md
@@ -63,7 +63,7 @@ eas build --platform android --profile production
 
 ## 🎨 **Choose Your Icon**
 
-**Visit:** http://tapp.thesrsconsulting.in/icon-colorful.html
+**Visit:** http://tapi.thesrsconsulting.in/icon-colorful.html
 
 **Options:**
 1. 🟢 Green Growth - Money & prosperity
@@ -298,7 +298,7 @@ Everything is prepared. Just run the build command and follow the guides.
 ---
 
 **Quick Links:**
-- 🎨 Icons: http://tapp.thesrsconsulting.in/icon-colorful.html
+- 🎨 Icons: http://tapi.thesrsconsulting.in/icon-colorful.html
 - 🏪 Play Console: https://play.google.com/console
 - 📖 Full Guide: ANDROID_PLAY_STORE_GUIDE.md
 - 📸 Screenshot Guide: SCREENSHOT_GUIDE.md

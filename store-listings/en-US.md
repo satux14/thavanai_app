@@ -130,8 +130,8 @@ Transform your lending business with eThavanai Book, the most comprehensive digi
 📞 **Support & Contact**
 
 Have questions? Need help? Contact us:
-• Email: support@thesrsconsulting.in
-• Website: https://tapp.thesrsconsulting.in
+• Email: thesrsconsulting@gmail.com
+• Website: https://tapi.thesrsconsulting.in/home
 • We respond within 24 hours!
 
 🚀 **Get Started Today!**
@@ -152,8 +152,8 @@ Download eThavanai Book now and modernize your daily installment management. Joi
 
 ---
 
-**Privacy Policy:** https://tapp.thesrsconsulting.in/privacy
-**Terms of Service:** https://tapp.thesrsconsulting.in/terms
+**Privacy Policy:** https://tapi.thesrsconsulting.in/privacy
+**Terms of Service:** https://tapi.thesrsconsulting.in/terms
 
 ---
 

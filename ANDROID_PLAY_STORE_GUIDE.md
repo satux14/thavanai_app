@@ -21,7 +21,7 @@ Complete step-by-step guide to publish your app on Google Play Store.
 ### ✅ **Technical Setup**
 - [x] EAS CLI configured
 - [x] app.json configured
-- [x] Server deployed (tapp.thesrsconsulting.in)
+- [x] Server deployed (tapi.thesrsconsulting.in)
 - [ ] Google Play Developer account ($25 one-time)
 - [ ] Signing key generated
 
@@ -150,7 +150,7 @@ adb install path/to/app.apk
 **Fill in:**
 - Developer name: **SRS Consulting**
 - Email: Your business email
-- Website: https://tapp.thesrsconsulting.in
+- Website: https://tapi.thesrsconsulting.in
 - Phone: Your contact number
 - Address: Your business address
 
@@ -180,7 +180,7 @@ The Play Console will show a checklist. Complete each section:
 
 **Choose your icon from the options created:**
 
-Visit: http://tapp.thesrsconsulting.in/icon-colorful.html
+Visit: http://tapi.thesrsconsulting.in/icon-colorful.html
 
 **Convert SVG to PNG:**
 ```bash
@@ -281,10 +281,10 @@ Digital daily installment ledger. Track loans with Tamil & English support.
    - Tags: finance, business, productivity
 
 8. **Contact details:**
-   - Website: https://tapp.thesrsconsulting.in
+   - Website: https://tapi.thesrsconsulting.in
    - Email: support@thesrsconsulting.in
    - Phone: (optional)
-   - Privacy policy: https://tapp.thesrsconsulting.in (host PRIVACY_POLICY.md)
+   - Privacy policy: https://tapi.thesrsconsulting.in (host PRIVACY_POLICY.md)
 
 ### **B. Translations (Tamil)**
 

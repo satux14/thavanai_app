@@ -39,9 +39,9 @@ This directory contains the public landing page for eThavanai Book - Daily Ledge
 
 When server is running:
 
-- **Home:** http://tapp.thesrsconsulting.in/ or http://localhost:3000/
-- **Home (alt):** http://tapp.thesrsconsulting.in/home
-- **Icon Preview:** http://tapp.thesrsconsulting.in/icon-preview.html
+- **Home:** http://tapi.thesrsconsulting.in/ or http://localhost:3000/
+- **Home (alt):** http://tapi.thesrsconsulting.in/home
+- **Icon Preview:** http://tapi.thesrsconsulting.in/icon-preview.html
 
 ## Icon Usage
 

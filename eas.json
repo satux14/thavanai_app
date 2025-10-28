@@ -28,7 +28,8 @@
         "NODE_ENV": "production"
       },
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "credentialsSource": "remote"
       },
       "ios": {
         "buildConfiguration": "Release"

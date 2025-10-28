@@ -12,7 +12,7 @@ import {
   ImageBackground,
   Modal,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+// import { LinearGradient } from 'expo-linear-gradient';
 import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook, getBookShares, unshareBook } from '../utils/storage';
 import { getCurrentUser, logoutUser } from '../utils/auth';
 import * as Print from 'expo-print';
@@ -610,17 +610,12 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* App Title with Gradient */}
-      <LinearGradient
-        colors={['#6366F1', '#4F46E5', '#3B82F6']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.appTitleContainer}
-      >
+      {/* App Title */}
+      <View style={styles.appTitleContainer}>
         <Text style={styles.appTitle}>
           {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
         </Text>
-      </LinearGradient>
+      </View>
 
       {/* Header with User Info and Logout */}
       <View style={styles.header}>
@@ -1171,8 +1166,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     ...(Platform.OS === 'web' ? { height: '100vh' } : {}),
   },
-  // App Title Styles (at the top with gradient)
+  // App Title Styles (at the top)
   appTitleContainer: {
+    backgroundColor: '#6366F1',
     paddingTop: 50,
     paddingBottom: 12,
     paddingHorizontal: 15,

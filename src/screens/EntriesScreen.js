@@ -1360,7 +1360,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#5d61beb5',
     borderBottomWidth: 2,
-    borderBottomColor: '#e91e63',
+    borderBottomColor: '#5d61be66',
   },
   tableBodyScroll: {
     maxHeight: 500, // Allows vertical scrolling for rows
@@ -1368,12 +1368,12 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#e91e63',
+    borderBottomColor: '#5d61be66',
     minHeight: 32,
-    backgroundColor: '#5d61be66',
+    backgroundColor: '#fff',
   },
   tableRowFilled: {
-    backgroundColor: '#5d61be66',
+    backgroundColor: '#f9f9f9',
   },
   cell: {
     justifyContent: 'center',
@@ -1381,7 +1381,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     paddingHorizontal: 4,
     borderRightWidth: 1,
-    borderRightColor: '#e91e63',
+    borderRightColor: '#5d61be66',
   },
   headerCell: {
     paddingVertical: 6,

@@ -1006,7 +1006,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 12,
     flexWrap: 'wrap',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: '#7678b1',
     padding: 12,
     borderRadius: 10,
   },
@@ -1047,19 +1047,19 @@ const styles = StyleSheet.create({
     // Inherits white background from actionButton
   },
   deleteButton: {
-    borderColor: '#fff',
+    borderColor: '#e0e0e0',
     borderWidth: 2,
   },
   viewSharesButton: {
     // Inherits white background from actionButton
   },
   actionButtonText: {
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 13,
   },
   deleteButtonText: {
-    color: '#000',
+    color: '#fff',
     fontWeight: 'bold',
     fontSize: 13,
   },

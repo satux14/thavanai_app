@@ -877,29 +877,32 @@ export default function DashboardScreen({ navigation }) {
                     </View>
                     
                     <View style={styles.singleLineInfo}>
-                      <Text style={styles.singleLineName} numberOfLines={1}>
-                        {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
-                        {book.name}
-                        {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
-                      </Text>
-                      <View style={styles.singleLineSubInfoContainer}>
-                        <Text style={styles.singleLineSubInfo}>
-                          D.L:{book.dlNo || 'N/A'} • 
+                      <View style={styles.singleLineTopRow}>
+                        <Text style={styles.singleLineName} numberOfLines={1}>
+                          {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
+                          {book.name}
+                          {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
                         </Text>
-                        <View style={styles.singleLineAmountBadge}>
-                          <Text style={styles.singleLineSubInfo}>₹{book.loanAmount}</Text>
-                        </View>
-                        <Text style={styles.singleLineSubInfo}> → </Text>
-                        <View style={[
-                          styles.singleLineBalanceBadge,
-                          book.balance === 0 && styles.singleLineBalanceBadgeZero,
-                          book.balance < 0 && styles.singleLineBalanceBadgeNegative
-                        ]}>
-                          <Text style={[
-                            styles.singleLineBalanceText,
-                            book.balance === 0 && styles.singleLineBalanceZero,
-                            book.balance < 0 && styles.singleLineBalanceNegative
-                          ]}>{t('balance')}: ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
+                      </View>
+                      <View style={styles.singleLineBottomRow}>
+                        <Text style={styles.singleLineDlNumber}>D.L: {book.dlNo || 'N/A'}</Text>
+                        <View style={styles.singleLineAmountSection}>
+                          <View style={styles.singleLineAmountBadge}>
+                            <Text style={styles.singleLineAmountValue}>₹{book.loanAmount}</Text>
+                          </View>
+                          <View style={styles.singleLineSeparator} />
+                          <View style={[
+                            styles.singleLineBalanceBadge,
+                            book.balance === 0 && styles.singleLineBalanceBadgeZero,
+                            book.balance < 0 && styles.singleLineBalanceBadgeNegative
+                          ]}>
+                            <Text style={styles.singleLineBalanceLabel}>{t('balance')}: </Text>
+                            <Text style={[
+                              styles.singleLineBalanceValue,
+                              book.balance === 0 && styles.singleLineBalanceZero,
+                              book.balance < 0 && styles.singleLineBalanceNegative
+                            ]}>₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
+                          </View>
                         </View>
                       </View>
                     </View>
@@ -993,29 +996,32 @@ export default function DashboardScreen({ navigation }) {
                     </View>
                     
                     <View style={styles.singleLineInfo}>
-                      <Text style={styles.singleLineName} numberOfLines={1}>
-                        {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
-                        {book.name}
-                        {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
-                      </Text>
-                      <View style={styles.singleLineSubInfoContainer}>
-                        <Text style={styles.singleLineSubInfo}>
-                          👤{book.ownerName} • D.L:{book.dlNo || 'N/A'} • 
+                      <View style={styles.singleLineTopRow}>
+                        <Text style={styles.singleLineName} numberOfLines={1}>
+                          {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
+                          {book.name}
+                          {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
                         </Text>
-                        <View style={styles.singleLineAmountBadge}>
-                          <Text style={styles.singleLineSubInfo}>₹{book.loanAmount}</Text>
-                        </View>
-                        <Text style={styles.singleLineSubInfo}> → </Text>
-                        <View style={[
-                          styles.singleLineBalanceBadge,
-                          book.balance === 0 && styles.singleLineBalanceBadgeZero,
-                          book.balance < 0 && styles.singleLineBalanceBadgeNegative
-                        ]}>
-                          <Text style={[
-                            styles.singleLineBalanceText,
-                            book.balance === 0 && styles.singleLineBalanceZero,
-                            book.balance < 0 && styles.singleLineBalanceNegative
-                          ]}>{t('balance')}: ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
+                      </View>
+                      <View style={styles.singleLineBottomRow}>
+                        <Text style={styles.singleLineDlNumber}>👤{book.ownerName} • D.L: {book.dlNo || 'N/A'}</Text>
+                        <View style={styles.singleLineAmountSection}>
+                          <View style={styles.singleLineAmountBadge}>
+                            <Text style={styles.singleLineAmountValue}>₹{book.loanAmount}</Text>
+                          </View>
+                          <View style={styles.singleLineSeparator} />
+                          <View style={[
+                            styles.singleLineBalanceBadge,
+                            book.balance === 0 && styles.singleLineBalanceBadgeZero,
+                            book.balance < 0 && styles.singleLineBalanceBadgeNegative
+                          ]}>
+                            <Text style={styles.singleLineBalanceLabel}>{t('balance')}: </Text>
+                            <Text style={[
+                              styles.singleLineBalanceValue,
+                              book.balance === 0 && styles.singleLineBalanceZero,
+                              book.balance < 0 && styles.singleLineBalanceNegative
+                            ]}>₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
+                          </View>
                         </View>
                       </View>
                     </View>
@@ -2030,43 +2036,71 @@ const styles = StyleSheet.create({
   },
   singleLineInfo: {
     flex: 1,
-    justifyContent: 'center',
     paddingRight: 8,
+    paddingVertical: 4,
+  },
+  singleLineTopRow: {
+    marginBottom: 6,
   },
   singleLineName: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 2,
   },
   singleLinePending: {
     color: '#FF9800',
-    fontSize: 13,
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   singleLineFavorite: {
-    fontSize: 13,
+    fontSize: 16,
+    color: '#FFD700',
   },
-  singleLineSubInfoContainer: {
+  singleLineBottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  singleLineSubInfo: {
-    fontSize: 11,
+  singleLineDlNumber: {
+    fontSize: 10,
     color: '#666',
     fontWeight: '500',
+    flex: 0,
+    minWidth: 80,
+  },
+  singleLineAmountSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flex: 1,
+    justifyContent: 'flex-end',
   },
   singleLineAmountBadge: {
+    flexDirection: 'row',
     backgroundColor: 'rgba(76, 175, 80, 0.15)',
     paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 4,
+    alignItems: 'center',
+  },
+  singleLineAmountValue: {
+    fontSize: 11,
+    color: '#2E7D32',
+    fontWeight: 'bold',
+  },
+  singleLineSeparator: {
+    width: 1,
+    height: 16,
+    backgroundColor: '#d1d5db',
   },
   singleLineBalanceBadge: {
+    flexDirection: 'row',
     backgroundColor: 'rgba(33, 150, 243, 0.15)',
     paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingVertical: 3,
     borderRadius: 4,
+    alignItems: 'center',
   },
   singleLineBalanceBadgeZero: {
     backgroundColor: 'rgba(76, 175, 80, 0.2)',
@@ -2074,9 +2108,14 @@ const styles = StyleSheet.create({
   singleLineBalanceBadgeNegative: {
     backgroundColor: 'rgba(244, 67, 54, 0.15)',
   },
-  singleLineBalanceText: {
+  singleLineBalanceLabel: {
+    fontSize: 10,
+    color: '#1976D2',
+    fontWeight: '600',
+  },
+  singleLineBalanceValue: {
     fontSize: 11,
-    color: '#2196F3',
+    color: '#1565C0',
     fontWeight: 'bold',
   },
   singleLineBalanceZero: {

@@ -1370,10 +1370,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e91e63',
     minHeight: 32,
-    backgroundColor: '#fff',
+    backgroundColor: '#5d61be66',
   },
   tableRowFilled: {
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#5d61be66',
   },
   cell: {
     justifyContent: 'center',

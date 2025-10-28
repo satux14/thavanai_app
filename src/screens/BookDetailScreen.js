@@ -791,7 +791,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#787abd61',
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
@@ -1047,7 +1047,7 @@ const styles = StyleSheet.create({
     // Inherits white background from actionButton
   },
   deleteButton: {
-    borderColor: '#f44336',
+    borderColor: '#fff',
     borderWidth: 2,
   },
   viewSharesButton: {
@@ -1059,7 +1059,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   deleteButtonText: {
-    color: '#f44336',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 13,
   },

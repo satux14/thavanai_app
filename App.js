@@ -161,6 +161,13 @@ function AppNavigator() {
           options={{
             title: 'Book Details',
             headerShown: true,
+            headerStyle: {
+              backgroundColor: '#7678b1',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         {console.log('BookDetail Stack.Screen registered successfully')}
@@ -170,6 +177,13 @@ function AppNavigator() {
           options={{
             title: 'Daily Entries',
             headerShown: true,
+            headerStyle: {
+              backgroundColor: '#7678b1',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         {console.log('Entries Stack.Screen registered successfully')}

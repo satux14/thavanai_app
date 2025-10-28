@@ -857,11 +857,11 @@ export default function DashboardScreen({ navigation }) {
               const cardWrapperProps = book.backgroundImage
                 ? {
                     source: { uri: book.backgroundImage },
-                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    style: styles.singleLineCard,
                     imageStyle: { borderRadius: 8 },
                   }
                 : {
-                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    style: styles.singleLineCard,
                   };
 
               return (
@@ -973,11 +973,11 @@ export default function DashboardScreen({ navigation }) {
               const cardWrapperProps = book.backgroundImage
                 ? {
                     source: { uri: book.backgroundImage },
-                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    style: styles.singleLineCard,
                     imageStyle: { borderRadius: 8 },
                   }
                 : {
-                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    style: styles.singleLineCard,
                   };
 
               return (
@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
   },
   // App Title Styles (at the top)
   appTitleContainer: {
-    backgroundColor: '#1980BE',
+    backgroundColor: '#7678b1',
     paddingTop: 50,
     paddingBottom: 8,
     paddingHorizontal: 15,
@@ -1301,7 +1301,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logoutButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#787abd7d',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 6,

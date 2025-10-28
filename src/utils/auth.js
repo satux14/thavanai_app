@@ -3,9 +3,9 @@ import { authAPI } from '../services/api';
 /**
  * Register a new user
  */
-export const registerUser = async (username, password, fullName, preferredLanguage = 'en') => {
+export const registerUser = async (username, password, fullName, preferredLanguage = 'en', phone = '', email = '') => {
   try {
-    const data = await authAPI.register(username, password, fullName, preferredLanguage);
+    const data = await authAPI.register(username, password, fullName, preferredLanguage, phone, email);
     
     return {
       success: true,

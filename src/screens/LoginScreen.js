@@ -93,12 +93,10 @@ export default function LoginScreen({ navigation }) {
         <View style={styles.header}>
           <Text style={styles.titleTamil}>eThavanai Book</Text>
           <Text style={styles.titleEnglish}>Digital Ledger</Text>
-          <Text style={styles.subtitle}>Secure Digital Lending</Text>
         </View>
 
         {/* Login Form */}
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>Login</Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Username</Text>
@@ -161,22 +159,6 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Features */}
-        <View style={styles.features}>
-          <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🔐</Text>
-            <Text style={styles.featureText}>Secure Authentication</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>📱</Text>
-            <Text style={styles.featureText}>QR Code Verification</Text>
-          </View>
-          <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>💰</Text>
-            <Text style={styles.featureText}>Track Payments</Text>
-          </View>
-        </View>
         {console.log('✅✅✅ ALL LoginScreen JSX RENDERED SUCCESSFULLY ✅✅✅')}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -193,34 +175,35 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E91E63',
+    backgroundColor: '#928eb6',
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
     padding: 20,
+    paddingTop: 120,
+    paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
     marginBottom: 60,
-    marginTop: 40,
+    marginTop: 20,
   },
   titleTamil: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#7678b1',
+    color: '#FFFFFF',
     marginBottom: 8,
     letterSpacing: 1,
   },
   titleEnglish: {
     fontSize: 20,
-    color: '#8f91d9c9',
+    color: '#FFFFFF',
     fontWeight: '600',
     letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#FFFFFF',
     fontStyle: 'italic',
     marginTop: 8,
   },
@@ -242,7 +225,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   input: {
@@ -260,7 +243,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   loginButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    backgroundColor: '#5d61beb5',
     padding: 18,
     borderRadius: 30,
     alignItems: 'center',
@@ -275,7 +258,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(200, 200, 200, 0.6)',
   },
   loginButtonText: {
-    color: '#333',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 1,
@@ -297,24 +280,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
-  },
-  features: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  featureItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  featureIcon: {
-    fontSize: 30,
-    marginBottom: 5,
-  },
-  featureText: {
-    fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
   },
 });
 

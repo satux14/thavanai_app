@@ -106,10 +106,10 @@ function isCacheValid(key) {
 
 // Authentication API
 export const authAPI = {
-  async register(username, password, fullName, preferredLanguage = 'en') {
+  async register(username, password, fullName, preferredLanguage = 'en', phone = '', email = '') {
     const data = await apiRequest('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ username, password, fullName, preferredLanguage }),
+      body: JSON.stringify({ username, password, fullName, preferredLanguage, phone, email }),
     });
 
     if (data.token) {

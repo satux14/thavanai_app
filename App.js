@@ -133,6 +133,13 @@ function AppNavigator() {
           options={{
             title: 'Register',
             headerShown: true, // Explicit
+            headerStyle: {
+              backgroundColor: '#7678b1',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
           }}
         />
         {console.log('Register Stack.Screen registered successfully')}

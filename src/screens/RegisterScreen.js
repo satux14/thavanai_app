@@ -20,6 +20,8 @@ export default function RegisterScreen({ navigation }) {
     fullName: '',
     password: '',
     confirmPassword: '',
+    phone: '', // Optional
+    email: '', // Optional
     preferredLanguage: 'en', // Default to English
   });
   const [loading, setLoading] = useState(false);
@@ -72,7 +74,9 @@ export default function RegisterScreen({ navigation }) {
       formData.username,
       formData.password,
       formData.fullName,
-      formData.preferredLanguage
+      formData.preferredLanguage,
+      formData.phone,
+      formData.email
     );
 
     if (result.success) {
@@ -128,13 +132,12 @@ export default function RegisterScreen({ navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.titleTamil}>{t('newAccount')}</Text>
-          <Text style={styles.titleEnglish}>{t('createNewAccount')}</Text>
+          <Text style={styles.titleTamil}>eThavanai Book</Text>
+          <Text style={styles.titleEnglish}>Digital Ledger</Text>
         </View>
 
         {/* Register Form */}
         <View style={styles.formContainer}>
-          <Text style={styles.formTitle}>{t('register')}</Text>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>{t('fullName')} *</Text>
@@ -164,6 +167,37 @@ export default function RegisterScreen({ navigation }) {
               returnKeyType="next"
             />
             <Text style={styles.hint}>{t('minChars', { count: 3 })}, {t('usernameLowercase')}</Text>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Phone Number (Optional)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.phone}
+              onChangeText={(text) =>
+                setFormData({ ...formData, phone: text })
+              }
+              placeholder="Enter your phone number"
+              keyboardType="phone-pad"
+              autoCapitalize="none"
+              returnKeyType="next"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email (Optional)</Text>
+            <TextInput
+              style={styles.input}
+              value={formData.email}
+              onChangeText={(text) =>
+                setFormData({ ...formData, email: text })
+              }
+              placeholder="Enter your email address"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="next"
+            />
           </View>
 
           <View style={styles.inputContainer}>
@@ -256,27 +290,6 @@ export default function RegisterScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Info */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoTitle}>What you'll get:</Text>
-          <View style={styles.infoItem}>
-            <Text style={styles.bulletPoint}>✓</Text>
-            <Text style={styles.infoText}>Create and manage loan books</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.bulletPoint}>✓</Text>
-            <Text style={styles.infoText}>Share books with debtors</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.bulletPoint}>✓</Text>
-            <Text style={styles.infoText}>Secure QR code payments</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.bulletPoint}>✓</Text>
-            <Text style={styles.infoText}>Track all transactions</Text>
-          </View>
-        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -285,40 +298,38 @@ export default function RegisterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#928eb6',
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'center',
     padding: 20,
-    paddingTop: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
+    marginTop: 20,
   },
   titleTamil: {
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 5,
+    color: '#FFFFFF',
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   titleEnglish: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 20,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 10,
     marginBottom: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   formTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
@@ -330,23 +341,28 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 0,
+    borderRadius: 30,
+    padding: 18,
+    paddingLeft: 20,
     fontSize: 16,
-    color: '#000', // Explicit text color for Android
+    color: '#333',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
   },
   hint: {
     fontSize: 12,
-    color: '#999',
-    marginTop: 4,
-    fontStyle: 'italic',
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginTop: 6,
+    marginLeft: 10,
   },
   languageButtons: {
     flexDirection: 'row',
@@ -356,89 +372,63 @@ const styles = StyleSheet.create({
   languageButton: {
     flex: 1,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#ddd',
-    backgroundColor: '#f9f9f9',
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
   },
   languageButtonActive: {
-    borderColor: '#2196F3',
-    backgroundColor: '#E3F2FD',
+    borderColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   languageButtonText: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000',
     fontWeight: '500',
   },
   languageButtonTextActive: {
-    color: '#2196F3',
+    color: '#000000',
     fontWeight: '700',
   },
   registerButton: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: '#5d61beb5',
+    padding: 18,
+    borderRadius: 30,
     alignItems: 'center',
     marginTop: 10,
-    elevation: 2,
+    elevation: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowRadius: 5,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: 'rgba(200, 200, 200, 0.6)',
   },
   registerButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
+    letterSpacing: 1,
   },
   loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 30,
     gap: 5,
   },
   loginText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500',
   },
   loginLink: {
-    fontSize: 14,
-    color: '#2196F3',
+    fontSize: 15,
+    color: '#FFFFFF',
     fontWeight: 'bold',
-  },
-  infoContainer: {
-    backgroundColor: '#e3f2fd',
-    borderRadius: 8,
-    padding: 15,
-    borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  infoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  bulletPoint: {
-    fontSize: 16,
-    color: '#4CAF50',
-    marginRight: 10,
-    fontWeight: 'bold',
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#555',
-    flex: 1,
+    textDecorationLine: 'underline',
   },
 });
 

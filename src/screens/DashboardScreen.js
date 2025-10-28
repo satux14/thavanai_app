@@ -12,6 +12,7 @@ import {
   ImageBackground,
   Modal,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getAllBooks, deleteBook, closeBook, reopenBook, getEntries, shareBook, getBookShares, unshareBook } from '../utils/storage';
 import { getCurrentUser, logoutUser } from '../utils/auth';
 import * as Print from 'expo-print';
@@ -609,6 +610,18 @@ export default function DashboardScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* App Title with Gradient */}
+      <LinearGradient
+        colors={['#6366F1', '#4F46E5', '#3B82F6']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.appTitleContainer}
+      >
+        <Text style={styles.appTitle}>
+          {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
+        </Text>
+      </LinearGradient>
+
       {/* Header with User Info and Logout */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -633,13 +646,6 @@ export default function DashboardScreen({ navigation }) {
 
       {/* Offline Indicator */}
       <OfflineIndicator />
-
-      {/* App Title */}
-      <View style={styles.appTitleContainer}>
-        <Text style={styles.appTitle}>
-          {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
-        </Text>
-      </View>
 
       {/* View Mode Toggle with Search/Filter Icon */}
       <View style={styles.viewModeContainer}>
@@ -1165,11 +1171,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     ...(Platform.OS === 'web' ? { height: '100vh' } : {}),
   },
-  header: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 15,
+  // App Title Styles (at the top with gradient)
+  appTitleContainer: {
     paddingTop: 50,
-    paddingBottom: 20,
+    paddingBottom: 12,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  header: {
+    backgroundColor: '#EC4899',
+    paddingHorizontal: 15,
+    paddingTop: 12,
+    paddingBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -1180,20 +1198,15 @@ const styles = StyleSheet.create({
   headerRight: {
     alignItems: 'flex-end',
   },
-  // App Title Styles
-  appTitleContainer: {
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: '#2196F3',
-  },
   appTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#FFFFFF',
     textAlign: 'center',
+    letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   appTitleEnglish: {
     fontSize: 14,

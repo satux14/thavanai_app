@@ -769,11 +769,12 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   addEntryButton: {
-    backgroundColor: '#4CAF50',
-    padding: 18,
-    borderRadius: 12,
+    backgroundColor: '#10B981',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -782,8 +783,8 @@ const styles = StyleSheet.create({
   },
   addEntryButtonText: {
     color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
   },
   bookCard: {
     backgroundColor: '#fff',

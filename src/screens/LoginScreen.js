@@ -9,7 +9,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { loginUser } from '../utils/auth';
 import { useLanguage } from '../utils/i18n';
 
@@ -89,8 +91,8 @@ export default function LoginScreen({ navigation }) {
       >
         {/* Logo/Title */}
         <View style={styles.header}>
-          <Text style={styles.titleTamil}>தினத்தவணைப் புத்தகம்</Text>
-          <Text style={styles.titleEnglish}>Daily Installment Book</Text>
+          <Text style={styles.titleTamil}>eThavanai Book</Text>
+          <Text style={styles.titleEnglish}>Digital Ledger</Text>
           <Text style={styles.subtitle}>Secure Digital Lending</Text>
         </View>
 
@@ -191,7 +193,7 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#E91E63',
   },
   scrollContent: {
     flexGrow: 1,
@@ -200,34 +202,32 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 60,
+    marginTop: 40,
   },
   titleTamil: {
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: 'bold',
-    color: '#2196F3',
-    marginBottom: 5,
+    color: '#7678b1',
+    marginBottom: 8,
+    letterSpacing: 1,
   },
   titleEnglish: {
-    fontSize: 18,
-    color: '#666',
-    marginBottom: 5,
+    fontSize: 20,
+    color: '#8f91d9c9',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 14,
-    color: '#999',
+    color: 'rgba(255, 255, 255, 0.9)',
     fontStyle: 'italic',
+    marginTop: 8,
   },
   formContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 10,
     marginBottom: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   formTitle: {
     fontSize: 24,
@@ -246,49 +246,57 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderWidth: 0,
+    borderRadius: 30,
+    padding: 18,
+    paddingLeft: 20,
     fontSize: 16,
-    color: '#000', // Explicit text color for Android
-  },
-  loginButton: {
-    backgroundColor: '#2196F3',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-    elevation: 2,
+    color: '#333',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+  },
+  loginButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    padding: 18,
+    borderRadius: 30,
+    alignItems: 'center',
+    marginTop: 10,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
-    shadowRadius: 3,
+    shadowRadius: 5,
   },
   buttonDisabled: {
-    backgroundColor: '#ccc',
+    backgroundColor: 'rgba(200, 200, 200, 0.6)',
   },
   loginButtonText: {
-    color: '#fff',
+    color: '#333',
     fontSize: 18,
     fontWeight: 'bold',
+    letterSpacing: 1,
   },
   registerContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 30,
     gap: 5,
   },
   registerText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500',
   },
   registerLink: {
-    fontSize: 14,
-    color: '#2196F3',
+    fontSize: 15,
+    color: '#FFFFFF',
     fontWeight: 'bold',
+    textDecorationLine: 'underline',
   },
   features: {
     flexDirection: 'row',

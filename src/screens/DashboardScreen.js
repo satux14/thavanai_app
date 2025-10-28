@@ -495,7 +495,7 @@ export default function DashboardScreen({ navigation }) {
             </style>
           </head>
           <body>
-            <h1>Daily Installment Book</h1>
+            <h1>eThavanai Book<br/>Daily Ledger</h1>
             
             <div class="info-section">
               <h2>Book Information</h2>
@@ -612,9 +612,14 @@ export default function DashboardScreen({ navigation }) {
     <View style={styles.container}>
       {/* App Title */}
       <View style={styles.appTitleContainer}>
-        <Text style={styles.appTitle}>
-          {language === 'ta' ? 'தினத்தவணைப் புத்தகம்' : 'Daily Installment Book'}
-        </Text>
+        {language === 'ta' ? (
+          <Text style={styles.appTitle}>தினத்தவணைப் புத்தகம்</Text>
+        ) : (
+          <>
+            <Text style={styles.appTitle}>eThavanai Book</Text>
+            <Text style={styles.appTitleSubtitle}>Daily Ledger</Text>
+          </>
+        )}
       </View>
 
       {/* Header with User Info and Logout */}
@@ -1210,11 +1215,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   appTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',
     letterSpacing: 0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  appTitleSubtitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    marginTop: 2,
+    opacity: 0.95,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,

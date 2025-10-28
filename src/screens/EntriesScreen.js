@@ -56,16 +56,8 @@ export default function EntriesScreen({ navigation, route }) {
   useEffect(() => {
     navigation.setOptions({
       title: t('dailyEntries'),
-      headerRight: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('BookDetail', { bookId })}
-          style={{ marginRight: 15 }}
-        >
-          <Text style={{ fontSize: 24, color: '#2196F3' }}>⚙️</Text>
-        </TouchableOpacity>
-      ),
     });
-  }, [t, navigation, bookId]);
+  }, [t, navigation]);
 
   const loadData = async (forceRefresh = false) => {
     try {
@@ -1286,7 +1278,7 @@ const styles = StyleSheet.create({
   },
   homeIconButton: {
     padding: 6,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderRadius: 8,
     marginLeft: 10,
   },
@@ -1294,7 +1286,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   bookHeader: {
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     padding: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -1330,7 +1322,7 @@ const styles = StyleSheet.create({
   pageNavButton: {
     padding: 8,
     paddingHorizontal: 15,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderRadius: 6,
   },
   pageNavButtonDisabled: {
@@ -1366,7 +1358,7 @@ const styles = StyleSheet.create({
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderBottomWidth: 2,
     borderBottomColor: '#e91e63',
   },
@@ -1475,7 +1467,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inlineApproveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5d61beb5',
   },
   inlineRejectButton: {
     backgroundColor: '#f44336',
@@ -1488,7 +1480,7 @@ const styles = StyleSheet.create({
   inlineRequestButton: {
     paddingVertical: 6,
     paddingHorizontal: 10,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderRadius: 8,
     minWidth: 120,
     alignItems: 'center',
@@ -1555,7 +1547,7 @@ const styles = StyleSheet.create({
   reSignRequestButton: {
     paddingVertical: 4,
     paddingHorizontal: 8,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderRadius: 6,
     minWidth: 100,
     alignItems: 'center',
@@ -1608,7 +1600,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalApproveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5d61beb5',
   },
   modalRejectButton: {
     backgroundColor: '#f44336',
@@ -1636,7 +1628,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#ddd',
   },
   addPageButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5d61beb5',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -1668,7 +1660,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
   },
   modalTitle: {
     fontSize: 20,
@@ -1792,7 +1784,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   approveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5d61beb5',
   },
   approveButtonText: {
     color: '#fff',
@@ -1812,7 +1804,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#5d61beb5',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
@@ -1848,7 +1840,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
   },
   signatureTitle: {
     fontSize: 20,
@@ -1866,7 +1858,7 @@ const styles = StyleSheet.create({
   fontSizeButton: {
     width: 32,
     height: 32,
-    backgroundColor: '#2196F3',
+    backgroundColor: '#5d61beb5',
     borderRadius: 6,
     justifyContent: 'center',
     alignItems: 'center',

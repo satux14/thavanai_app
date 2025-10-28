@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   addEntryButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#5d61beb5',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -790,13 +790,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    borderWidth: 2,
-    borderColor: '#2196F3',
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
     overflow: 'hidden',
     position: 'relative',
   },
@@ -1016,43 +1016,45 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
-    elevation: 2,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    elevation: 3,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
   },
   viewEntriesButton: {
-    backgroundColor: '#00BCD4',
+    // Inherits white background from actionButton
   },
   exportButton: {
-    backgroundColor: '#9C27B0',
+    // Inherits white background from actionButton
   },
   favoriteButton: {
-    backgroundColor: '#FFC107',
+    // Inherits white background from actionButton
   },
   editButton: {
-    backgroundColor: '#2196F3',
+    // Inherits white background from actionButton
   },
   shareButton: {
-    backgroundColor: '#FF9800',
+    // Inherits white background from actionButton
   },
   closeButton: {
-    backgroundColor: '#607D8B',
+    // Inherits white background from actionButton
   },
   reopenButton: {
-    backgroundColor: '#4CAF50',
+    // Inherits white background from actionButton
   },
   deleteButton: {
-    backgroundColor: '#fff',
-    borderWidth: 2,
     borderColor: '#f44336',
+    borderWidth: 2,
   },
   viewSharesButton: {
-    backgroundColor: '#9C27B0',
+    // Inherits white background from actionButton
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 13,
   },

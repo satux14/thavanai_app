@@ -2100,7 +2100,7 @@ const styles = StyleSheet.create({
   singleLineAddButton: {
     width: 42,
     height: 42,
-    backgroundColor: '#5d61beb5',
+    backgroundColor: '#7678b194',
     justifyContent: 'center',
     alignItems: 'center',
     borderLeftWidth: 1,

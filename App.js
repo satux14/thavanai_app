@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { AppState, Platform } from 'react-native';
+import { AppState, Platform, TouchableOpacity, Text } from 'react-native';
 import { getCurrentUser } from './src/utils/auth';
 import { LanguageProvider, useLanguage } from './src/utils/i18n';
 import ErrorBoundary from './src/components/ErrorBoundary';
@@ -174,7 +174,7 @@ function AppNavigator() {
         <Stack.Screen
           name="Entries"
           component={EntriesScreen}
-          options={{
+          options={({ navigation }) => ({
             title: 'Daily Entries',
             headerShown: true,
             headerStyle: {
@@ -184,7 +184,15 @@ function AppNavigator() {
             headerTitleStyle: {
               fontWeight: 'bold',
             },
-          }}
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Dashboard')}
+                style={{ marginRight: 15 }}
+              >
+                <Text style={{ fontSize: 24 }}>🏠</Text>
+              </TouchableOpacity>
+            ),
+          })}
         />
         {console.log('Entries Stack.Screen registered successfully')}
         {console.log('3️⃣ All Stack.Screens registered')}

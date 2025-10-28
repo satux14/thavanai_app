@@ -708,21 +708,6 @@ export default function EntriesScreen({ navigation, route }) {
       {/* Offline Indicator */}
       <OfflineIndicator />
       
-      {/* User Info - Top Left with Home Icon - Top Right */}
-      {currentUser && (
-        <View style={styles.userInfoHeader}>
-          <Text style={styles.userInfoText}>
-            👤 {currentUser.fullName} (@{currentUser.username})
-          </Text>
-          <TouchableOpacity 
-            style={styles.homeIconButton}
-            onPress={() => navigation.navigate('Dashboard')}
-          >
-            <Text style={styles.homeIcon}>🏠</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
       {/* Book Info Header */}
       <View style={styles.bookHeader}>
         <View style={styles.bookHeaderLeft}>
@@ -1258,32 +1243,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  userInfoHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 8,
-    paddingLeft: 15,
-    paddingRight: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  userInfoText: {
-    fontSize: 14,
-    flex: 1,
-    color: '#333',
-    fontWeight: '600',
-  },
-  homeIconButton: {
-    padding: 6,
-    backgroundColor: '#5d61beb5',
-    borderRadius: 8,
-    marginLeft: 10,
-  },
-  homeIcon: {
-    fontSize: 20,
   },
   bookHeader: {
     backgroundColor: '#5d61beb5',

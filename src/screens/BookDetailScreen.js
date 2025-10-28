@@ -1006,9 +1006,11 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 12,
     flexWrap: 'wrap',
-    backgroundColor: '#7678b1',
+    backgroundColor: '#7678b191',
     padding: 12,
     borderRadius: 10,
+    borderLeftWidth: 5,
+    borderLeftColor: '#7678b12b',
   },
   actionButton: {
     flex: 1,
@@ -1054,12 +1056,12 @@ const styles = StyleSheet.create({
     // Inherits white background from actionButton
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 13,
   },
   deleteButtonText: {
-    color: '#fff',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 13,
   },

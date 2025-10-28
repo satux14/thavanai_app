@@ -30,7 +30,7 @@ export default function BookInfoScreen({ navigation, route }) {
     numberOfDays: '100', // Default to 100 days
     startDate: '',
     endDate: '',
-    backgroundColor: '#2196F3',
+    backgroundColor: '#7678b1',
     backgroundImage: null,
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -287,12 +287,12 @@ export default function BookInfoScreen({ navigation, route }) {
                 style={styles.colorInput}
                 value={bookInfo.backgroundColor}
                 onChangeText={(color) => setBookInfo({ ...bookInfo, backgroundColor: color })}
-                placeholder="#2196F3"
+                placeholder="#7678b1"
                 autoCapitalize="none"
               />
             </View>
             <View style={styles.colorPaletteContainer}>
-              {['#2196F3', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#E91E63'].map((color) => (
+              {['#7678b1', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#E91E63'].map((color) => (
                 <TouchableOpacity
                   key={color}
                   style={[styles.colorOption, { backgroundColor: color }]}
@@ -347,7 +347,7 @@ export default function BookInfoScreen({ navigation, route }) {
                     style={{
                       padding: 10,
                       borderWidth: 2,
-                      borderColor: '#2196F3',
+                      borderColor: '#7678b1',
                       borderRadius: 8,
                       borderStyle: 'dashed',
                     }}
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
   titleTamil: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#7678b1',
     marginBottom: 5,
   },
   titleEnglish: {
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   dlNoContainer: {
     backgroundColor: '#fff',
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#7678b1',
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   dlNoLabel: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2196F3',
+    color: '#7678b1',
     marginBottom: 10,
   },
   dlNoInput: {
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#7678b1',
     marginBottom: 20,
   },
   fieldContainer: {
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#2196F3',
+    color: '#7678b1',
     marginBottom: 8,
     fontWeight: '600',
   },
@@ -625,7 +625,7 @@ const styles = StyleSheet.create({
   },
   imageUploadContainer: {
     borderWidth: 2,
-    borderColor: '#2196F3',
+    borderColor: '#7678b1',
     borderStyle: 'dashed',
     borderRadius: 8,
     padding: 15,

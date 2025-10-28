@@ -481,8 +481,10 @@ export default function BookDetailScreen({ navigation, route }) {
         <CardWrapper {...cardWrapperProps}>
           {book.backgroundImage && <View style={styles.imageOverlay} />}
           
-          {/* Card Header */}
-          <View style={[styles.bookHeader, book.backgroundImage && { zIndex: 1 }]}>
+          {/* Card Display - Click to view entries */}
+          <TouchableOpacity activeOpacity={0.8} onPress={handleViewEntries} style={{ flex: 1 }}>
+            {/* Card Header */}
+            <View style={[styles.bookHeader, book.backgroundImage && { zIndex: 1 }]}>
             <View style={styles.bookTitleSection}>
               <View style={styles.headerTopRow}>
                 <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
@@ -565,6 +567,7 @@ export default function BookDetailScreen({ navigation, route }) {
               <Text style={styles.sharedBadgeText}>🤝 {t('shared')}</Text>
             </View>
           )}
+          </TouchableOpacity>
 
           {/* Action Buttons */}
           <View style={[styles.bookActions, book.backgroundImage && { zIndex: 1 }]}>

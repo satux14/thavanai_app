@@ -237,11 +237,13 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const handleOpenBook = (book) => {
-    navigation.navigate('BookDetail', { bookId: book.id });
+    // Navigate directly to Entries page (view entries)
+    navigation.navigate('Entries', { bookId: book.id });
   };
 
   const handleAddEntry = (book) => {
-    navigation.navigate('Entries', { bookId: book.id });
+    // Navigate to Entries page with add mode
+    navigation.navigate('Entries', { bookId: book.id, addMode: true });
   };
 
   const handleEditBook = (book) => {

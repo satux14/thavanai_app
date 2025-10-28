@@ -56,8 +56,16 @@ export default function EntriesScreen({ navigation, route }) {
   useEffect(() => {
     navigation.setOptions({
       title: t('dailyEntries'),
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('BookDetail', { bookId })}
+          style={{ marginRight: 15 }}
+        >
+          <Text style={{ fontSize: 24, color: '#2196F3' }}>⚙️</Text>
+        </TouchableOpacity>
+      ),
     });
-  }, [t, navigation]);
+  }, [t, navigation, bookId]);
 
   const loadData = async (forceRefresh = false) => {
     try {

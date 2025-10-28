@@ -1,0 +1,7 @@
+# Ignore all uploaded files
+book-backgrounds/*
+
+# But keep the directory structure
+!.gitignore
+!README.md
+

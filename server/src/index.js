@@ -11,6 +11,7 @@ const booksRoutes = require('./routes/books');
 const entriesRoutes = require('./routes/entries');
 const sharingRoutes = require('./routes/sharing');
 const adminRoutes = require('./routes/admin');
+const uploadsRoutes = require('./routes/uploads');
 const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
@@ -39,6 +40,7 @@ app.use('/api/books', booksRoutes);
 app.use('/api/entries', entriesRoutes);
 app.use('/api/sharing', sharingRoutes);
 app.use('/api/admin', authenticateToken, adminRoutes); // Admin routes (protected)
+app.use('/api/uploads', uploadsRoutes); // Upload routes (protected)
 
 // OpenAPI/Swagger Documentation
 try {
@@ -48,6 +50,9 @@ try {
 } catch (error) {
   console.warn('⚠ OpenAPI spec not found, skipping documentation');
 }
+
+// Serve Uploaded Images (static files)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Serve Landing Page (static files)
 app.use(express.static(path.join(__dirname, '../public')));

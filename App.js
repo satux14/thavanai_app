@@ -117,22 +117,19 @@ function AppNavigator() {
       {console.log('2️⃣ Stack.Navigator JSX start')}
         {console.log('Stack.Navigator is rendering with initialRouteName:', initialRoute)}
         {/* Auth Screens */}
-        {console.log('About to render Login Stack.Screen with headerShown:', false, 'Type:', typeof false)}
         <Stack.Screen
           name="Login"
           component={LoginScreen}
           options={{
-            headerShown: false, // Explicitly boolean
+            headerShown: false,
           }}
         />
-        {console.log('Login Stack.Screen registered successfully')}
-        {console.log('About to register Register screen, t function type:', typeof t)}
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
           options={{
             title: 'Register',
-            headerShown: true, // Explicit
+            headerShown: true,
             headerStyle: {
               backgroundColor: '#7678b1',
             },
@@ -142,7 +139,6 @@ function AppNavigator() {
             },
           }}
         />
-        {console.log('Register Stack.Screen registered successfully')}
 
         {/* Main App Screens */}
         <Stack.Screen

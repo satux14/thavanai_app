@@ -67,18 +67,10 @@ export default function LoginScreen({ navigation }) {
     navigation.navigate('Register');
   };
 
-  console.log('=== LoginScreen ABOUT TO RENDER JSX ===');
-  console.log('Disabled prop will be:', Boolean(loading));
-  console.log('Platform.OS:', Platform.OS);
-  console.log('KeyboardAvoidingView behavior:', Platform.OS === 'ios' ? 'padding' : 'height');
-  
   const keyboardAvoidingBehavior = Platform.OS === 'ios' ? 'padding' : 'height';
-  const keyboardShouldPersist = 'handled'; // Changed from 'handled' to boolean for iOS/Hermes
-  console.log('KeyboardAvoidingView behavior type:', typeof keyboardAvoidingBehavior);
-  console.log('keyboardShouldPersistTaps value:', keyboardShouldPersist, '| Type:', typeof keyboardShouldPersist);
+  const keyboardShouldPersist = 'handled';
 
   try {
-    console.log('=== STARTING LOGINSCREEN RENDER ===');
     return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -100,7 +92,6 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Username</Text>
-            {console.log('About to render Username TextInput with autoCorrect:', false, 'Type:', typeof false)}
             <TextInput
               style={styles.input}
               value={username}
@@ -109,16 +100,11 @@ export default function LoginScreen({ navigation }) {
               autoCapitalize="none"
               autoCorrect={false}
               returnKeyType="next"
-              onSubmitEditing={() => {
-                // Focus on password field (if we had a ref)
-                // For now, just move to next field naturally
-              }}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
-            {console.log('About to render Password TextInput with secureTextEntry:', true, 'Type:', typeof true, 'autoCorrect:', false)}
             <TextInput
               style={styles.input}
               value={password}
@@ -132,15 +118,6 @@ export default function LoginScreen({ navigation }) {
             />
           </View>
 
-          {console.log('About to render Login TouchableOpacity with disabled:', Boolean(loading), 'Type:', typeof Boolean(loading))}
-          {(() => {
-            const buttonStyle = loading ? [styles.loginButton, styles.buttonDisabled] : styles.loginButton;
-            console.log('Login button style computed:', Array.isArray(buttonStyle) ? 'array' : 'object', 'loading:', loading);
-            if (Array.isArray(buttonStyle)) {
-              console.log('Style array has', buttonStyle.length, 'items, contains false?', buttonStyle.includes(false));
-            }
-            return null;
-          })()}
           <TouchableOpacity
             style={loading ? [styles.loginButton, styles.buttonDisabled] : styles.loginButton}
             onPress={handleLogin}
@@ -150,7 +127,6 @@ export default function LoginScreen({ navigation }) {
               {loading ? 'Logging in...' : 'Login'}
             </Text>
           </TouchableOpacity>
-          {console.log('✅ Login TouchableOpacity rendered successfully!')}
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Don't have an account?</Text>
@@ -159,7 +135,6 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-        {console.log('✅✅✅ ALL LoginScreen JSX RENDERED SUCCESSFULLY ✅✅✅')}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -179,13 +154,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    justifyContent: 'space-between',
     padding: 20,
-    paddingTop: 120,
+    paddingTop: 80,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 60,
+    marginBottom: 40,
     marginTop: 20,
   },
   titleTamil: {

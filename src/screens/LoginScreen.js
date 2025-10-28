@@ -154,15 +154,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     padding: 20,
-    paddingTop: 80,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
     marginBottom: 40,
-    marginTop: 20,
   },
   titleTamil: {
     fontSize: 36,

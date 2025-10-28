@@ -55,7 +55,18 @@ export default function BookDetailScreen({ navigation, route }) {
         ).length;
         
         // Determine if the book is owned by the current user
-        const isOwned = bookData.owner_id === user?.id || bookData.isOwned === true;
+        // Note: API returns 'ownerId' (camelCase), not 'owner_id'
+        const bookOwnerId = bookData.ownerId || bookData.owner_id;
+        const isOwned = bookOwnerId === user?.id || bookData.isOwned === true;
+        
+        // DEBUG: Check ownership
+        console.log('🔍 BookDetail Debug:');
+        console.log('  Current user ID:', user?.id);
+        console.log('  Book ownerId:', bookData.ownerId);
+        console.log('  Book owner_id:', bookData.owner_id);
+        console.log('  bookData.isOwned:', bookData.isOwned);
+        console.log('  Calculated isOwned:', isOwned);
+        console.log('  Match?', bookOwnerId === user?.id);
         
         setBook({ 
           ...bookData, 

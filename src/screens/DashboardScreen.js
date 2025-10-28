@@ -1168,7 +1168,7 @@ const styles = StyleSheet.create({
   },
   // App Title Styles (at the top)
   appTitleContainer: {
-    backgroundColor: '#6366F1',
+    backgroundColor: '#1980BE',
     paddingTop: 50,
     paddingBottom: 12,
     paddingHorizontal: 15,

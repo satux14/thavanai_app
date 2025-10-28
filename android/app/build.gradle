@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.thesrsconsulting.tapp'
+    namespace 'com.sathishkumarmnm.tapp'
     defaultConfig {
-        applicationId 'com.thesrsconsulting.tapp'
+        applicationId 'com.sathishkumarmnm.tapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

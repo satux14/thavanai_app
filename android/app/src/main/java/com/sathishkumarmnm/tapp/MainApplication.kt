@@ -1,4 +1,4 @@
-package com.thesrsconsulting.tapp
+package com.sathishkumarmnm.tapp
 
 import android.app.Application
 import android.content.res.Configuration

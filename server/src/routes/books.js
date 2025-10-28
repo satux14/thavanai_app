@@ -263,6 +263,38 @@ router.patch('/:id/reopen', (req, res) => {
   });
 });
 
+// Toggle favorite status
+router.patch('/:id/favorite', (req, res) => {
+  const { is_favorite } = req.body;
+  
+  // Verify ownership
+  db.get('SELECT owner_id FROM books WHERE id = ?', [req.params.id], (err, book) => {
+    if (err || !book) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    if (book.owner_id !== req.user.id) {
+      return res.status(403).json({ error: 'You can only favorite your own books' });
+    }
+
+    db.run(
+      'UPDATE books SET is_favorite = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [is_favorite ? 1 : 0, req.params.id],
+      (err) => {
+        if (err) {
+          console.error('Toggle favorite error:', err);
+          return res.status(500).json({ error: 'Failed to update favorite status' });
+        }
+
+        res.json({ 
+          message: 'Favorite status updated successfully',
+          is_favorite: is_favorite ? 1 : 0
+        });
+      }
+    );
+  });
+});
+
 // Delete book
 router.delete('/:id', (req, res) => {
   // Verify ownership

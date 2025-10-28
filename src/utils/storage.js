@@ -138,6 +138,18 @@ export const reopenBook = async (bookId) => {
   }
 };
 
+/**
+ * Toggle favorite status for a book
+ */
+export const toggleFavoriteBook = async (bookId, isFavorite) => {
+  try {
+    await booksAPI.toggleFavorite(bookId, isFavorite);
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    throw error;
+  }
+};
+
 // ==================== ENTRIES ====================
 
 /**

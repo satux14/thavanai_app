@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tablet Screenshot Generator - eThavanai Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .upload-section {
+            border: 2px dashed #2196F3;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-section:hover {
+            background: #f5f5f5;
+            border-color: #1976D2;
+        }
+        #fileInput {
+            display: none;
+        }
+        .preview-area {
+            margin: 20px 0;
+            text-align: center;
+        }
+        canvas {
+            border: 1px solid #ddd;
+            margin: 10px;
+            max-width: 100%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .generated-list {
+            margin: 20px 0;
+        }
+        .generated-item {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        select {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Tablet Screenshot Generator</h1>
+        
+        <div class="info">
+            <h3>📋 Requirements for 10-inch Tablet Screenshots:</h3>
+            <ul style="text-align: left;">
+                <li><strong>Dimensions:</strong> Between 1,080px and 7,680px per side</li>
+                <li><strong>Aspect Ratio:</strong> 16:9 (landscape) or 9:16 (portrait)</li>
+                <li><strong>Format:</strong> PNG or JPEG</li>
+                <li><strong>File Size:</strong> Up to 8 MB each</li>
+                <li><strong>Quantity:</strong> Up to 8 screenshots (optional but recommended)</li>
+            </ul>
+            
+            <h3>✨ What This Tool Does:</h3>
+            <ul style="text-align: left;">
+                <li>Takes your phone screenshots</li>
+                <li>Resizes to tablet dimensions (1920x1080 - landscape, or 1080x1920 - portrait)</li>
+                <li>Adds tablet frame (optional)</li>
+                <li>Centers content professionally</li>
+                <li>Downloads ready-to-upload PNG files</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <label>
+                <strong>Orientation:</strong>
+                <select id="orientation">
+                    <option value="landscape">Landscape (1920x1080) - Recommended</option>
+                    <option value="portrait">Portrait (1080x1920)</option>
+                </select>
+            </label>
+            
+            <label style="margin-left: 20px;">
+                <input type="checkbox" id="addFrame" checked>
+                <strong>Add Tablet Frame</strong>
+            </label>
+        </div>
+
+        <div class="upload-section" onclick="document.getElementById('fileInput').click()">
+            <h2>📤 Click to Upload Phone Screenshots</h2>
+            <p>Select multiple images (PNG or JPEG)</p>
+            <p style="color: #666; font-size: 14px;">Supports batch processing - upload all your screenshots at once!</p>
+            <input type="file" id="fileInput" multiple accept="image/*">
+        </div>
+
+        <div class="preview-area" id="previewArea"></div>
+        
+        <div class="controls" id="downloadControls" style="display: none;">
+            <button id="downloadAll">Download All Tablet Screenshots</button>
+        </div>
+
+        <div class="generated-list" id="generatedList"></div>
+    </div>
+
+    <script>
+        let processedImages = [];
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+            
+            document.getElementById('previewArea').innerHTML = '<p>Processing images...</p>';
+            processedImages = [];
+            
+            let processed = 0;
+            files.forEach((file, index) => {
+                processImage(file, index, () => {
+                    processed++;
+                    if (processed === files.length) {
+                        document.getElementById('downloadControls').style.display = 'block';
+                        showGeneratedList();
+                    }
+                });
+            });
+        });
+        
+        function processImage(file, index, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const orientation = document.getElementById('orientation').value;
+                    const addFrame = document.getElementById('addFrame').checked;
+                    
+                    // Tablet dimensions
+                    const width = orientation === 'landscape' ? 1920 : 1080;
+                    const height = orientation === 'landscape' ? 1080 : 1920;
+                    
+                    // Create canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Background (white or light gray)
+                    ctx.fillStyle = '#f5f5f5';
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    // Add frame if selected
+                    if (addFrame) {
+                        drawTabletFrame(ctx, width, height, orientation);
+                    }
+                    
+                    // Calculate scaling to fit screenshot
+                    const padding = addFrame ? 120 : 40;
+                    const maxWidth = width - (padding * 2);
+                    const maxHeight = height - (padding * 2);
+                    
+                    let scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+                    
+                    // Don't upscale, only downscale
+                    if (scale > 1) scale = 1;
+                    
+                    const scaledWidth = img.width * scale;
+                    const scaledHeight = img.height * scale;
+                    
+                    // Center the image
+                    const x = (width - scaledWidth) / 2;
+                    const y = (height - scaledHeight) / 2;
+                    
+                    // Draw shadow
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 10;
+                    
+                    // Draw the screenshot
+                    ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
+                    
+                    // Reset shadow
+                    ctx.shadowColor = 'transparent';
+                    
+                    // Store processed image
+                    const filename = `tablet-screenshot-${index + 1}-${orientation}.png`;
+                    canvas.toBlob(function(blob) {
+                        processedImages.push({
+                            blob: blob,
+                            filename: filename,
+                            canvas: canvas
+                        });
+                        callback();
+                    }, 'image/png');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function drawTabletFrame(ctx, width, height, orientation) {
+            // Tablet frame
+            const frameThickness = 60;
+            const cornerRadius = 30;
+            
+            // Outer frame (dark)
+            ctx.fillStyle = '#333';
+            roundRect(ctx, 0, 0, width, height, cornerRadius);
+            ctx.fill();
+            
+            // Inner screen area (light)
+            ctx.fillStyle = '#ffffff';
+            roundRect(ctx, frameThickness, frameThickness, 
+                     width - (frameThickness * 2), 
+                     height - (frameThickness * 2), 
+                     cornerRadius - 10);
+            ctx.fill();
+            
+            // Camera (top center)
+            ctx.fillStyle = '#222';
+            ctx.beginPath();
+            ctx.arc(width / 2, 30, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        function showGeneratedList() {
+            const listDiv = document.getElementById('generatedList');
+            listDiv.innerHTML = '<h3>✅ Generated Tablet Screenshots:</h3>';
+            
+            processedImages.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'generated-item';
+                div.innerHTML = `
+                    <span><strong>${index + 1}.</strong> ${item.filename}</span>
+                    <button onclick="downloadSingle(${index})">Download</button>
+                `;
+                listDiv.appendChild(div);
+                
+                // Show preview
+                const previewDiv = document.createElement('div');
+                previewDiv.style.margin = '10px 0';
+                item.canvas.style.maxWidth = '300px';
+                previewDiv.appendChild(item.canvas);
+                listDiv.appendChild(previewDiv);
+            });
+        }
+        
+        function downloadSingle(index) {
+            const item = processedImages[index];
+            const url = URL.createObjectURL(item.blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = item.filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        document.getElementById('downloadAll').addEventListener('click', function() {
+            processedImages.forEach((item, index) => {
+                setTimeout(() => downloadSingle(index), index * 200);
+            });
+            alert(`✅ Downloading ${processedImages.length} tablet screenshots!\n\nFiles will appear in your Downloads folder.`);
+        });
+    </script>
+</body>
+</html>
+

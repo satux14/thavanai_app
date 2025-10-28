@@ -291,6 +291,22 @@ export const booksAPI = {
     // Invalidate cache
     cache.books = null;
   },
+
+  async toggleFavorite(bookId, isFavorite) {
+    // Check online status before write operation
+    await updateOnlineStatus();
+    if (!isOnline) {
+      throw new Error('Cannot update favorite while offline. Please connect to the internet.');
+    }
+    
+    await apiRequest(`/books/${bookId}/favorite`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_favorite: isFavorite ? 1 : 0 }),
+    });
+
+    // Invalidate cache
+    cache.books = null;
+  },
 };
 
 // Entries API

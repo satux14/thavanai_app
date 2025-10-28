@@ -171,8 +171,13 @@ export default function DashboardScreen({ navigation }) {
         );
       }
 
-      // Apply sorting
+      // Apply sorting (favorites always first)
       filtered.sort((a, b) => {
+        // Favorites always come first
+        if (a.is_favorite && !b.is_favorite) return -1;
+        if (!a.is_favorite && b.is_favorite) return 1;
+        
+        // Then sort by selected criteria
         switch (sortBy) {
           case 'name':
             return (a.name || '').localeCompare(b.name || '');
@@ -232,6 +237,10 @@ export default function DashboardScreen({ navigation }) {
   };
 
   const handleOpenBook = (book) => {
+    navigation.navigate('BookDetail', { bookId: book.id });
+  };
+
+  const handleAddEntry = (book) => {
     navigation.navigate('Entries', { bookId: book.id });
   };
 
@@ -638,7 +647,7 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => setViewMode('owner')}
         >
           <Text style={[styles.viewModeTabText, viewMode === 'owner' && styles.viewModeTabTextActive]}>
-            📖 {t('asOwner')} ({ownedBooks.length})
+            📖 {t('asOwner')} ({filteredOwnedBooks.length})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -646,7 +655,7 @@ export default function DashboardScreen({ navigation }) {
           onPress={() => setViewMode('borrower')}
         >
           <Text style={[styles.viewModeTabText, viewMode === 'borrower' && styles.viewModeTabTextActive]}>
-            🤝 {t('asBorrower')} ({sharedBooks.length})
+            🤝 {t('asBorrower')} ({filteredSharedBooks.length})
           </Text>
         </TouchableOpacity>
         
@@ -842,187 +851,73 @@ export default function DashboardScreen({ navigation }) {
             </View>
           ) : (
             filteredOwnedBooks.map((book, index) => {
-            const CardWrapper = book.backgroundImage ? ImageBackground : View;
-            const cardWrapperProps = book.backgroundImage
-              ? {
-                  source: { uri: book.backgroundImage },
-                  style: [
-                    styles.bookCard,
-                    { backgroundColor: book.backgroundColor || '#fff' },
-                  ],
-                  imageStyle: { borderRadius: 12 },
-                }
-              : {
-                  style: [
-                    styles.bookCard,
-                    { backgroundColor: book.backgroundColor || '#fff' },
-                  ],
-                };
+              const CardWrapper = book.backgroundImage ? ImageBackground : View;
+              const cardWrapperProps = book.backgroundImage
+                ? {
+                    source: { uri: book.backgroundImage },
+                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    imageStyle: { borderRadius: 8 },
+                  }
+                : {
+                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                  };
 
-            return (
-              <TouchableOpacity
-                key={book.id}
-                onPress={() => handleOpenBook(book)}
-                activeOpacity={0.8}
-              >
-                <CardWrapper {...cardWrapperProps}>
-                  {/* Semi-transparent overlay if image is set */}
-                  {book.backgroundImage && (
-                    <View style={styles.imageOverlay} />
-                  )}
-                  
-                  {/* Card Header */}
-                  <View style={[styles.bookHeader, book.backgroundImage && { zIndex: 1 }]}>
-                    <View style={styles.bookNumber}>
-                      <Text style={styles.bookNumberText}>{index + 1}</Text>
+              return (
+                <CardWrapper key={book.id} {...cardWrapperProps}>
+                  {book.backgroundImage && <View style={styles.singleLineOverlay} />}
+                  <TouchableOpacity
+                    style={[styles.singleLineContent, book.backgroundImage && { zIndex: 1 }]}
+                    onPress={() => handleOpenBook(book)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.singleLineNumber}>
+                      <Text style={styles.singleLineNumberText}>{index + 1}</Text>
                     </View>
-                    <View style={styles.bookTitleSection}>
-                      <View style={styles.headerTopRow}>
-                        <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
-                        <View style={styles.updatedContainer}>
-                          <Text style={styles.updatedLabel}>{t('updated')}</Text>
-                          <Text style={styles.updatedTime}>{formatDateTime(book.updatedAt)}</Text>
+                    
+                    <View style={styles.singleLineInfo}>
+                      <Text style={styles.singleLineName} numberOfLines={1}>
+                        {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
+                        {book.name}
+                        {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
+                      </Text>
+                      <View style={styles.singleLineSubInfoContainer}>
+                        <Text style={styles.singleLineSubInfo}>
+                          D.L:{book.dlNo || 'N/A'} • 
+                        </Text>
+                        <View style={styles.singleLineAmountBadge}>
+                          <Text style={styles.singleLineSubInfo}>₹{book.loanAmount}</Text>
+                        </View>
+                        <Text style={styles.singleLineSubInfo}> → </Text>
+                        <View style={[
+                          styles.singleLineBalanceBadge,
+                          book.balance === 0 && styles.singleLineBalanceBadgeZero,
+                          book.balance < 0 && styles.singleLineBalanceBadgeNegative
+                        ]}>
+                          <Text style={[
+                            styles.singleLineBalanceText,
+                            book.balance === 0 && styles.singleLineBalanceZero,
+                            book.balance < 0 && styles.singleLineBalanceNegative
+                          ]}>{t('balance')}: ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
                         </View>
                       </View>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.bookName}>
-                          {book.name}
-                          {book.fatherName && (
-                            <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
-                          )}
-                        </Text>
-                        {book.pendingSignatures > 0 && (
-                          <View style={styles.pendingBadgeInline}>
-                            <Text style={styles.pendingBadgeInlineText}>
-                              ⚠️ {book.pendingSignatures}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
                     </View>
-                  </View>
 
-              {/* Loan Amount & Balance - Prominent */}
-              <View style={[styles.loanSection, book.backgroundImage && { zIndex: 1 }]}>
-                <View style={styles.amountRow}>
-                  <View style={styles.amountItem}>
-                    <Text style={styles.loanLabel}>{t('loanAmount')}</Text>
-                    <Text style={styles.loanAmount}>₹{book.loanAmount || 'N/A'}</Text>
-                  </View>
-                  <View style={styles.balanceDivider} />
-                  <View style={styles.amountItem}>
-                    <Text style={styles.balanceLabel}>{t('balance')}</Text>
-                    <Text style={[
-                      styles.balanceAmount,
-                      book.balance === 0 && styles.balanceZero,
-                      book.balance < 0 && styles.balanceNegative
-                    ]}>
-                      ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(2) : '0.00'}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Date Information */}
-              <View style={[styles.dateSection, book.backgroundImage && { zIndex: 1 }]}>
-                <View style={styles.dateRow}>
-                  <View style={styles.dateItem}>
-                    <Text style={styles.dateLabel}>{t('startDate')}</Text>
-                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.startDate)}</Text>
-                  </View>
-                  <View style={styles.dateDivider} />
-                  <View style={styles.dateItem}>
-                    <Text style={styles.dateLabel}>{t('endDate')}</Text>
-                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.endDate)}</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Status Badge */}
-              {book.status === 'closed' && (
-                <View style={[styles.statusBadge, book.backgroundImage && { zIndex: 1 }]}>
-                  <Text style={styles.statusBadgeText}>🔒 {t('closed')}</Text>
-                </View>
-              )}
-
-              {/* Action Buttons */}
-              <View style={[styles.bookActions, book.backgroundImage && { zIndex: 1 }]}>
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.exportButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleExportBook(book);
-                  }}
-                >
-                  <Text style={styles.actionButtonText}>📄 {t('exportPdf')}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.editButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleEditBook(book);
-                  }}
-                >
-                  <Text style={styles.actionButtonText}>✏️ {t('edit')}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.shareButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleShareBook(book);
-                  }}
-                >
-                  <Text style={styles.actionButtonText}>🤝 {t('share')}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.viewSharesButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleViewSharedUsers(book);
-                  }}
-                >
-                  <Text style={styles.actionButtonText}>👥 {t('viewShared')}</Text>
-                </TouchableOpacity>
-
-                {book.status === 'closed' ? (
-                  <TouchableOpacity
-                    style={[styles.actionButton, styles.reopenButton]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleReopenBook(book);
-                    }}
-                  >
-                    <Text style={styles.actionButtonText}>🔓 {t('reopen')}</Text>
+                    {book.status === 'closed' && (
+                      <View style={styles.singleLineClosedBadge}>
+                        <Text style={styles.singleLineClosedText}>🔒</Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
-                ) : (
+                  
                   <TouchableOpacity
-                    style={[styles.actionButton, styles.closeButton]}
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      handleCloseBook(book);
-                    }}
+                    style={[styles.singleLineAddButton, book.backgroundImage && { zIndex: 1 }]}
+                    onPress={() => handleAddEntry(book)}
                   >
-                    <Text style={styles.actionButtonText}>🔒 {t('close')}</Text>
+                    <Text style={styles.singleLineAddIcon}>+</Text>
                   </TouchableOpacity>
-                )}
-
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.deleteButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleDeleteBook(book);
-                  }}
-                >
-                  <Text style={styles.deleteButtonText}>🗑️ {t('delete')}</Text>
-                </TouchableOpacity>
-              </View>
-            </CardWrapper>
-          </TouchableOpacity>
-            );
-          })
+                </CardWrapper>
+              );
+            })
           )
         ) : (
           // Borrower View
@@ -1072,134 +967,73 @@ export default function DashboardScreen({ navigation }) {
             </View>
           ) : (
             filteredSharedBooks.map((book, index) => {
-            const CardWrapper = book.backgroundImage ? ImageBackground : View;
-            const cardWrapperProps = book.backgroundImage
-              ? {
-                  source: { uri: book.backgroundImage },
-                  style: [
-                    styles.bookCard,
-                    { backgroundColor: book.backgroundColor || '#fff' },
-                  ],
-                }
-              : {
-                  style: [
-                    styles.bookCard,
-                    { backgroundColor: book.backgroundColor || '#fff' },
-                  ],
-                };
+              const CardWrapper = book.backgroundImage ? ImageBackground : View;
+              const cardWrapperProps = book.backgroundImage
+                ? {
+                    source: { uri: book.backgroundImage },
+                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                    imageStyle: { borderRadius: 8 },
+                  }
+                : {
+                    style: [styles.singleLineCard, { backgroundColor: book.backgroundColor || '#fff' }],
+                  };
 
-            return (
-              <TouchableOpacity
-                key={book.id}
-                onPress={() => handleOpenBook(book)}
-                activeOpacity={0.8}
-              >
-                <CardWrapper {...cardWrapperProps}>
-                  {/* Semi-transparent overlay if image is set */}
-                  {book.backgroundImage && (
-                    <View style={styles.imageOverlay} />
-                  )}
-                  
-                  {/* Card Header */}
-                  <View style={[styles.bookHeader, book.backgroundImage && { zIndex: 1 }]}>
-                    <View style={styles.bookNumber}>
-                      <Text style={styles.bookNumberText}>{index + 1}</Text>
+              return (
+                <CardWrapper key={book.id} {...cardWrapperProps}>
+                  {book.backgroundImage && <View style={styles.singleLineOverlay} />}
+                  <TouchableOpacity
+                    style={[styles.singleLineContent, book.backgroundImage && { zIndex: 1 }]}
+                    onPress={() => handleOpenBook(book)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.singleLineNumber}>
+                      <Text style={styles.singleLineNumberText}>{index + 1}</Text>
                     </View>
-                    <View style={styles.bookTitleSection}>
-                      <View style={styles.headerTopRow}>
-                        <Text style={styles.bookDlNo}>D.L.No: {book.dlNo || 'N/A'}</Text>
-                        <View style={styles.lastUpdatedContainer}>
-                          <View style={styles.updatedContainer}>
-                            <Text style={styles.updatedLabel}>{t('updated')}</Text>
-                            <Text style={styles.updatedTime}>{formatDateTime(book.updatedAt)}</Text>
-                          </View>
-                          <Text style={styles.ownerInfo}>
-                            {t('asOwner')}: {book.ownerName} (@{book.ownerUsername})
-                          </Text>
+                    
+                    <View style={styles.singleLineInfo}>
+                      <Text style={styles.singleLineName} numberOfLines={1}>
+                        {book.is_favorite && <Text style={styles.singleLineFavorite}>⭐ </Text>}
+                        {book.name}
+                        {book.pendingSignatures > 0 && <Text style={styles.singleLinePending}> ⚠️{book.pendingSignatures}</Text>}
+                      </Text>
+                      <View style={styles.singleLineSubInfoContainer}>
+                        <Text style={styles.singleLineSubInfo}>
+                          👤{book.ownerName} • D.L:{book.dlNo || 'N/A'} • 
+                        </Text>
+                        <View style={styles.singleLineAmountBadge}>
+                          <Text style={styles.singleLineSubInfo}>₹{book.loanAmount}</Text>
+                        </View>
+                        <Text style={styles.singleLineSubInfo}> → </Text>
+                        <View style={[
+                          styles.singleLineBalanceBadge,
+                          book.balance === 0 && styles.singleLineBalanceBadgeZero,
+                          book.balance < 0 && styles.singleLineBalanceBadgeNegative
+                        ]}>
+                          <Text style={[
+                            styles.singleLineBalanceText,
+                            book.balance === 0 && styles.singleLineBalanceZero,
+                            book.balance < 0 && styles.singleLineBalanceNegative
+                          ]}>{t('balance')}: ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(0) : '0'}</Text>
                         </View>
                       </View>
-                      <View style={styles.nameRow}>
-                        <Text style={styles.bookName}>
-                          {book.name}
-                          {book.fatherName && (
-                            <Text style={styles.fatherNameInline}> (Father: {book.fatherName})</Text>
-                          )}
-                        </Text>
-                        {book.pendingSignatures > 0 && (
-                          <View style={styles.pendingBadgeInline}>
-                            <Text style={styles.pendingBadgeInlineText}>
-                              ⚠️ {book.pendingSignatures}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
                     </View>
-                  </View>
 
-              {/* Loan Amount & Balance - Prominent */}
-              <View style={[styles.loanSection, book.backgroundImage && { zIndex: 1 }]}>
-                <View style={styles.amountRow}>
-                  <View style={styles.amountItem}>
-                    <Text style={styles.loanLabel}>{t('loanAmount')}</Text>
-                    <Text style={styles.loanAmount}>₹{book.loanAmount || 'N/A'}</Text>
-                  </View>
-                  <View style={styles.balanceDivider} />
-                  <View style={styles.amountItem}>
-                    <Text style={styles.balanceLabel}>{t('balance')}</Text>
-                    <Text style={[
-                      styles.balanceAmount,
-                      book.balance === 0 && styles.balanceZero,
-                      book.balance < 0 && styles.balanceNegative
-                    ]}>
-                      ₹{(typeof book.balance === 'number' && !isNaN(book.balance)) ? book.balance.toFixed(2) : '0.00'}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Date Information */}
-              <View style={[styles.dateSection, book.backgroundImage && { zIndex: 1 }]}>
-                <View style={styles.dateRow}>
-                  <View style={styles.dateItem}>
-                    <Text style={styles.dateLabel}>{t('startDate')}</Text>
-                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.startDate)}</Text>
-                  </View>
-                  <View style={styles.dateDivider} />
-                  <View style={styles.dateItem}>
-                    <Text style={styles.dateLabel}>{t('endDate')}</Text>
-                    <Text style={styles.dateValue}>{formatDateDDMMYYYY(book.endDate)}</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* Status Badge */}
-              {book.status === 'closed' && (
-                <View style={[styles.statusBadge, book.backgroundImage && { zIndex: 1 }]}>
-                  <Text style={styles.statusBadgeText}>🔒 {t('closed')}</Text>
-                </View>
-              )}
-
-              {/* Shared Badge */}
-              <View style={[styles.sharedBadge, book.backgroundImage && { zIndex: 1 }]}>
-                <Text style={styles.sharedBadgeText}>🤝 {t('shared')}</Text>
-              </View>
-
-              {/* Action Buttons - Borrower has limited actions */}
-              <View style={[styles.bookActions, book.backgroundImage && { zIndex: 1 }]}>
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.exportButton]}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    handleExportBook(book);
-                  }}
-                >
-                  <Text style={styles.actionButtonText}>📄 {t('exportPdf')}</Text>
-                </TouchableOpacity>
-              </View>
-            </CardWrapper>
-          </TouchableOpacity>
-            );
-          })
+                    {book.status === 'closed' && (
+                      <View style={styles.singleLineClosedBadge}>
+                        <Text style={styles.singleLineClosedText}>🔒</Text>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.singleLineAddButton, book.backgroundImage && { zIndex: 1 }]}
+                    onPress={() => handleAddEntry(book)}
+                  >
+                    <Text style={styles.singleLineAddIcon}>+</Text>
+                  </TouchableOpacity>
+                </CardWrapper>
+              );
+            })
           )
         )}
         
@@ -2122,6 +1956,139 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  // Single Line Card Styles
+  singleLineCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: '#2196F3',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  singleLineOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    zIndex: 0,
+  },
+  singleLineContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    paddingRight: 8,
+  },
+  singleLineNumber: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  singleLineNumberText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  singleLineInfo: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingRight: 8,
+  },
+  singleLineName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 2,
+  },
+  singleLinePending: {
+    color: '#FF9800',
+    fontSize: 13,
+  },
+  singleLineFavorite: {
+    fontSize: 13,
+  },
+  singleLineSubInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  singleLineSubInfo: {
+    fontSize: 11,
+    color: '#666',
+    fontWeight: '500',
+  },
+  singleLineAmountBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  singleLineBalanceBadge: {
+    backgroundColor: 'rgba(33, 150, 243, 0.15)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  singleLineBalanceBadgeZero: {
+    backgroundColor: 'rgba(76, 175, 80, 0.2)',
+  },
+  singleLineBalanceBadgeNegative: {
+    backgroundColor: 'rgba(244, 67, 54, 0.15)',
+  },
+  singleLineBalanceText: {
+    fontSize: 11,
+    color: '#2196F3',
+    fontWeight: 'bold',
+  },
+  singleLineBalanceZero: {
+    color: '#4CAF50',
+  },
+  singleLineBalanceNegative: {
+    color: '#f44336',
+  },
+  singleLineClosedBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FF5722',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  singleLineClosedText: {
+    fontSize: 14,
+  },
+  singleLineAddButton: {
+    width: 42,
+    height: 42,
+    backgroundColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(0,0,0,0.1)',
+    marginRight: 2,
+    marginVertical: 3,
+    borderRadius: 6,
+  },
+  singleLineAddIcon: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#fff',
   },
 });
 

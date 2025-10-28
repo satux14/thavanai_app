@@ -25,6 +25,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 import BookInfoScreen from './src/screens/BookInfoScreen';
+import BookDetailScreen from './src/screens/BookDetailScreen';
 import EntriesScreen from './src/screens/EntriesScreen';
 
 const Stack = createStackNavigator();
@@ -154,6 +155,15 @@ function AppNavigator() {
           }}
         />
         {console.log('BookInfo Stack.Screen registered successfully')}
+        <Stack.Screen
+          name="BookDetail"
+          component={BookDetailScreen}
+          options={{
+            title: 'Book Details',
+            headerShown: true,
+          }}
+        />
+        {console.log('BookDetail Stack.Screen registered successfully')}
         <Stack.Screen
           name="Entries"
           component={EntriesScreen}

@@ -2,7 +2,7 @@
   "expo": {
     "name": "eThavanai Book - Daily Ledger",
     "slug": "thavanai_mobile",
-    "version": "1.0.1",
+    "version": "0.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sathishkumarmnm.tapp",
-      "buildNumber": "1.0.1",
+      "buildNumber": "0.0.2",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Allow Thavanai to access your camera to take photos for book backgrounds.",

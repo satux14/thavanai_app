@@ -2,7 +2,7 @@
   "expo": {
     "name": "eThavanai Book - Daily Ledger",
     "slug": "thavanai_mobile",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,8 +19,8 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sathishkumarmnm.tapp",
-      "buildNumber": "0.0.2",
+      "bundleIdentifier": "com.thesrsconsulting.tapp",
+      "buildNumber": "0.0.1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "Allow Thavanai to access your camera to take photos for book backgrounds.",
@@ -38,8 +38,8 @@
         "backgroundColor": "#2196F3"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.sathishkumarmnm.tapp",
-      "versionCode": 2,
+      "package": "com.thesrsconsulting.tapp",
+      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",

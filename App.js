@@ -66,7 +66,7 @@ function AppNavigator() {
         await initializeAdMob();
         await initInterstitialAd();
         await initAppOpenAd();
-        console.log('AdMob initialized');
+        console.log('AdMob initialized successfully');
       } else {
         console.log('⚠️  Skipping AdMob initialization (web platform or not available)');
       }

@@ -12,19 +12,19 @@ export const ADMOB_CONFIG = {
   
   // Banner Ad Units
   BANNER_AD_UNIT_ID: Platform.select({
-    ios: 'ca-app-pub-2582947091237108/2175188493', // Same for now, create separate iOS unit later
+    ios: 'ca-app-pub-2582947091237108/1196562010',
     android: 'ca-app-pub-2582947091237108/2175188493',
   }),
   
   // Interstitial Ad Units
   INTERSTITIAL_AD_UNIT_ID: Platform.select({
-    ios: 'ca-app-pub-2582947091237108/4309670898', // Same for now, create separate iOS unit later
+    ios: 'ca-app-pub-2582947091237108/4700692754',
     android: 'ca-app-pub-2582947091237108/4309670898',
   }),
   
   // App Open Ad Units
   APP_OPEN_AD_UNIT_ID: Platform.select({
-    ios: 'ca-app-pub-2582947091237108/9992957005', // Same for now, create separate iOS unit later
+    ios: 'ca-app-pub-2582947091237108/3283669309',
     android: 'ca-app-pub-2582947091237108/9992957005',
   }),
 

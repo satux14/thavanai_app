@@ -176,6 +176,7 @@ function renderUsersTable(users) {
                                     onclick="toggleUserStatus(${user.id}, '${user.status}')">
                                 ${user.status === 'active' ? 'Deactivate' : 'Activate'}
                             </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.username}')">Delete</button>
                         </td>
                     </tr>
                 `).join('')}
@@ -200,6 +201,8 @@ async function viewUser(userId) {
                 <p><strong>ID:</strong> ${data.user.id}</p>
                 <p><strong>Username:</strong> ${data.user.username}</p>
                 <p><strong>Full Name:</strong> ${data.user.full_name}</p>
+                <p><strong>Phone:</strong> ${data.user.phone || '-'}</p>
+                <p><strong>Email:</strong> ${data.user.email || '-'}</p>
                 <p><strong>Language:</strong> ${data.user.preferred_language}</p>
                 <p><strong>Status:</strong> <span class="badge ${data.user.status === 'active' ? 'badge-success' : 'badge-warning'}">${data.user.status}</span></p>
                 <p><strong>Created:</strong> ${new Date(data.user.created_at).toLocaleString()}</p>
@@ -281,6 +284,39 @@ async function toggleUserStatus(userId, currentStatus) {
             loadStats();
         } else {
             alert('Error updating user status');
+        }
+    } catch (error) {
+        alert('Connection error');
+    }
+}
+
+async function deleteUser(userId, username) {
+    if (!confirm(`⚠️ WARNING: Delete user "${username}"?\n\nThis will permanently delete:\n- The user account\n- All books owned by this user\n- All entries in their books\n- All shares\n\nThis action CANNOT be undone!`)) {
+        return;
+    }
+    
+    // Double confirmation
+    const confirmText = prompt(`Type "${username}" to confirm deletion:`);
+    if (confirmText !== username) {
+        alert('Deletion cancelled. Username did not match.');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            }
+        });
+        
+        if (response.ok) {
+            alert(`User "${username}" has been deleted successfully.`);
+            loadUsers(currentPage.users);
+            loadStats();
+        } else {
+            const data = await response.json();
+            alert('Error deleting user: ' + (data.error || 'Unknown error'));
         }
     } catch (error) {
         alert('Connection error');

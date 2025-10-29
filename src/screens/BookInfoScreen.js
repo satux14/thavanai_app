@@ -15,7 +15,7 @@ import { saveBook, getBook, updateBook, getAllBooks } from '../utils/storage';
 import { getCurrentUser } from '../utils/auth';
 import DatePicker from '../components/DatePicker';
 import { useLanguage } from '../utils/i18n';
-import { BACKGROUND_IMAGES, getDefaultBackgroundImage } from '../utils/backgroundImages';
+import { BACKGROUND_IMAGES } from '../utils/backgroundImages';
 import { showInterstitialAd } from '../utils/interstitialAds';
 
 export default function BookInfoScreen({ navigation, route }) {
@@ -30,7 +30,7 @@ export default function BookInfoScreen({ navigation, route }) {
     numberOfDays: '100', // Default to 100 days
     startDate: '',
     endDate: '',
-    backgroundColor: '#7678b1',
+    backgroundColor: '#FFFFFF',
     backgroundImage: null,
   });
   const [isEditing, setIsEditing] = useState(false);
@@ -73,11 +73,8 @@ export default function BookInfoScreen({ navigation, route }) {
   useEffect(() => {
     if (bookId) {
       loadBookInfo();
-    } else {
-      // Set default background image for new books
-      const defaultImage = getDefaultBackgroundImage();
-      setBookInfo(prev => ({ ...prev, backgroundImage: defaultImage.uri }));
     }
+    // No default background image for new books - let user choose
   }, [bookId]);
 
   // Update navigation header when language changes
@@ -287,12 +284,12 @@ export default function BookInfoScreen({ navigation, route }) {
                 style={styles.colorInput}
                 value={bookInfo.backgroundColor}
                 onChangeText={(color) => setBookInfo({ ...bookInfo, backgroundColor: color })}
-                placeholder="#7678b1"
+                placeholder="#FFFFFF"
                 autoCapitalize="none"
               />
             </View>
             <View style={styles.colorPaletteContainer}>
-              {['#7678b1', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#E91E63'].map((color) => (
+              {['#FFFFFF', '#7678b1', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#E91E63'].map((color) => (
                 <TouchableOpacity
                   key={color}
                   style={[styles.colorOption, { backgroundColor: color }]}

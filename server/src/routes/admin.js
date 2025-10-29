@@ -138,7 +138,7 @@ router.get('/users/:userId', adminAuth, (req, res) => {
   const { userId } = req.params;
 
   db.get(
-    `SELECT id, username, full_name, preferred_language, role, status, created_at
+    `SELECT id, username, full_name, phone, email, preferred_language, role, status, created_at
     FROM users WHERE id = ?`,
     [userId],
     (err, user) => {

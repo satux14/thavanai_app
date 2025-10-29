@@ -108,7 +108,17 @@ export default function DashboardScreen({ navigation }) {
                  e.signatureRequestedBy !== user.id
           ).length;
           
-          return { ...book, balance, entryCount: entries.length, pendingSignatures };
+          // Load shared users for owned books
+          let sharedUsersList = [];
+          if (book.isOwned === true) {
+            try {
+              sharedUsersList = await getBookShares(book.id);
+            } catch (error) {
+              console.error(`Error loading shares for book ${book.id}:`, error);
+            }
+          }
+          
+          return { ...book, balance, entryCount: entries.length, pendingSignatures, sharedUsers: sharedUsersList };
         })
       );
       
@@ -890,7 +900,14 @@ export default function DashboardScreen({ navigation }) {
                         </Text>
                       </View>
                       <View style={styles.singleLineBottomRow}>
-                        <Text style={styles.singleLineDlNumber}>D.L: {book.dlNo || 'N/A'}</Text>
+                        <View style={styles.singleLineLeftSection}>
+                          <Text style={styles.singleLineDlNumber}>D.L: {book.dlNo || 'N/A'}</Text>
+                          {book.sharedUsers && book.sharedUsers.length > 0 && (
+                            <Text style={styles.singleLineSharedWith}>
+                              🤝 {book.sharedUsers[0].fullName}{book.sharedUsers.length > 1 ? ' & more' : ''}
+                            </Text>
+                          )}
+                        </View>
                         <View style={styles.singleLineAmountSection}>
                           <View style={styles.singleLineAmountBadge}>
                             <Text style={styles.singleLineAmountValue}>₹{book.loanAmount}</Text>
@@ -2079,18 +2096,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 8,
   },
+  singleLineLeftSection: {
+    flex: 1,
+    minWidth: 0,
+  },
   singleLineDlNumber: {
     fontSize: 10,
     color: '#666',
     fontWeight: '500',
-    flex: 0,
-    minWidth: 80,
+  },
+  singleLineSharedWith: {
+    fontSize: 9,
+    color: '#4CAF50',
+    fontWeight: '600',
+    marginTop: 2,
   },
   singleLineAmountSection: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    flex: 1,
+    flex: 0,
     justifyContent: 'flex-end',
   },
   singleLineAmountBadge: {

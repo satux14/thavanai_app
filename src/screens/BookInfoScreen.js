@@ -10,6 +10,7 @@ import {
   Platform,
   Image,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
 import { saveBook, getBook, updateBook, getAllBooks } from '../utils/storage';
 import { getCurrentUser } from '../utils/auth';
@@ -36,6 +37,7 @@ export default function BookInfoScreen({ navigation, route }) {
   const [isEditing, setIsEditing] = useState(false);
   const [showImageGallery, setShowImageGallery] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('nature');
+  const [isCreating, setIsCreating] = useState(false);
 
   // Auto-calculate end date when start date or numberOfDays changes
   const handleStartDateChange = (date) => {
@@ -128,29 +130,37 @@ export default function BookInfoScreen({ navigation, route }) {
       }
     } else {
       // Create new book
-      const newBook = await saveBook(bookInfo);
-      if (newBook && newBook.id) {
-        // Check if this is the 5th book (or every 5th book after that)
-        try {
-          const currentUser = await getCurrentUser();
-          if (currentUser) {
-            const books = await getAllBooks();
-            const userBookCount = books.filter(b => b.owner_id === currentUser.id).length;
-            
-            // Show ad on 5th, 10th, 15th, etc. book creation (multiples of 5)
-            if (userBookCount % 5 === 0) {
-              await showInterstitialAd();
+      setIsCreating(true);
+      try {
+        const newBook = await saveBook(bookInfo);
+        if (newBook && newBook.id) {
+          // Check if this is the 5th book (or every 5th book after that)
+          try {
+            const currentUser = await getCurrentUser();
+            if (currentUser) {
+              const books = await getAllBooks();
+              const userBookCount = books.filter(b => b.owner_id === currentUser.id).length;
+              
+              // Show ad on 5th, 10th, 15th, etc. book creation (multiples of 5)
+              if (userBookCount % 5 === 0) {
+                await showInterstitialAd();
+              }
             }
+          } catch (error) {
+            console.error('Error showing ad:', error);
+            // Don't block navigation if ad fails
           }
-        } catch (error) {
-          console.error('Error showing ad:', error);
-          // Don't block navigation if ad fails
+          
+          // Navigate directly to entries page
+          navigation.replace('Entries', { bookId: newBook.id });
+        } else {
+          setIsCreating(false);
+          Alert.alert('Error', 'Failed to create book');
         }
-        
-        // Navigate directly to entries page
-        navigation.replace('Entries', { bookId: newBook.id });
-      } else {
-        Alert.alert('Error', 'Failed to create book');
+      } catch (error) {
+        setIsCreating(false);
+        console.error('Error creating book:', error);
+        Alert.alert('Error', 'Failed to create book: ' + error.message);
       }
     }
   };
@@ -189,6 +199,7 @@ export default function BookInfoScreen({ navigation, route }) {
             value={bookInfo.dlNo}
             onChangeText={(text) => setBookInfo({ ...bookInfo, dlNo: text })}
             placeholder="Enter DL Number"
+            placeholderTextColor="#999"
           />
         </View>
 
@@ -202,6 +213,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.name}
               onChangeText={(text) => setBookInfo({ ...bookInfo, name: text })}
               placeholder="Enter name"
+              placeholderTextColor="#999"
             />
           </View>
 
@@ -213,6 +225,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.fatherName}
               onChangeText={(text) => setBookInfo({ ...bookInfo, fatherName: text })}
               placeholder="Enter father name"
+              placeholderTextColor="#999"
             />
           </View>
 
@@ -224,6 +237,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.address}
               onChangeText={(text) => setBookInfo({ ...bookInfo, address: text })}
               placeholder="Enter address"
+              placeholderTextColor="#999"
               multiline={true}
               numberOfLines={3}
             />
@@ -237,6 +251,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.loanAmount}
               onChangeText={(text) => setBookInfo({ ...bookInfo, loanAmount: text })}
               placeholder="Enter loan amount"
+              placeholderTextColor="#999"
               keyboardType="numeric"
             />
           </View>
@@ -249,6 +264,7 @@ export default function BookInfoScreen({ navigation, route }) {
               value={bookInfo.numberOfDays}
               onChangeText={handleNumberOfDaysChange}
               placeholder="Enter number of days (e.g., 100)"
+              placeholderTextColor="#999"
               keyboardType="numeric"
             />
             <Text style={styles.helperText}>
@@ -285,6 +301,7 @@ export default function BookInfoScreen({ navigation, route }) {
                 value={bookInfo.backgroundColor}
                 onChangeText={(color) => setBookInfo({ ...bookInfo, backgroundColor: color })}
                 placeholder="#FFFFFF"
+                placeholderTextColor="#999"
                 autoCapitalize="none"
               />
             </View>
@@ -359,13 +376,28 @@ export default function BookInfoScreen({ navigation, route }) {
 
         {/* Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.buttonText}>
-              {isEditing ? 'Update Book' : 'Create Book'}
-            </Text>
+          <TouchableOpacity 
+            style={[styles.saveButton, isCreating && styles.saveButtonDisabled]} 
+            onPress={handleSave}
+            disabled={isCreating}
+          >
+            {isCreating ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator color="#fff" size="small" />
+                <Text style={[styles.buttonText, { marginLeft: 10 }]}>Creating...</Text>
+              </View>
+            ) : (
+              <Text style={styles.buttonText}>
+                {isEditing ? 'Update Book' : 'Create Book'}
+              </Text>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+          <TouchableOpacity 
+            style={styles.cancelButton} 
+            onPress={handleCancel}
+            disabled={isCreating}
+          >
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -497,6 +529,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 2,
     borderBottomColor: '#e91e63',
+    color: '#000',
   },
   form: {
     backgroundColor: '#fff',
@@ -521,6 +554,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 8,
     paddingHorizontal: 4,
+    color: '#000',
   },
   multilineInput: {
     borderWidth: 1,
@@ -529,6 +563,7 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: 80,
     textAlignVertical: 'top',
+    color: '#000',
   },
   buttonContainer: {
     gap: 15,
@@ -543,6 +578,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#9E9E9E',
+    opacity: 0.7,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -581,6 +625,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     fontSize: 16,
+    color: '#000',
   },
   colorPaletteContainer: {
     flexDirection: 'row',

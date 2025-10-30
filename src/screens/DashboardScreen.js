@@ -1998,9 +1998,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#9C27B0',
   },
   createButtonContainer: {
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    backgroundColor: 'transparent',
     paddingHorizontal: 15,
     paddingVertical: 10,
     paddingBottom: 15,

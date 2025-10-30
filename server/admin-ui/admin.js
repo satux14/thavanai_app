@@ -193,6 +193,11 @@ async function viewUser(userId) {
             headers: { 'Authorization': `Bearer ${authToken}` }
         });
         
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
         
         const modalContent = `
@@ -258,7 +263,8 @@ async function viewUser(userId) {
         document.getElementById('modalContent').innerHTML = modalContent;
         document.getElementById('detailsModal').classList.add('show');
     } catch (error) {
-        alert('Error loading user details');
+        console.error('Error loading user details:', error);
+        alert('Error loading user details: ' + error.message);
     }
 }
 

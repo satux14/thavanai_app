@@ -84,6 +84,11 @@ router.post('/login', async (req, res) => {
           return res.status(401).json({ error: 'Invalid username or password' });
         }
 
+        // Check if user is active
+        if (user.status === 'inactive') {
+          return res.status(403).json({ error: 'Your account has been deactivated. Please contact support.' });
+        }
+
         const token = generateToken(user);
 
         res.json({

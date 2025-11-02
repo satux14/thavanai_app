@@ -39,7 +39,7 @@ export default function EntriesScreen({ navigation, route }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [isOwner, setIsOwner] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
-  const [fontSize, setFontSize] = useState(14); // Default font size
+  const [tableScale, setTableScale] = useState(1.0); // Scale factor for table (1.0 = fit to screen)
 
   useEffect(() => {
     loadData();
@@ -702,6 +702,19 @@ export default function EntriesScreen({ navigation, route }) {
 
   const currentPageEntries = getCurrentPageEntries();
   const style = `.m-signature-pad--footer {display: none; margin: 0px;}`;
+  
+  // Calculate dynamic styles based on scale
+  const baseFontSize = 10;
+  const scaledFontSize = Math.round(baseFontSize * tableScale);
+  
+  // Use flex for responsive layout at default scale, fixed widths when zoomed
+  const getCellStyle = (flexValue, baseWidth) => {
+    if (tableScale <= 1.0) {
+      return { flex: flexValue, minWidth: 0 }; // minWidth: 0 allows shrinking
+    } else {
+      return { width: baseWidth * tableScale };
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -760,18 +773,18 @@ export default function EntriesScreen({ navigation, route }) {
           <Text style={styles.pageNavButtonText}>{t('next')}</Text>
         </TouchableOpacity>
         
-        {/* Font Size Controls */}
+        {/* Table Scale Controls */}
         <View style={styles.fontSizeControls}>
           <TouchableOpacity
             style={styles.fontSizeButton}
-            onPress={() => setFontSize(Math.max(10, fontSize - 1))}
+            onPress={() => setTableScale(Math.max(0.8, tableScale - 0.1))}
           >
             <Text style={styles.fontSizeButtonText}>-</Text>
           </TouchableOpacity>
-          <Text style={styles.fontSizeText}>{fontSize}</Text>
+          <Text style={styles.fontSizeText}>{Math.round(tableScale * 100)}%</Text>
           <TouchableOpacity
             style={styles.fontSizeButton}
-            onPress={() => setFontSize(Math.min(20, fontSize + 1))}
+            onPress={() => setTableScale(Math.min(2.0, tableScale + 0.1))}
           >
             <Text style={styles.fontSizeButtonText}>+</Text>
           </TouchableOpacity>
@@ -780,30 +793,30 @@ export default function EntriesScreen({ navigation, route }) {
 
       {/* Table */}
       <View style={styles.tableWrapper}>
-        <ScrollView 
-          horizontal={true} 
-          showsHorizontalScrollIndicator={true}
-          bounces={false}
-          style={styles.horizontalScroll}
-          contentContainerStyle={styles.scrollContentContainer}
-        >
-          <View style={styles.tableContainer}>
+        {tableScale > 1.0 ? (
+          <ScrollView 
+            horizontal={true} 
+            showsHorizontalScrollIndicator={true}
+            bounces={false}
+            style={styles.horizontalScroll}
+          >
+            <View style={{ width: 560 * tableScale }}>
             {/* Table Header */}
             <View style={styles.tableHeader}>
-              <View style={[styles.cell, styles.headerCell, styles.serialCell]}>
-                <Text style={styles.headerText}>{t('serialNo')}</Text>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.6, 50)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('serialNo')}</Text>
               </View>
-              <View style={[styles.cell, styles.headerCell, styles.dateCell]}>
-                <Text style={styles.headerText}>{t('date')}</Text>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(1.2, 110)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('date')}</Text>
               </View>
-              <View style={[styles.cell, styles.headerCell, styles.amountCell]}>
-                <Text style={styles.headerText}>{t('creditRs')}</Text>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.8, 80)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('creditRs')}</Text>
               </View>
-              <View style={[styles.cell, styles.headerCell, styles.amountCell]}>
-                <Text style={styles.headerText}>{t('balanceRs')}</Text>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.8, 80)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('balanceRs')}</Text>
               </View>
-              <View style={[styles.cell, styles.headerCell, styles.signatureCell]}>
-                <Text style={styles.headerText}>{t('signature')}</Text>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(2.6, 140), { borderRightWidth: 0 }]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('signature')}</Text>
               </View>
             </View>
 
@@ -827,28 +840,28 @@ export default function EntriesScreen({ navigation, route }) {
                   ]}
                   onPress={() => handleEditEntry(entry)}
                 >
-                  <View style={[styles.cell, styles.serialCell]}>
-                    <Text style={[styles.cellText, { fontSize }]}>{entry.serialNumber}</Text>
+                  <View style={[styles.cell, getCellStyle(0.6, 50)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>{entry.serialNumber}</Text>
                   </View>
-                  <View style={[styles.cell, styles.dateCell]}>
-                    <Text style={[styles.cellText, { fontSize }]}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
+                  <View style={[styles.cell, getCellStyle(1.2, 110)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
                   </View>
-                  <View style={[styles.cell, styles.amountCell]}>
+                  <View style={[styles.cell, getCellStyle(0.8, 80)]}>
                     <Text style={[
                       styles.cellText, 
-                      { fontSize },
+                      { fontSize: scaledFontSize },
                       // Strike through if rejected
                       entry.signatureStatus === 'request_rejected' && styles.strikethrough
                     ]}>
                       {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : (entry.amount === 0 ? '0' : '')}
                     </Text>
                   </View>
-                  <View style={[styles.cell, styles.amountCell]}>
-                    <Text style={[styles.cellText, { fontSize }]}>
+                  <View style={[styles.cell, getCellStyle(0.8, 80)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>
                       {entry.id ? calculateEntryBalance(entry) : ''}
                     </Text>
                   </View>
-                  <View style={[styles.cell, styles.signatureCell]}>
+                  <View style={[styles.cell, getCellStyle(2.6, 140), { borderRightWidth: 0 }]}>
                     {(() => {
                       const status = entry.signatureStatus || 'none';
                       const requesterId = entry.signatureRequestedBy;
@@ -873,7 +886,7 @@ export default function EntriesScreen({ navigation, route }) {
                               {isRequester ? (
                                 // Requester sees "Pending Approval" button (non-clickable)
                                 <View style={styles.pendingApprovalButton}>
-                                  <Text style={styles.pendingApprovalButtonText}>{t('pendingApproval')}</Text>
+                                  <Text style={[styles.pendingApprovalButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('pendingApproval')}</Text>
                                 </View>
                               ) : canApprove ? (
                                 // Approver sees "Approve/Reject" button
@@ -885,12 +898,12 @@ export default function EntriesScreen({ navigation, route }) {
                                     setShowApproveRejectModal(true);
                                   }}
                                 >
-                                  <Text style={styles.approveRejectButtonText}>{t('approveReject')}</Text>
+                                  <Text style={[styles.approveRejectButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('approveReject')}</Text>
                                 </TouchableOpacity>
                               ) : (
                                 // Other users just see pending status button
                                 <View style={styles.pendingApprovalButton}>
-                                  <Text style={styles.pendingApprovalButtonText}>{t('pending')}</Text>
+                                  <Text style={[styles.pendingApprovalButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('pending')}</Text>
                                 </View>
                               )}
                             </View>
@@ -900,11 +913,11 @@ export default function EntriesScreen({ navigation, route }) {
                           return (
                             <View style={styles.signatureStatusContainer}>
                               <View style={styles.approvedInfoBox}>
-                                <Text style={styles.approvedInfoText}>✓ {t('approved')}</Text>
-                                <Text style={styles.approvedDetailText}>
+                                <Text style={[styles.approvedInfoText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>✓ {t('approved')}</Text>
+                                <Text style={[styles.approvedDetailText, { fontSize: Math.max(7, scaledFontSize - 4) }]}>
                                   {t('reqBy')} {requesterName}
                                 </Text>
-                                <Text style={styles.approvedDetailText}>
+                                <Text style={[styles.approvedDetailText, { fontSize: Math.max(7, scaledFontSize - 4) }]}>
                                   {t('approvedBy')} {signerName}
                                 </Text>
                               </View>
@@ -932,7 +945,7 @@ export default function EntriesScreen({ navigation, route }) {
                                     }
                                   }}
                                 >
-                                  <Text style={styles.reSignRequestButtonText}>{t('reReqSign')}</Text>
+                                  <Text style={[styles.reSignRequestButtonText, { fontSize: Math.max(7, scaledFontSize - 3) }]}>{t('reReqSign')}</Text>
                                 </TouchableOpacity>
                               )}
                             </View>
@@ -964,7 +977,7 @@ export default function EntriesScreen({ navigation, route }) {
                                     }
                                   }}
                                 >
-                                  <Text style={styles.inlineRequestButtonText}>{t('reqSign')}</Text>
+                                  <Text style={[styles.inlineRequestButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('reqSign')}</Text>
                                 </TouchableOpacity>
                               )}
                             </View>
@@ -995,9 +1008,9 @@ export default function EntriesScreen({ navigation, route }) {
                                 }
                               }}
                             >
-                              <Text style={styles.inlineRequestButtonText}>{t('reqSign')}</Text>
+                              <Text style={[styles.inlineRequestButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('reqSign')}</Text>
                             </TouchableOpacity>
-                          ) : <Text style={styles.cellText}></Text>;
+                          ) : <Text style={[styles.cellText, { fontSize: scaledFontSize }]}></Text>;
                       }
                     })()}
                   </View>
@@ -1007,6 +1020,218 @@ export default function EntriesScreen({ navigation, route }) {
             </ScrollView>
           </View>
         </ScrollView>
+        ) : (
+          <View style={{ width: '100%' }}>
+            {/* Table Header */}
+            <View style={styles.tableHeader}>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.6, 50)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('serialNo')}</Text>
+              </View>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(1.2, 110)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('date')}</Text>
+              </View>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.8, 80)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('creditRs')}</Text>
+              </View>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(0.8, 80)]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('balanceRs')}</Text>
+              </View>
+              <View style={[styles.cell, styles.headerCell, getCellStyle(2.6, 140), { borderRightWidth: 0 }]}>
+                <Text style={[styles.headerText, { fontSize: scaledFontSize }]}>{t('signature')}</Text>
+              </View>
+            </View>
+
+            {/* Table Rows - Scrollable */}
+            <ScrollView 
+              style={styles.tableBodyScroll}
+              nestedScrollEnabled={true}
+              showsVerticalScrollIndicator={true}
+            >
+              {currentPageEntries.map((entry, index) => {
+                if (entry.serialNumber <= 3 || entry.serialNumber === 9) {
+                }
+                
+                return (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.tableRow,
+                    entry.date && styles.tableRowFilled,
+                  ]}
+                  onPress={() => handleEditEntry(entry)}
+                >
+                  <View style={[styles.cell, getCellStyle(0.8, 50)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>{entry.serialNumber}</Text>
+                  </View>
+                  <View style={[styles.cell, getCellStyle(1.5, 110)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>{entry.date ? formatDateDDMMYYYY(entry.date) : ''}</Text>
+                  </View>
+                  <View style={[styles.cell, getCellStyle(1, 80)]}>
+                    <Text style={[
+                      styles.cellText, 
+                      { fontSize: scaledFontSize },
+                      entry.signatureStatus === 'request_rejected' && styles.strikethrough
+                    ]}>
+                      {entry.amount !== null && entry.amount !== undefined && entry.amount !== '' ? String(entry.amount) : (entry.amount === 0 ? '0' : '')}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, getCellStyle(1, 80)]}>
+                    <Text style={[styles.cellText, { fontSize: scaledFontSize }]}>
+                      {entry.id ? calculateEntryBalance(entry) : ''}
+                    </Text>
+                  </View>
+                  <View style={[styles.cell, getCellStyle(1.8, 140), { borderRightWidth: 0 }]}>
+                    {(() => {
+                      const status = entry.signatureStatus || 'none';
+                      const requesterId = entry.signatureRequestedBy;
+                      const signedById = entry.signedBy;
+                      const isRequester = requesterId === currentUser?.id;
+                      const canApprove = status === 'signature_requested' && !isRequester && entry.id;
+                      const hasAmount = entry.amount !== null && entry.amount !== undefined && entry.amount !== '';
+                      const canRequest = entry.id && hasAmount;
+                      const canReRequest = status === 'signed_by_request' && entry.id && hasAmount;
+                      
+                      const requester = allUsers.find(u => u.id === requesterId);
+                      const signer = allUsers.find(u => u.id === signedById);
+                      const requesterName = requester?.username || 'Unknown';
+                      const signerName = signer?.username || 'Unknown';
+                      
+                      switch (status) {
+                        case 'signature_requested':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              {isRequester ? (
+                                <View style={styles.pendingApprovalButton}>
+                                  <Text style={[styles.pendingApprovalButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('pendingApproval')}</Text>
+                                </View>
+                              ) : canApprove ? (
+                                <TouchableOpacity
+                                  style={styles.approveRejectButton}
+                                  onPress={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedEntryForApproval(entry);
+                                    setShowApproveRejectModal(true);
+                                  }}
+                                >
+                                  <Text style={[styles.approveRejectButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('approveReject')}</Text>
+                                </TouchableOpacity>
+                              ) : (
+                                <View style={styles.pendingApprovalButton}>
+                                  <Text style={[styles.pendingApprovalButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('pending')}</Text>
+                                </View>
+                              )}
+                            </View>
+                          );
+                        case 'signed_by_request':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              <View style={styles.approvedInfoBox}>
+                                <Text style={[styles.approvedInfoText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>✓ {t('approved')}</Text>
+                                <Text style={[styles.approvedDetailText, { fontSize: Math.max(7, scaledFontSize - 4) }]}>
+                                  {t('reqBy')} {requesterName}
+                                </Text>
+                                <Text style={[styles.approvedDetailText, { fontSize: Math.max(7, scaledFontSize - 4) }]}>
+                                  {t('approvedBy')} {signerName}
+                                </Text>
+                              </View>
+                              {canReRequest && (
+                                <TouchableOpacity
+                                  style={styles.reSignRequestButton}
+                                  onPress={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await requestSignature(entry.id, currentUser.id);
+                                      await new Promise(resolve => setTimeout(resolve, 500));
+                                      await loadData(true);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('signatureRequested'));
+                                      } else {
+                                        Alert.alert(t('success'), t('signatureRequested'));
+                                      }
+                                    } catch (error) {
+                                      console.error('Error:', error);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('requestFailed'));
+                                      } else {
+                                        Alert.alert(t('error'), t('requestFailed'));
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <Text style={[styles.reSignRequestButtonText, { fontSize: Math.max(7, scaledFontSize - 3) }]}>{t('reReqSign')}</Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          );
+                        case 'request_rejected':
+                          return (
+                            <View style={styles.signatureStatusContainer}>
+                              {canRequest && (
+                                <TouchableOpacity
+                                  style={styles.inlineRequestButton}
+                                  onPress={async (e) => {
+                                    e.stopPropagation();
+                                    try {
+                                      await requestSignature(entry.id, currentUser.id);
+                                      await new Promise(resolve => setTimeout(resolve, 500));
+                                      await loadData(true);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('signatureRequested'));
+                                      } else {
+                                        Alert.alert(t('success'), t('signatureRequested'));
+                                      }
+                                    } catch (error) {
+                                      console.error('Error:', error);
+                                      if (Platform.OS === 'web') {
+                                        alert(t('requestFailed'));
+                                      } else {
+                                        Alert.alert(t('error'), t('requestFailed'));
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <Text style={[styles.inlineRequestButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('reqSign')}</Text>
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          );
+                        default:
+                          return canRequest ? (
+                            <TouchableOpacity
+                              style={styles.inlineRequestButton}
+                              onPress={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  await requestSignature(entry.id, currentUser.id);
+                                  await new Promise(resolve => setTimeout(resolve, 500));
+                                  await loadData(true);
+                                  if (Platform.OS === 'web') {
+                                    alert(t('signatureRequested'));
+                                  } else {
+                                    Alert.alert(t('success'), t('signatureRequested'));
+                                  }
+                                } catch (error) {
+                                  console.error('Error:', error);
+                                  if (Platform.OS === 'web') {
+                                    alert(t('requestFailed'));
+                                  } else {
+                                    Alert.alert(t('error'), t('requestFailed'));
+                                  }
+                                }
+                              }}
+                            >
+                              <Text style={[styles.inlineRequestButtonText, { fontSize: Math.max(8, scaledFontSize - 2) }]}>{t('reqSign')}</Text>
+                            </TouchableOpacity>
+                          ) : <Text style={[styles.cellText, { fontSize: scaledFontSize }]}></Text>;
+                      }
+                    })()}
+                  </View>
+                </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )}
       </View>
 
       {/* Bottom Actions - Compact for Ad Space */}
@@ -1070,6 +1295,7 @@ export default function EntriesScreen({ navigation, route }) {
                     });
                   }}
                   placeholder="Enter credit amount"
+                  placeholderTextColor="#999"
                   keyboardType="numeric"
                 />
               </View>
@@ -1084,6 +1310,7 @@ export default function EntriesScreen({ navigation, route }) {
                     setEditFormData({ ...editFormData, remaining: text })
                   }
                   placeholder={t('balanceRs')}
+                  placeholderTextColor="#999"
                   keyboardType="numeric"
                   editable={true}
                 />
@@ -1304,19 +1531,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContentContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
   },
   tableContainer: {
-    marginVertical: 5,
+    marginVertical: 0,
     backgroundColor: 'transparent',
-    width: 700,
+    width: '100%',
   },
   tableHeader: {
     flexDirection: 'row',
     backgroundColor: '#7678b1',
-    borderRadius: 8,
-    marginHorizontal: 8,
-    marginBottom: 8,
+    borderRadius: 0,
+    marginHorizontal: 0,
+    marginBottom: 2,
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -1328,19 +1555,14 @@ const styles = StyleSheet.create({
   },
   tableRow: {
     flexDirection: 'row',
-    minHeight: 44,
+    minHeight: 40,
     backgroundColor: '#fff',
-    marginHorizontal: 8,
-    marginVertical: 1,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    paddingVertical: 4,
+    marginHorizontal: 0,
+    marginVertical: 0.5,
+    borderRadius: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+    paddingVertical: 2,
   },
   tableRowFilled: {
     backgroundColor: '#f5f7fa',
@@ -1350,31 +1572,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 4,
-    paddingHorizontal: 6,
-    marginVertical: 6,
+    paddingHorizontal: 1,
     borderRightWidth: 1,
     borderRightColor: '#d1d5db',
   },
   headerCell: {
     paddingVertical: 6,
   },
-  serialCell: {
-    width: 80,
-  },
-  dateCell: {
-    width: 140,
-  },
-  amountCell: {
-    width: 140,
-  },
-  signatureCell: {
-    width: 200,
-    borderRightWidth: 0,
-  },
   headerText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 11,
     textAlign: 'center',
   },
   headerSubText: {
@@ -1384,7 +1592,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   cellText: {
-    fontSize: 14,
+    fontSize: 11,
     color: '#1F2937',
     textAlign: 'center',
     fontWeight: '500',
@@ -1451,63 +1659,63 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inlineRequestButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
     backgroundColor: '#5d61beb5',
-    borderRadius: 8,
-    minWidth: 120,
+    borderRadius: 4,
+    minWidth: 60,
     alignItems: 'center',
   },
   inlineRequestButtonText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   pendingApprovalButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
     backgroundColor: '#FFF3E0',
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: '#FF9800',
-    minWidth: 120,
+    minWidth: 60,
     alignItems: 'center',
   },
   pendingApprovalButtonText: {
     color: '#FF9800',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   approveRejectButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    paddingVertical: 3,
+    paddingHorizontal: 4,
     backgroundColor: '#673AB7',
-    borderRadius: 8,
-    minWidth: 120,
+    borderRadius: 4,
+    minWidth: 60,
     alignItems: 'center',
   },
   approveRejectButtonText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   approvedInfoBox: {
     backgroundColor: '#E8F5E9',
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: '#4CAF50',
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    marginBottom: 4,
-    minWidth: 120,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+    marginBottom: 2,
+    minWidth: 60,
     alignItems: 'center',
   },
   approvedInfoText: {
     color: '#4CAF50',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -1518,16 +1726,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   reSignRequestButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
     backgroundColor: '#5d61beb5',
-    borderRadius: 6,
-    minWidth: 100,
+    borderRadius: 5,
+    minWidth: 70,
     alignItems: 'center',
   },
   reSignRequestButtonText: {
     color: '#fff',
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
   },
   approveRejectModalOverlay: {
@@ -1672,6 +1880,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    color: '#000',
   },
   autoCalculated: {
     backgroundColor: '#f0f8ff',
@@ -1842,10 +2051,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   fontSizeText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
-    minWidth: 24,
+    minWidth: 42,
     textAlign: 'center',
   },
 });

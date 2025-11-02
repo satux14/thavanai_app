@@ -82,8 +82,9 @@ export default function DashboardScreen({ navigation }) {
 
   const loadBooks = async (forceRefresh = false) => {
     try {
+      // Show loading only during initial mount, not during pull-to-refresh
       if (!refreshing) {
-        setLoading(true); // Show loading only for initial load, not for refresh
+        setLoading(true);
       }
       setConnectionError(false); // Reset error state
       
@@ -152,6 +153,7 @@ export default function DashboardScreen({ navigation }) {
 
   const onRefresh = async () => {
     setRefreshing(true);
+    setLoading(false); // Ensure loading is off during refresh
     await loadBooks(true); // Force refresh to bypass cache
     setRefreshing(false);
   };

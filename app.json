@@ -53,7 +53,6 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-sqlite",
       [
         "react-native-google-mobile-ads",
         {
